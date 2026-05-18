@@ -1946,22 +1946,21 @@ function buildPdfHTML() {
 }
 
 async function generatePdfBase64() {
-    // Create container in NORMAL document flow (not fixed/absolute - html2canvas can't capture those)
+    // Create container positioned at document origin (top-left)
+    // MUST be position:absolute at top:0 so html2canvas captures from (0,0)
     const container = document.createElement('div');
     container.id = 'pdfRenderContainer';
-    // Use normal flow positioning - critical for html2canvas to work
-    container.style.cssText = 'width:800px;background:#fff;padding:0;margin:0;';
+    container.style.cssText = 'position:absolute;left:0;top:0;width:800px;background:#fff;padding:20px;margin:0;z-index:99999;';
     container.innerHTML = buildPdfHTML();
 
-    // Append at end of body in normal document flow
+    var oldScroll = window.scrollY;
     document.body.appendChild(container);
 
-    // Scroll to bottom briefly so browser renders the element
-    var oldScroll = window.scrollY;
-    container.scrollIntoView();
+    // Wait for DOM rendering
+    await new Promise(function(r) { setTimeout(r, 800); });
 
-    // Wait for full DOM rendering
-    await new Promise(function(r) { setTimeout(r, 1000); });
+    var containerHeight = container.scrollHeight;
+    console.log('PDF container height:', containerHeight);
 
     try {
         var opt = {
@@ -1972,15 +1971,18 @@ async function generatePdfBase64() {
                 scale: 2,
                 useCORS: true,
                 logging: true,
-                letterRendering: true,
                 width: 800,
+                height: containerHeight,
+                windowWidth: 800,
+                windowHeight: containerHeight,
+                x: 0,
+                y: 0,
                 scrollX: 0,
-                scrollY: -container.getBoundingClientRect().top
+                scrollY: 0
             },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        // Use outputPdf (html2pdf worker method) - NOT .toPdf().output()
         var dataUri = await html2pdf().set(opt).from(container).outputPdf('datauristring');
         var base64 = dataUri.split(',')[1];
 
@@ -1994,7 +1996,6 @@ async function generatePdfBase64() {
         console.error('generatePdfBase64 error:', e);
         throw e;
     } finally {
-        // Cleanup: remove container and restore scroll
         if (container.parentNode) container.parentNode.removeChild(container);
         window.scrollTo(0, oldScroll);
     }
