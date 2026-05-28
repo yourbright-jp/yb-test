@@ -109,6 +109,22 @@
 
         /* Hidden */
         .hidden { display: none !important; }
+
+        .ja-sub {
+            display: block;
+            font-size: 0.78em;
+            color: #888;
+            margin-top: 2px;
+            font-weight: normal;
+            line-height: 1.4;
+        }
+        .radio-item label .ja-sub,
+        .checkbox-item label .ja-sub {
+            display: inline;
+            font-size: 0.82em;
+            margin-top: 0;
+        }
+        option .ja-sub { display: none; }
     </style>
 </head>
 <body>
@@ -1815,17 +1831,57 @@ function t(key) {
     return value || key;
 }
 
+function tJa(key) {
+    const keys = key.split('.');
+    let value = translations['ja'];
+    for (const k of keys) {
+        if (value && typeof value === 'object') {
+            value = value[k];
+        }
+    }
+    return value || key;
+}
+
+function tBi(key) {
+    if (appState.currentLanguage === 'ja') {
+        return t(key);
+    }
+    var local = t(key);
+    var ja = tJa(key);
+    if (local === ja || !ja) return local;
+    return local + '<span class="ja-sub">（' + ja + '）</span>';
+}
+
+function tBiText(key) {
+    if (appState.currentLanguage === 'ja') {
+        return t(key);
+    }
+    var local = t(key);
+    var ja = tJa(key);
+    if (local === ja || !ja) return local;
+    return local + '（' + ja + '）';
+}
+
 function updateLanguage(lang) {
     appState.currentLanguage = lang;
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === lang);
     });
     renderAllText();
+    if (appState.currentSection === 'part1') {
+        renderPart1Form();
+    } else if (appState.currentSection === 'part2') {
+        renderPart2Page();
+    }
 }
 
 function renderAllText() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
-        el.textContent = t(el.dataset.i18n);
+        if (el.tagName === 'BUTTON' || el.tagName === 'OPTION') {
+            el.textContent = t(el.dataset.i18n);
+        } else {
+            el.innerHTML = tBi(el.dataset.i18n);
+        }
     });
 }
 
@@ -1853,7 +1909,7 @@ function renderPart1Form() {
         group.className = 'form-group';
 
         const label = document.createElement('label');
-        label.innerHTML = (field.required ? '<span class="required">' : '') + t(field.label) + (field.required ? '</span>' : '');
+        label.innerHTML = (field.required ? '<span class="required">' : '') + tBi(field.label) + (field.required ? '</span>' : '');
         group.appendChild(label);
 
         let input;
@@ -1875,7 +1931,7 @@ function renderPart1Form() {
                 field.options.forEach(opt => {
                     const option = document.createElement('option');
                     option.value = opt.value;
-                    option.textContent = t(opt.label);
+                    option.textContent = tBiText(opt.label);
                     input.appendChild(option);
                 });
                 break;
@@ -1892,7 +1948,7 @@ function renderPart1Form() {
                     cb.name = field.id;
                     const lbl = document.createElement('label');
                     lbl.htmlFor = cb.id;
-                    lbl.textContent = t(opt.label);
+                    lbl.innerHTML = tBi(opt.label);
                     item.appendChild(cb);
                     item.appendChild(lbl);
                     checkboxGroup.appendChild(item);
@@ -2163,7 +2219,7 @@ function renderPart2Page() {
 
         const textDiv = document.createElement('div');
         textDiv.className = 'question-text';
-        textDiv.innerHTML = '<span class="question-num">Q' + (startIdx + index + 1) + ':</span> ' + t(q.text);
+        textDiv.innerHTML = '<span class="question-num">Q' + (startIdx + index + 1) + ':</span> ' + tBi(q.text);
         item.appendChild(textDiv);
 
         if (q.type === 'svg' && q.svg) {
@@ -2189,7 +2245,7 @@ function renderPart2Page() {
             });
             const label = document.createElement('label');
             label.htmlFor = radio.id;
-            label.textContent = t(opt.label);
+            label.innerHTML = tBi(opt.label);
             optItem.appendChild(radio);
             optItem.appendChild(label);
             optionsDiv.appendChild(optItem);
@@ -2380,7 +2436,7 @@ function showResults() {
         const row = table.insertRow();
         const cell1 = row.insertCell();
         const cell2 = row.insertCell();
-        cell1.textContent = t(info.label);
+        cell1.innerHTML = tBi(info.label);
         cell2.textContent = info.value;
     });
 
