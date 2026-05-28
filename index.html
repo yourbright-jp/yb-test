@@ -3077,14 +3077,14 @@ async function sendResultsEmail() {
 function initLanguageSelector() {
     const selector = document.getElementById('langSelector');
     const languages = [
-        { code: 'ja', name: '日本語' },
-        { code: 'en', name: 'English' },
-        { code: 'vi', name: 'Tiếng Việt' },
-        { code: 'my', name: 'မြန်မာ' },
-        { code: 'id', name: 'Bahasa Indonesia' },
-        { code: 'km', name: 'ខ្មែរ' },
-        { code: 'th', name: 'ไทย' },
-        { code: 'bn', name: 'বাংলা' }
+        { code: 'ja', name: '日本語', ja: '' },
+        { code: 'en', name: 'English', ja: '英語' },
+        { code: 'vi', name: 'Tiếng Việt', ja: 'ベトナム語' },
+        { code: 'my', name: 'မြန်မာ', ja: 'ミャンマー語' },
+        { code: 'id', name: 'Bahasa Indonesia', ja: 'インドネシア語' },
+        { code: 'km', name: 'ខ្មែរ', ja: 'クメール語' },
+        { code: 'th', name: 'ไทย', ja: 'タイ語' },
+        { code: 'bn', name: 'বাংলা', ja: 'ベンガル語' }
     ];
 
     languages.forEach(lang => {
@@ -3092,7 +3092,11 @@ function initLanguageSelector() {
         btn.type = 'button';
         btn.className = 'lang-btn' + (lang.code === 'ja' ? ' active' : '');
         btn.dataset.lang = lang.code;
-        btn.textContent = lang.name;
+        if (lang.ja) {
+            btn.innerHTML = lang.name + '<span class="ja-sub" style="color:#888;">（' + lang.ja + '）</span>';
+        } else {
+            btn.textContent = lang.name;
+        }
         btn.onclick = () => updateLanguage(lang.code);
         selector.appendChild(btn);
     });
