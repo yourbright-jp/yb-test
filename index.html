@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YB適性検査テスト - YB Tekisei Kensa Test</title>
+    <title>ユアブライト適性検査テスト - YB Tekisei Kensa Test</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- Email: Google Apps Script (same method as rirekisho app) -->
@@ -132,7 +132,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1 data-i18n="title">YB適性検査テスト</h1>
+            <h1 data-i18n="title">ユアブライト適性検査テスト</h1>
             <p data-i18n="subtitle">YB Tekisei Kensa Test</p>
         </div>
 
@@ -210,8 +210,8 @@ const EMAIL_CONFIG = {
 // ==================== TRANSLATIONS ====================
 const translations = {
     ja: {
-        title: "YB適性検査",
-        subtitle: "YB適性検査テスト",
+        title: "ユアブライト適性検査",
+        subtitle: "YourBright適性検査テスト",
         selectMode: "受験モードを選択してください",
         domestic: "日本国内",
         domesticDesc: "日本に住んでいる方向け",
@@ -452,8 +452,8 @@ const translations = {
     },
 
     en: {
-        title: "YB Personality Test",
-        subtitle: "YB Tekisei Kensa Test",
+        title: "YourBright Personality Test",
+        subtitle: "YourBright Tekisei Kensa Test",
         selectMode: "Select your test mode",
         domestic: "In Japan",
         domesticDesc: "For people currently living in Japan",
@@ -682,8 +682,8 @@ const translations = {
     },
 
     vi: {
-        title: "Trắc nghiệm Tính cách YB",
-        subtitle: "YB Tekisei Kensa Test",
+        title: "Trắc nghiệm Tính cách YourBright",
+        subtitle: "YourBright Tekisei Kensa Test",
         selectMode: "Chọn chế độ làm bài",
         domestic: "Trong Nhật Bản",
         domesticDesc: "Dành cho người đang sống tại Nhật Bản",
@@ -885,8 +885,8 @@ const translations = {
     },
 
     my: {
-        title: "YB စိတ်ဓာတ်စစ်ဆေးမှု",
-        subtitle: "YB Tekisei Kensa Test",
+        title: "YourBright စိတ်ဓာတ်စစ်ဆေးမှု",
+        subtitle: "YourBright Tekisei Kensa Test",
         selectMode: "စာမေးပွဲပုံစံရွေးချယ်ပါ",
         domestic: "ဂျပန်နိုင်ငံတွင်း",
         domesticDesc: "ဂျပန်တွင်နေထိုင်သူများအတွက်",
@@ -1088,8 +1088,8 @@ const translations = {
     },
 
     id: {
-        title: "Tes Kepribadian YB",
-        subtitle: "YB Tekisei Kensa Test",
+        title: "Tes Kepribadian YourBright",
+        subtitle: "YourBright Tekisei Kensa Test",
         selectMode: "Pilih mode tes Anda",
         domestic: "Di Jepang",
         domesticDesc: "Untuk yang tinggal di Jepang",
@@ -1291,8 +1291,8 @@ const translations = {
     },
 
     km: {
-        title: "តេស្តបុគ្គលិកលក្ខណៈ YB",
-        subtitle: "YB Tekisei Kensa Test",
+        title: "តេស្តបុគ្គលិកលក្ខណៈ YourBright",
+        subtitle: "YourBright Tekisei Kensa Test",
         selectMode: "ជ្រើសរើសរបៀបប្រឡង",
         domestic: "នៅក្នុងប្រទេសជប៉ុន",
         domesticDesc: "សម្រាប់អ្នកដែលរស់នៅក្នុងប្រទេសជប៉ុន",
@@ -1494,8 +1494,8 @@ const translations = {
     },
 
     th: {
-        title: "แบบทดสอบบุคลิกภาพ YB",
-        subtitle: "YB Tekisei Kensa Test",
+        title: "แบบทดสอบบุคลิกภาพ YourBright",
+        subtitle: "YourBright Tekisei Kensa Test",
         selectMode: "เลือกโหมดการทดสอบ",
         domestic: "ในประเทศญี่ปุ่น",
         domesticDesc: "สำหรับผู้ที่อาศัยอยู่ในญี่ปุ่น",
@@ -1697,8 +1697,8 @@ const translations = {
     },
 
     bn: {
-        title: "YB ব্যক্তিত্ব পরীক্ষা",
-        subtitle: "YB Tekisei Kensa Test",
+        title: "YourBright ব্যক্তিত্ব পরীক্ষা",
+        subtitle: "YourBright Tekisei Kensa Test",
         selectMode: "পরীক্ষার মোড নির্বাচন করুন",
         domestic: "জাপানে",
         domesticDesc: "জাপানে বসবাসকারীদের জন্য",
@@ -2813,7 +2813,7 @@ function buildEmailHTML() {
 
     return `
     <div style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;max-width:700px;margin:0 auto;color:#333;">
-        <h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:10px;">YB検査結果</h2>
+        <h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:10px;">ユアブライト検査結果</h2>
 
         <table style="width:100%;border-collapse:collapse;margin:16px 0;">
             <tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">ID番号</td><td style="padding:6px 12px;border:1px solid #ddd;">${appState.testId}</td></tr>
@@ -2839,7 +2839,7 @@ function buildEmailHTML() {
         <div style="margin:12px 0;">${commentHTML}</div>
 
         <hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">
-        <p style="color:#999;font-size:12px;">検査日: ${date} ｜ YourBright Co., Ltd. - YB適性検査システム</p>
+        <p style="color:#999;font-size:12px;">検査日: ${date} ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>
     </div>`;
 }
 
@@ -2875,7 +2875,7 @@ function buildPdfHTML() {
     }).join('');
 
     return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#333;background:#fff;">' +
-        '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:10px;">YB検査結果</h2>' +
+        '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:10px;">ユアブライト検査結果</h2>' +
         '<table style="width:100%;border-collapse:collapse;margin:16px 0;">' +
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tBi('idNumber') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + appState.testId + '</td></tr>' +
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('name') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + name + '</td></tr>' +
@@ -2895,7 +2895,7 @@ function buildPdfHTML() {
         '<h3 style="margin-top:24px;color:#333;">' + tBi('commentTitle') + '</h3>' +
         '<div style="margin:12px 0;">' + commentHTML + '</div>' +
         '<hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">' +
-        '<p style="color:#999;font-size:12px;">検査日: ' + date + ' ｜ YourBright Co., Ltd. - YB適性検査システム</p>' +
+        '<p style="color:#999;font-size:12px;">検査日: ' + date + ' ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>' +
         '</div>';
 }
 
@@ -3015,7 +3015,7 @@ async function sendResultsEmail() {
         const payload = JSON.stringify({
             type: 'yb_test_result',
             emails: [toEmail],
-            subject: '【YB検査結果】' + name + ' (' + appState.testId + ') - ' + date,
+            subject: '【ユアブライト検査結果】' + name + ' (' + appState.testId + ') - ' + date,
             html_body: buildEmailHTML(),
             pdf_base64: pdfBase64,
             pdf_filename: pdfFilename,
