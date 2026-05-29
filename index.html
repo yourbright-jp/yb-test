@@ -3106,11 +3106,12 @@ function buildEmailHTML() {
             <tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">${tBi('marital')}</td><td style="padding:6px 12px;border:1px solid #ddd;">${marital}</td></tr>
         </table>
 
-        <h3 style="margin-top:24px;color:#333;">応募者のレーダーチャート</h3>
-        <div style="margin:12px 0;">
-            ${buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 380)}
+        <h3 style="margin-top:24px;color:#333;text-align:center;">応募者のレーダーチャート</h3>
+        <div style="text-align:center;margin:20px 0;">
+            ${buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 500)}
         </div>
 
+        <div style="page-break-before:always;"></div>
         <h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>
         ${patternEmailHTML}
 
@@ -3158,10 +3159,11 @@ function buildPdfHTML() {
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('gender') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + gender + '</td></tr>' +
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('marital') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
         '</table>' +
-        '<h3 style="margin-top:24px;color:#333;">応募者のレーダーチャート</h3>' +
-        '<div style="margin:12px 0;">' +
-        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 380) +
+        '<h3 style="margin-top:24px;color:#333;text-align:center;">応募者のレーダーチャート</h3>' +
+        '<div style="text-align:center;margin:20px 0;">' +
+        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 500) +
         '</div>' +
+        '<div style="page-break-before:always;"></div>' +
         '<h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>' +
         pdfPatternHTML +
         '<hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">' +
