@@ -2554,7 +2554,7 @@ function buildRadarSVG(scores, color, size) {
     var labels = ['関心', '学習', '適応', 'コミュ', '介護', '自律'];
     var n = 6;
     var w = size, h = size;
-    var cx = w/2, cy = h/2, r = Math.min(w,h) * 0.28;
+    var cx = w/2, cy = h/2, r = Math.min(w,h) * 0.33;
     var s = '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="display:block;">';
     s += '<rect width="'+w+'" height="'+h+'" fill="white" rx="8"/>';
     // Grid pentagons
@@ -3108,7 +3108,7 @@ function buildEmailHTML() {
 
         <h3 style="margin-top:24px;color:#333;text-align:center;">応募者のレーダーチャート</h3>
         <div style="text-align:center;margin:20px 0;">
-            ${buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 500)}
+            ${buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 650)}
         </div>
 
         <div style="page-break-before:always;"></div>
@@ -3161,7 +3161,7 @@ function buildPdfHTML() {
         '</table>' +
         '<h3 style="margin-top:24px;color:#333;text-align:center;">応募者のレーダーチャート</h3>' +
         '<div style="text-align:center;margin:20px 0;">' +
-        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 500) +
+        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 650) +
         '</div>' +
         '<div style="page-break-before:always;"></div>' +
         '<h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>' +
