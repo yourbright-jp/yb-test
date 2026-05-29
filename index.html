@@ -3163,7 +3163,7 @@ function buildPdfHTML() {
         '<div style="text-align:center;margin:20px 0;">' +
         buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 650) +
         '</div>' +
-        '<div style="page-break-before:always;"></div>' +
+        '<div class="html2pdf__page-break" style="page-break-before:always;"></div>' +
         '<h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>' +
         pdfPatternHTML +
         '<hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">' +
@@ -3206,7 +3206,8 @@ async function generatePdfBase64() {
                 scrollX: 0,
                 scrollY: 0
             },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['css', 'legacy'] }
         };
 
         var dataUri = await html2pdf().set(opt).from(container).outputPdf('datauristring');
