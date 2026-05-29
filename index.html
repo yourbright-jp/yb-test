@@ -2809,64 +2809,6 @@ function showResults() {
     patternDiv.innerHTML = ph;
     resultsDiv.appendChild(patternDiv);
 
-    // 3 reference type charts (長期就労者３つのタイプ)
-    const refDiv = document.createElement('div');
-    refDiv.style.cssText = 'background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin:20px 0;';
-
-    var rh = '';
-    rh += '<h3 style="color:#1e40af;font-size:17px;margin:0 0 6px;text-align:center">長期就労者３つのタイプ</h3>';
-    rh += '<p style="font-size:12px;color:#888;text-align:center;margin:0 0 20px">2年以上就労している現役介護士・看護師194名の分析から抽出された代表パターン</p>';
-    rh += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">';
-
-    ['A', 'B', 'C'].forEach(function(key) {
-        var p = PATTERNS[key];
-        var isMatch = (key === match.type);
-        rh += '<div style="background:white;border:2px solid ' + (isMatch ? p.color : '#e5e7eb') + ';border-radius:8px;padding:14px;text-align:center' + (isMatch ? ';box-shadow:0 2px 8px rgba(0,0,0,0.1)' : '') + '">';
-        rh += '<span style="background:' + p.color + ';color:white;padding:4px 12px;border-radius:16px;font-size:12px;font-weight:700">' + key + '型</span>';
-        rh += '<div style="font-size:13px;font-weight:700;color:#374151;margin:8px 0 4px">' + p.name + '</div>';
-        if (isMatch) {
-            rh += '<div style="font-size:11px;color:' + p.color + ';font-weight:700;margin-bottom:6px">← あなたに最も近い</div>';
-        }
-        rh += '<div style="height:180px"><canvas id="refChart_' + key + '"></canvas></div>';
-        rh += '<div style="font-size:11px;color:#888;margin-top:6px">' + p.shortDesc + '</div>';
-        rh += '</div>';
-    });
-
-    rh += '</div>';
-    refDiv.innerHTML = rh;
-    resultsDiv.appendChild(refDiv);
-
-    // Render reference type charts after DOM is ready
-    setTimeout(function() {
-        ['A', 'B', 'C'].forEach(function(key) {
-            var cv = document.getElementById('refChart_' + key);
-            if (!cv) return;
-            var p = PATTERNS[key];
-            new Chart(cv.getContext('2d'), {
-                type: 'radar',
-                data: {
-                    labels: ['関心', '学習', '適応', 'コミュ', '介護', '自律'],
-                    datasets: [{
-                        label: key + '型',
-                        data: p.means,
-                        borderColor: p.color,
-                        backgroundColor: p.color + '25',
-                        borderWidth: 2,
-                        pointRadius: 2,
-                        pointBackgroundColor: p.color,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, font: { size: 8 } }, pointLabels: { font: { size: 9 } } } },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        });
-    }, 400);
-
     // Email section
     const emailDiv = document.createElement('div');
     emailDiv.className = 'email-section';
