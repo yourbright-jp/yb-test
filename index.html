@@ -2553,7 +2553,8 @@ const TRAIT_NAMES_FULL = ['日本への関心', '日本語学習適性', '異文
 function buildRadarSVG(scores, color, size) {
     var labels = ['関心', '学習', '適応', 'コミュ', '介護', '自律'];
     var n = 6;
-    var cx = size/2, cy = size/2, r = size*0.32;
+    var pad = 50;
+    var cx = size/2, cy = size/2, r = (size - pad*2) * 0.42;
     var s = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;">';
     s += '<rect width="'+size+'" height="'+size+'" fill="white" rx="8"/>';
     for (var ring = 1; ring <= 5; ring++) {
@@ -3097,13 +3098,13 @@ function buildEmailHTML() {
             <tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">${tBi('marital')}</td><td style="padding:6px 12px;border:1px solid #ddd;">${marital}</td></tr>
         </table>
 
-        <h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>
-        ${patternEmailHTML}
-
         <h3 style="margin-top:24px;color:#333;">応募者のレーダーチャート</h3>
         <div style="text-align:center;margin:12px 0;">
-            ${buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 340)}
+            ${buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 420)}
         </div>
+
+        <h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>
+        ${patternEmailHTML}
 
         <hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">
         <p style="color:#999;font-size:12px;">検査日: ${date} ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>
@@ -3149,12 +3150,12 @@ function buildPdfHTML() {
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('gender') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + gender + '</td></tr>' +
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('marital') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
         '</table>' +
-        '<h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>' +
-        pdfPatternHTML +
         '<h3 style="margin-top:24px;color:#333;">応募者のレーダーチャート</h3>' +
         '<div style="text-align:center;margin:12px 0;">' +
-        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 340) +
+        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 420) +
         '</div>' +
+        '<h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>' +
+        pdfPatternHTML +
         '<hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">' +
         '<p style="color:#999;font-size:12px;">検査日: ' + date + ' ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>' +
         '</div>';
