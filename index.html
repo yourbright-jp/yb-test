@@ -2553,41 +2553,54 @@ const TRAIT_NAMES_FULL = ['日本への関心', '日本語学習適性', '異文
 function buildRadarSVG(scores, color, size) {
     var labels = ['関心', '学習', '適応', 'コミュ', '介護', '自律'];
     var n = 6;
-    var pad = 50;
-    var cx = size/2, cy = size/2, r = (size - pad*2) * 0.42;
-    var s = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;">';
-    s += '<rect width="'+size+'" height="'+size+'" fill="white" rx="8"/>';
+    var w = size, h = size;
+    var cx = w/2, cy = h/2, r = Math.min(w,h) * 0.28;
+    var s = '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="display:block;">';
+    s += '<rect width="'+w+'" height="'+h+'" fill="white" rx="8"/>';
+    // Grid pentagons
     for (var ring = 1; ring <= 5; ring++) {
         var pts = [];
         for (var j = 0; j < n; j++) {
             var a = -Math.PI/2 + (2*Math.PI*j/n);
             pts.push((cx + r*ring/5*Math.cos(a)).toFixed(1)+','+(cy + r*ring/5*Math.sin(a)).toFixed(1));
         }
-        s += '<polygon points="'+pts.join(' ')+'" fill="none" stroke="#e5e7eb" stroke-width="0.8"/>';
+        s += '<polygon points="'+pts.join(' ')+'" fill="none" stroke="#d1d5db" stroke-width="0.7"/>';
+        // Scale numbers on top axis
+        var sy = cy - r*ring/5;
+        s += '<text x="'+(cx+4)+'" y="'+(sy-2)+'" font-size="9" fill="#aaa" font-family="sans-serif">'+ring+'</text>';
     }
+    // Axis lines
     for (var i = 0; i < n; i++) {
         var a = -Math.PI/2 + (2*Math.PI*i/n);
-        s += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r*Math.cos(a)).toFixed(1)+'" y2="'+(cy+r*Math.sin(a)).toFixed(1)+'" stroke="#e5e7eb" stroke-width="0.8"/>';
+        s += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r*Math.cos(a)).toFixed(1)+'" y2="'+(cy+r*Math.sin(a)).toFixed(1)+'" stroke="#d1d5db" stroke-width="0.7"/>';
     }
+    // Data polygon
     var dp = [];
     for (var i = 0; i < n; i++) {
         var a = -Math.PI/2 + (2*Math.PI*i/n);
         var v = Math.min(scores[i],5)/5;
         dp.push((cx+r*v*Math.cos(a)).toFixed(1)+','+(cy+r*v*Math.sin(a)).toFixed(1));
     }
-    s += '<polygon points="'+dp.join(' ')+'" fill="'+color+'" fill-opacity="0.15" stroke="'+color+'" stroke-width="2.5"/>';
+    s += '<polygon points="'+dp.join(' ')+'" fill="'+color+'" fill-opacity="0.18" stroke="'+color+'" stroke-width="2.5"/>';
+    // Data points
     for (var i = 0; i < n; i++) {
         var a = -Math.PI/2 + (2*Math.PI*i/n);
         var v = Math.min(scores[i],5)/5;
         var px = cx+r*v*Math.cos(a), py = cy+r*v*Math.sin(a);
         s += '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="4" fill="'+color+'" stroke="white" stroke-width="1.5"/>';
     }
+    // Labels + scores
     for (var i = 0; i < n; i++) {
         var a = -Math.PI/2 + (2*Math.PI*i/n);
-        var lx = cx + (r+28)*Math.cos(a), ly = cy + (r+28)*Math.sin(a);
-        var anc = (Math.abs(Math.cos(a)) < 0.15) ? 'middle' : (Math.cos(a) > 0 ? 'start' : 'end');
-        s += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="12" font-family="sans-serif" fill="#555">'+labels[i]+'</text>';
-        s += '<text x="'+lx.toFixed(1)+'" y="'+(ly+14).toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="11" font-family="sans-serif" fill="'+color+'" font-weight="bold">'+scores[i].toFixed(1)+'</text>';
+        var ld = r + 22;
+        var lx = cx + ld*Math.cos(a), ly = cy + ld*Math.sin(a);
+        var anc = 'middle';
+        if (Math.cos(a) > 0.3) anc = 'start';
+        else if (Math.cos(a) < -0.3) anc = 'end';
+        s += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="13" font-family="sans-serif" fill="#374151" font-weight="bold">'+labels[i]+'</text>';
+        var sx = lx, sy2 = ly + 15;
+        if (i === 0) { sx = lx; sy2 = ly - 15; } // top label: score above
+        s += '<text x="'+sx.toFixed(1)+'" y="'+sy2.toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="12" font-family="sans-serif" fill="'+color+'" font-weight="bold">'+scores[i].toFixed(1)+'</text>';
     }
     s += '</svg>';
     return s;
@@ -2663,40 +2676,35 @@ function generatePersonalityAnalysis(traits) {
         analysis.push('主体的に考え行動できる力があり、自ら課題を見つけて取り組む姿勢があります。');
     }
 
-    // Weakness analysis (弱み)
+    // Weakness analysis (弱み) - always analyze relative weakness
     analysis.push('');
     analysis.push('【弱み・克服すべき点】');
 
-    if (weakest.val < 3.0) {
-        analysis.push('「' + TRAIT_NAMES_FULL[weakest.idx] + '（' + weakest.val.toFixed(1) + '）」が課題です。この分野の強化が長期就労の鍵となります。');
-    } else if (weakest.val < 4.0) {
-        analysis.push('「' + TRAIT_NAMES_FULL[weakest.idx] + '（' + weakest.val.toFixed(1) + '）」は相対的に低い指標です。研修やサポートにより伸ばしていける分野です。');
+    // Always report the weakest trait (relative weakness)
+    var weak1 = indexed[indexed.length - 1];
+    var weak2 = indexed[indexed.length - 2];
+
+    // Weakness descriptions per trait
+    var weakDesc = {};
+    weakDesc[0] = '日本への関心がやや低めです。日本の文化・生活への理解を深め、就労モチベーションをさらに高めることが大切です。';
+    weakDesc[1] = '日本語学習適性が相対的に低い傾向です。継続的な学習習慣を身につけ、日本語力の向上に積極的に取り組みましょう。';
+    weakDesc[2] = '異文化適応力がやや弱めです。日本の習慣やルールを積極的に学び、柔軟に対応する力を養いましょう。';
+    weakDesc[3] = 'コミュニケーション能力に伸びしろがあります。日常会話の練習や、周囲と積極的に関わる姿勢を身につけましょう。';
+    weakDesc[4] = '介護職適応力をさらに伸ばす余地があります。介護の基本知識や利用者への接し方を事前に学ぶことをお勧めします。';
+    weakDesc[5] = '自律的判断力がやや控えめです。先輩のサポートを受けながら、徐々に自分で考えて行動する力を養いましょう。';
+
+    // Severity-based prefix
+    if (weak1.val < 3.0) {
+        analysis.push('「' + TRAIT_NAMES_FULL[weak1.idx] + '（' + weak1.val.toFixed(1) + '）」が最も低く、重点的な強化が必要です。' + weakDesc[weak1.idx]);
+    } else if (weak1.val < 4.0) {
+        analysis.push('「' + TRAIT_NAMES_FULL[weak1.idx] + '（' + weak1.val.toFixed(1) + '）」が相対的に低い指標です。' + weakDesc[weak1.idx]);
+    } else {
+        analysis.push('6指標すべてが高水準ですが、その中で「' + TRAIT_NAMES_FULL[weak1.idx] + '（' + weak1.val.toFixed(1) + '）」が相対的に低めです。' + weakDesc[weak1.idx]);
     }
 
-    // Specific weakness advice
-    if (traits.autonomy < 3.5) {
-        analysis.push('自律的判断力が控えめです。最初は先輩のサポートのもとで業務に慣れ、徐々に自分で考えて行動する力を養うことが重要です。');
-    }
-    if (traits.communication < 3.5) {
-        analysis.push('コミュニケーション能力の向上が必要です。日常会話の練習や、積極的に周囲と関わる姿勢を身につけることが大切です。');
-    }
-    if (traits.adaptation < 3.5) {
-        analysis.push('異文化適応力の強化が求められます。日本の文化・習慣を学び、柔軟に対応する力を伸ばしましょう。');
-    }
-    if (traits.learning < 3.0) {
-        analysis.push('日本語学習への取り組みを強化する必要があります。継続的な学習習慣を身につけることが重要です。');
-    }
-    if (traits.interest < 3.0) {
-        analysis.push('日本への関心が低い傾向があります。日本で働くモチベーションを明確にし、日本文化への理解を深めることが大切です。');
-    }
-    if (traits.careWork < 3.5) {
-        analysis.push('介護職への適応力を高めるために、介護の基本知識や心構えを事前に学ぶことをお勧めします。');
-    }
-
-    // If no specific weakness was added, add a general positive note
-    var hasWeaknessDetail = analysis.some(function(a){ return a.indexOf('克服') >= 0 || a.indexOf('必要') >= 0 || a.indexOf('強化') >= 0 || a.indexOf('課題') >= 0 || a.indexOf('低い') >= 0; });
-    if (!hasWeaknessDetail) {
-        analysis.push('全体的にバランスの取れた結果です。現在の強みを活かしながら、さらなる成長を目指しましょう。');
+    // Second weakest if notably different from strongest
+    if (weak2.val < strengths[0].val - 0.5) {
+        analysis.push('また、「' + TRAIT_NAMES_FULL[weak2.idx] + '（' + weak2.val.toFixed(1) + '）」も今後の成長ポイントです。');
     }
 
     return analysis;
@@ -3099,8 +3107,8 @@ function buildEmailHTML() {
         </table>
 
         <h3 style="margin-top:24px;color:#333;">応募者のレーダーチャート</h3>
-        <div style="text-align:center;margin:12px 0;">
-            ${buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 420)}
+        <div style="margin:12px 0;">
+            ${buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 380)}
         </div>
 
         <h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>
@@ -3151,8 +3159,8 @@ function buildPdfHTML() {
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('marital') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
         '</table>' +
         '<h3 style="margin-top:24px;color:#333;">応募者のレーダーチャート</h3>' +
-        '<div style="text-align:center;margin:12px 0;">' +
-        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 420) +
+        '<div style="margin:12px 0;">' +
+        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 380) +
         '</div>' +
         '<h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>' +
         pdfPatternHTML +
