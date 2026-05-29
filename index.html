@@ -3159,9 +3159,9 @@ function buildPdfHTML() {
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('gender') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + gender + '</td></tr>' +
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('marital') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
         '</table>' +
-        '<h3 style="margin-top:24px;color:#333;text-align:center;">応募者のレーダーチャート</h3>' +
-        '<div style="text-align:center;margin:20px 0;">' +
-        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 650) +
+        '<h3 style="margin-top:24px;color:#333;text-align:left;">応募者のレーダーチャート</h3>' +
+        '<div style="text-align:left;margin:20px 0;">' +
+        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 720) +
         '</div>' +
         '<h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>' +
         pdfPatternHTML +
