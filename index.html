@@ -2506,9 +2506,124 @@ function generateDetailedComments() {
     return comments;
 }
 
+// ==================== PATTERN MATCHING ====================
+const PATTERNS = {
+    A: {
+        name: '総合エキスパート型',
+        means: [3.42, 4.57, 4.44, 4.55, 4.65, 3.51],
+        color: '#2563eb',
+        bg: '#eff6ff',
+        border: '#bfdbfe',
+        description: '全6指標がバランスよく高水準にあるオールラウンド型です。特に介護職適応力と日本語学習適性が突出しており、異文化環境でも安定したパフォーマンスを発揮できます。介護現場での即戦力として期待でき、長期就労の可能性が最も高いタイプです。',
+        shortDesc: '万能型・即戦力'
+    },
+    B: {
+        name: '親日コミュニケーター型',
+        means: [4.53, 2.96, 4.13, 4.85, 3.96, 4.28],
+        color: '#16a34a',
+        bg: '#f0fdf4',
+        border: '#bbf7d0',
+        description: '日本への関心とコミュニケーション能力が非常に高い社交的なタイプです。日本文化への強い親和性を持ち、利用者やスタッフとの信頼関係を素早く構築できます。自律的判断力も高く、主体的に考えて行動できる積極的な人材です。',
+        shortDesc: '社交型・日本好き'
+    },
+    C: {
+        name: '堅実ランナー型',
+        means: [3.71, 4.09, 3.90, 4.02, 3.65, 2.54],
+        color: '#9333ea',
+        bg: '#faf5ff',
+        border: '#e9d5ff',
+        description: '日本語学習適性と日本への関心がバランスよく高い堅実なタイプです。コツコツと努力を積み重ね、着実に成長していきます。チームワークを大切にし、指示に忠実に業務をこなす安定感のある人材です。',
+        shortDesc: '堅実型・努力家'
+    }
+};
+
+const TRAIT_NAMES_FULL = ['日本への関心', '日本語学習適性', '異文化適応力', 'コミュニケーション能力', '介護職適応力', '自律的判断力'];
+
+function matchPattern(traits) {
+    const userScores = [traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy];
+
+    let bestMatch = 'A';
+    let bestDist = Infinity;
+    const distances = {};
+
+    ['A', 'B', 'C'].forEach(function(key) {
+        let dist = 0;
+        for (let i = 0; i < 6; i++) {
+            dist += Math.pow(userScores[i] - PATTERNS[key].means[i], 2);
+        }
+        dist = Math.sqrt(dist);
+        distances[key] = dist;
+        if (dist < bestDist) {
+            bestDist = dist;
+            bestMatch = key;
+        }
+    });
+
+    // Calculate similarity percentages (max distance ~12.25 for 6 dims, 0-5 range)
+    const maxDist = Math.sqrt(6 * 25);
+    const similarities = {};
+    ['A', 'B', 'C'].forEach(function(key) {
+        similarities[key] = Math.max(0, Math.round((1 - distances[key] / maxDist) * 100));
+    });
+
+    return { type: bestMatch, distance: bestDist, distances: distances, similarities: similarities, pattern: PATTERNS[bestMatch] };
+}
+
+function generatePersonalityAnalysis(traits) {
+    const userScores = [traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy];
+
+    // Find top 2 strengths and weakest
+    var indexed = userScores.map(function(v, i) { return {val: v, idx: i}; });
+    indexed.sort(function(a, b) { return b.val - a.val; });
+
+    var strengths = indexed.slice(0, 2);
+    var weakest = indexed[indexed.length - 1];
+
+    var analysis = [];
+
+    // Strength description
+    analysis.push('あなたの最も高い特性は「' + TRAIT_NAMES_FULL[strengths[0].idx] + '（' + strengths[0].val.toFixed(1) + '）」と「' + TRAIT_NAMES_FULL[strengths[1].idx] + '（' + strengths[1].val.toFixed(1) + '）」です。');
+
+    // Personality tendency based on score combinations
+    if (traits.communication >= 4.0 && traits.adaptation >= 4.0) {
+        analysis.push('社交的で柔軟性が高く、異文化環境でも円滑な人間関係を築ける傾向があります。');
+    } else if (traits.communication >= 4.0) {
+        analysis.push('人との関わりを大切にし、コミュニケーションに積極的な傾向があります。');
+    } else if (traits.adaptation >= 4.0) {
+        analysis.push('新しい環境への適応力が高く、変化に柔軟に対応できる傾向があります。');
+    }
+
+    if (traits.interest >= 4.0 && traits.learning >= 4.0) {
+        analysis.push('日本への強い関心と高い学習意欲を持ち、日本での生活・就労に対するモチベーションが非常に高いです。');
+    } else if (traits.interest >= 4.0) {
+        analysis.push('日本の文化や生活に対する関心が高く、日本での就労への意欲が感じられます。');
+    } else if (traits.learning >= 4.0) {
+        analysis.push('学習能力が高く、新しい知識やスキルの習得に積極的です。');
+    }
+
+    if (traits.careWork >= 4.0 && traits.autonomy >= 4.0) {
+        analysis.push('介護職への適応力と自律的判断力の両方が高く、即戦力としての素質があります。');
+    } else if (traits.careWork >= 4.0) {
+        analysis.push('介護の仕事に必要な資質を持ち、現場での活躍が期待できます。');
+    } else if (traits.autonomy >= 4.0) {
+        analysis.push('主体的に考え行動できる力があり、自ら課題を見つけて取り組む姿勢があります。');
+    }
+
+    // Growth area
+    if (weakest.val < 3.5) {
+        analysis.push('「' + TRAIT_NAMES_FULL[weakest.idx] + '」は今後の成長ポイントです。研修やサポートにより伸ばしていける分野です。');
+    }
+
+    return analysis;
+}
+
 function showResults() {
     const traits = calculateScores();
-    const comment = generateComment(traits);
+    const match = matchPattern(traits);
+
+    // Store for email/PDF use
+    appState.matchResult = match;
+    appState.traits = traits;
 
     const resultsDiv = document.getElementById('resultsContent');
     resultsDiv.innerHTML = '';
@@ -2537,26 +2652,61 @@ function showResults() {
 
     resultsDiv.appendChild(table);
 
-    // Chart
+    // Radar chart with pattern overlay
     const chartContainer = document.createElement('div');
     chartContainer.className = 'chart-container';
+    chartContainer.style.height = '420px';
     chartContainer.innerHTML = '<canvas id="resultsChart"></canvas>';
     resultsDiv.appendChild(chartContainer);
 
     setTimeout(() => {
-        createRadarChart(traits);
+        createRadarChart(traits, match);
     }, 100);
 
-    // Comment section
-    const commentDiv = document.createElement('div');
-    commentDiv.className = 'comment-section';
-    const detailedComments = generateDetailedComments();
-    let commentHtml = '<h3>' + tBi('commentTitle') + '</h3>';
-    detailedComments.forEach(c => {
-        commentHtml += '<p class="comment-text" style="margin:8px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid #667eea;line-height:1.6;">' + tBi(c) + '</p>';
+    // Pattern matching section (replaces old comment section)
+    const patternDiv = document.createElement('div');
+    patternDiv.style.cssText = 'background:' + match.pattern.bg + ';border:2px solid ' + match.pattern.border + ';border-radius:12px;padding:24px;margin:20px 0;';
+
+    let ph = '';
+    // Header with pattern badge
+    ph += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">';
+    ph += '<span style="background:' + match.pattern.color + ';color:white;padding:8px 20px;border-radius:24px;font-size:16px;font-weight:700">' + match.type + '型</span>';
+    ph += '<span style="font-size:18px;font-weight:700;color:#374151">' + match.pattern.name + '</span>';
+    ph += '<span style="font-size:13px;color:#666;background:white;padding:4px 12px;border-radius:12px;border:1px solid #e5e7eb">一致度: ' + match.similarities[match.type] + '%</span>';
+    ph += '</div>';
+
+    // Pattern description
+    ph += '<div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid #e5e7eb">';
+    ph += '<h3 style="color:' + match.pattern.color + ';font-size:15px;margin:0 0 10px 0">このタイプの特徴</h3>';
+    ph += '<p style="font-size:14px;color:#374151;line-height:1.8;margin:0">' + match.pattern.description + '</p>';
+    ph += '</div>';
+
+    // Similarity bars for all 3 patterns
+    ph += '<div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid #e5e7eb">';
+    ph += '<h3 style="color:#374151;font-size:14px;margin:0 0 12px 0">各パターンとの類似度</h3>';
+    ['A', 'B', 'C'].forEach(function(key) {
+        var p = PATTERNS[key];
+        var sim = match.similarities[key];
+        var isMatch = (key === match.type);
+        ph += '<div style="display:flex;align-items:center;margin-bottom:8px">';
+        ph += '<span style="width:180px;font-size:13px;font-weight:' + (isMatch ? '700' : '400') + ';color:' + (isMatch ? p.color : '#666') + '">' + key + '型 ' + p.name + '</span>';
+        ph += '<div style="flex:1;background:#f3f4f6;border-radius:4px;height:10px;margin:0 10px"><div style="background:' + p.color + ';height:10px;border-radius:4px;width:' + sim + '%;opacity:' + (isMatch ? '1' : '0.5') + '"></div></div>';
+        ph += '<span style="width:40px;text-align:right;font-size:13px;font-weight:' + (isMatch ? '700' : '400') + ';color:' + (isMatch ? p.color : '#888') + '">' + sim + '%</span>';
+        ph += '</div>';
     });
-    commentDiv.innerHTML = commentHtml;
-    resultsDiv.appendChild(commentDiv);
+    ph += '</div>';
+
+    // Personality analysis
+    var personalityItems = generatePersonalityAnalysis(traits);
+    ph += '<div style="background:white;border-radius:8px;padding:16px;border:1px solid #e5e7eb">';
+    ph += '<h3 style="color:#374151;font-size:15px;margin:0 0 12px 0">あなたの性格傾向・特性</h3>';
+    personalityItems.forEach(function(item) {
+        ph += '<p style="font-size:13px;color:#555;line-height:1.7;margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + match.pattern.color + ';border-radius:0 4px 4px 0">' + item + '</p>';
+    });
+    ph += '</div>';
+
+    patternDiv.innerHTML = ph;
+    resultsDiv.appendChild(patternDiv);
 
     // Email section
     const emailDiv = document.createElement('div');
@@ -2573,9 +2723,45 @@ function showResults() {
     resultsDiv.appendChild(emailDiv);
 }
 
-function createRadarChart(traits) {
+function createRadarChart(traits, match) {
     const ctx = document.getElementById('resultsChart')?.getContext('2d');
     if (!ctx) return;
+
+    var datasets = [{
+        label: 'あなたのスコア',
+        data: [
+            traits.interest,
+            traits.learning,
+            traits.adaptation,
+            traits.communication,
+            traits.careWork,
+            traits.autonomy
+        ],
+        borderColor: '#667eea',
+        backgroundColor: 'rgba(102, 126, 234, 0.2)',
+        pointBackgroundColor: '#667eea',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: '#667eea',
+        borderWidth: 2.5,
+        pointRadius: 5
+    }];
+
+    // Add matched pattern overlay
+    if (match && match.pattern) {
+        datasets.push({
+            label: match.type + '型 ' + match.pattern.name + '（参考）',
+            data: match.pattern.means,
+            borderColor: match.pattern.color,
+            backgroundColor: match.pattern.color + '15',
+            pointBackgroundColor: match.pattern.color,
+            pointBorderColor: '#fff',
+            borderWidth: 2,
+            borderDash: [6, 3],
+            pointRadius: 3,
+            pointStyle: 'triangle'
+        });
+    }
 
     new Chart(ctx, {
         type: 'radar',
@@ -2588,34 +2774,25 @@ function createRadarChart(traits) {
                 tBiText('traits.careWork'),
                 tBiText('traits.autonomy')
             ],
-            datasets: [{
-                label: tBiText('traits.communication'),
-                data: [
-                    traits.interest,
-                    traits.learning,
-                    traits.adaptation,
-                    traits.communication,
-                    traits.careWork,
-                    traits.autonomy
-                ],
-                borderColor: '#667eea',
-                backgroundColor: 'rgba(102, 126, 234, 0.2)',
-                pointBackgroundColor: '#667eea',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: '#667eea'
-            }]
+            datasets: datasets
         },
         options: {
             scales: {
                 r: {
                     beginAtZero: true,
                     max: 5,
-                    ticks: { stepSize: 1 }
+                    ticks: { stepSize: 1 },
+                    pointLabels: { font: { size: 13 } }
                 }
             },
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { size: 13 }, padding: 16 }
+                }
+            }
         }
     });
 }
@@ -2806,8 +2983,20 @@ function buildEmailHTML() {
         </tr>`;
     });
 
-    // Build comment HTML
-    const commentHTML = comments.map(c => `<p style="margin:8px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid #667eea;line-height:1.6;">${tBi(c)}</p>`).join('');
+    // Build pattern analysis HTML for email
+    const match = appState.matchResult || matchPattern(traits);
+    const personalityItems = generatePersonalityAnalysis(traits);
+    let patternEmailHTML = '';
+    patternEmailHTML += '<div style="background:' + match.pattern.bg + ';border:2px solid ' + match.pattern.border + ';border-radius:8px;padding:16px;margin:12px 0;">';
+    patternEmailHTML += '<div style="margin-bottom:10px"><span style="background:' + match.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + match.type + '型 ' + match.pattern.name + '</span>';
+    patternEmailHTML += ' <span style="font-size:13px;color:#666">（一致度: ' + match.similarities[match.type] + '%）</span></div>';
+    patternEmailHTML += '<p style="font-size:14px;color:#374151;line-height:1.7;margin:10px 0">' + match.pattern.description + '</p>';
+    patternEmailHTML += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb">';
+    patternEmailHTML += '<p style="font-weight:700;font-size:14px;color:#374151;margin:0 0 8px">性格傾向・特性</p>';
+    personalityItems.forEach(function(item) {
+        patternEmailHTML += '<p style="margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + match.pattern.color + ';font-size:13px;line-height:1.6">' + item + '</p>';
+    });
+    patternEmailHTML += '</div></div>';
 
     return `
     <div style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;max-width:700px;margin:0 auto;color:#333;">
@@ -2823,7 +3012,10 @@ function buildEmailHTML() {
             <tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">${tBi('marital')}</td><td style="padding:6px 12px;border:1px solid #ddd;">${marital}</td></tr>
         </table>
 
-        <h3 style="margin-top:24px;color:#333;">特性スコア</h3>
+        <h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>
+        ${patternEmailHTML}
+
+        <h3 style="margin-top:24px;color:#333;">特性スコア詳細</h3>
         <table style="width:100%;border-collapse:collapse;margin:12px 0;">
             <tr style="background:#667eea;color:white;">
                 <th style="padding:8px 12px;border:1px solid #ddd;text-align:left;">指標名</th>
@@ -2832,9 +3024,6 @@ function buildEmailHTML() {
             </tr>
             ${scoreRows}
         </table>
-
-        <h3 style="margin-top:24px;color:#333;">${tBi('commentTitle')}</h3>
-        <div style="margin:12px 0;">${commentHTML}</div>
 
         <hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">
         <p style="color:#999;font-size:12px;">検査日: ${date} ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>
@@ -2868,9 +3057,20 @@ function buildPdfHTML() {
             '</td></tr>';
     });
 
-    const commentHTML = comments.map(function(c) {
-        return '<p style="margin:8px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid #667eea;line-height:1.6;">' + tBi(c) + '</p>';
-    }).join('');
+    // Build pattern analysis HTML for PDF
+    const match2 = appState.matchResult || matchPattern(traits);
+    const personalityItems2 = generatePersonalityAnalysis(traits);
+    var pdfPatternHTML = '';
+    pdfPatternHTML += '<div style="background:' + match2.pattern.bg + ';border:2px solid ' + match2.pattern.border + ';border-radius:8px;padding:16px;margin:12px 0;">';
+    pdfPatternHTML += '<div style="margin-bottom:10px"><span style="background:' + match2.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + match2.type + '型 ' + match2.pattern.name + '</span>';
+    pdfPatternHTML += ' <span style="font-size:13px;color:#666">（一致度: ' + match2.similarities[match2.type] + '%）</span></div>';
+    pdfPatternHTML += '<p style="font-size:14px;color:#374151;line-height:1.7;margin:10px 0">' + match2.pattern.description + '</p>';
+    pdfPatternHTML += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb">';
+    pdfPatternHTML += '<p style="font-weight:700;font-size:14px;color:#374151;margin:0 0 8px">性格傾向・特性</p>';
+    personalityItems2.forEach(function(item) {
+        pdfPatternHTML += '<p style="margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + match2.pattern.color + ';font-size:13px;line-height:1.6">' + item + '</p>';
+    });
+    pdfPatternHTML += '</div></div>';
 
     return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#333;background:#fff;">' +
         '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:10px;">ユアブライト検査結果</h2>' +
@@ -2883,15 +3083,15 @@ function buildPdfHTML() {
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('gender') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + gender + '</td></tr>' +
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('marital') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
         '</table>' +
-        '<h3 style="margin-top:24px;color:#333;">特性スコア</h3>' +
+        '<h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>' +
+        pdfPatternHTML +
+        '<h3 style="margin-top:24px;color:#333;">特性スコア詳細</h3>' +
         '<table style="width:100%;border-collapse:collapse;margin:12px 0;">' +
         '<tr style="background:#667eea;color:white;">' +
         '<th style="padding:8px 12px;border:1px solid #ddd;text-align:left;">指標名</th>' +
         '<th style="padding:8px 12px;border:1px solid #ddd;text-align:center;">スコア</th>' +
         '<th style="padding:8px 12px;border:1px solid #ddd;text-align:center;"></th>' +
         '</tr>' + scoreRows + '</table>' +
-        '<h3 style="margin-top:24px;color:#333;">' + tBi('commentTitle') + '</h3>' +
-        '<div style="margin:12px 0;">' + commentHTML + '</div>' +
         '<hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">' +
         '<p style="color:#999;font-size:12px;">検査日: ' + date + ' ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>' +
         '</div>';
