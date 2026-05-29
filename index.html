@@ -229,7 +229,8 @@ const translations = {
         nextPage: "次ページ",
         retake: "もう一度受検",
         resultsTitle: "検査結果",
-        name: "氏名",
+        name: "氏名（ローマ字）",
+        nameKana: "氏名（カタカナ）",
         country: "出身国",
         education: "最終学歴",
         age: "年齢",
@@ -470,7 +471,8 @@ const translations = {
         nextPage: "Next Page",
         retake: "Retake Test",
         resultsTitle: "Test Results",
-        name: "Name",
+        name: "Name (Romaji)",
+        nameKana: "Name (Katakana)",
         country: "Country of Origin",
         education: "Final Education",
         age: "Age",
@@ -699,7 +701,8 @@ const translations = {
         nextPage: "Trang tiếp",
         retake: "Làm lại",
         resultsTitle: "Kết quả kiểm tra",
-        name: "Họ và tên",
+        name: "Họ và tên (Romaji)",
+        nameKana: "Họ và tên (Katakana)",
         country: "Quốc tịch",
         education: "Trình độ học vấn",
         age: "Tuổi",
@@ -901,7 +904,8 @@ const translations = {
         nextPage: "နောက်စာမျက်နှာ",
         retake: "ပြန်လည်ဖြေဆိုရန်",
         resultsTitle: "စာမေးပွဲရလဒ်",
-        name: "အမည်",
+        name: "အမည် (Romaji)",
+        nameKana: "အမည် (Katakana)",
         country: "နိုင်ငံ",
         education: "ပညာအရည်အချင်း",
         age: "အသက်",
@@ -1103,7 +1107,8 @@ const translations = {
         nextPage: "Halaman Berikutnya",
         retake: "Ulangi Tes",
         resultsTitle: "Hasil Tes",
-        name: "Nama",
+        name: "Nama (Romaji)",
+        nameKana: "Nama (Katakana)",
         country: "Negara Asal",
         education: "Pendidikan Terakhir",
         age: "Usia",
@@ -1305,7 +1310,8 @@ const translations = {
         nextPage: "ទំព័របន្ទាប់",
         retake: "ធ្វើតេស្តម្ដងទៀត",
         resultsTitle: "លទ្ធផលតេស្ត",
-        name: "ឈ្មោះ",
+        name: "ឈ្មោះ (Romaji)",
+        nameKana: "ឈ្មោះ (Katakana)",
         country: "ប្រទេសកំណើត",
         education: "កម្រិតសិក្សា",
         age: "អាយុ",
@@ -1507,7 +1513,8 @@ const translations = {
         nextPage: "หน้าถัดไป",
         retake: "ทำแบบทดสอบอีกครั้ง",
         resultsTitle: "ผลการทดสอบ",
-        name: "ชื่อ",
+        name: "ชื่อ (Romaji)",
+        nameKana: "ชื่อ (Katakana)",
         country: "ประเทศ",
         education: "ระดับการศึกษา",
         age: "อายุ",
@@ -1709,7 +1716,8 @@ const translations = {
         nextPage: "পরবর্তী পৃষ্ঠা",
         retake: "পুনরায় পরীক্ষা দিন",
         resultsTitle: "পরীক্ষার ফলাফল",
-        name: "নাম",
+        name: "নাম (Romaji)",
+        nameKana: "নাম (Katakana)",
         country: "দেশ",
         education: "শিক্ষাগত যোগ্যতা",
         age: "বয়স",
@@ -2064,6 +2072,7 @@ function renderPart1Form() {
 function getDomesticFields() {
     return [
         { id: 'name', label: 'name', type: 'text', required: true },
+        { id: 'name_kana', label: 'nameKana', type: 'text', required: true },
         { id: 'country', label: 'country', type: 'text', required: true },
         { id: 'education', label: 'education', type: 'select', required: true, options: [
             { value: 1, label: 'edu1' }, { value: 2, label: 'edu2' }, { value: 3, label: 'edu3' },
@@ -2129,6 +2138,7 @@ function getDomesticFields() {
 function getOverseasFields() {
     return [
         { id: 'name', label: 'name', type: 'text', required: true },
+        { id: 'name_kana', label: 'nameKana', type: 'text', required: true },
         { id: 'country', label: 'country', type: 'text', required: true },
         { id: 'education', label: 'education', type: 'select', required: true, options: [
             { value: 1, label: 'edu1' }, { value: 2, label: 'edu2' }, { value: 3, label: 'edu3' },
@@ -2539,6 +2549,49 @@ const PATTERNS = {
 
 const TRAIT_NAMES_FULL = ['日本への関心', '日本語学習適性', '異文化適応力', 'コミュニケーション能力', '介護職適応力', '自律的判断力'];
 
+// Build SVG radar chart for email/PDF (no canvas needed)
+function buildRadarSVG(scores, color, size) {
+    var labels = ['関心', '学習', '適応', 'コミュ', '介護', '自律'];
+    var n = 6;
+    var cx = size/2, cy = size/2, r = size*0.32;
+    var s = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;">';
+    s += '<rect width="'+size+'" height="'+size+'" fill="white" rx="8"/>';
+    for (var ring = 1; ring <= 5; ring++) {
+        var pts = [];
+        for (var j = 0; j < n; j++) {
+            var a = -Math.PI/2 + (2*Math.PI*j/n);
+            pts.push((cx + r*ring/5*Math.cos(a)).toFixed(1)+','+(cy + r*ring/5*Math.sin(a)).toFixed(1));
+        }
+        s += '<polygon points="'+pts.join(' ')+'" fill="none" stroke="#e5e7eb" stroke-width="0.8"/>';
+    }
+    for (var i = 0; i < n; i++) {
+        var a = -Math.PI/2 + (2*Math.PI*i/n);
+        s += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r*Math.cos(a)).toFixed(1)+'" y2="'+(cy+r*Math.sin(a)).toFixed(1)+'" stroke="#e5e7eb" stroke-width="0.8"/>';
+    }
+    var dp = [];
+    for (var i = 0; i < n; i++) {
+        var a = -Math.PI/2 + (2*Math.PI*i/n);
+        var v = Math.min(scores[i],5)/5;
+        dp.push((cx+r*v*Math.cos(a)).toFixed(1)+','+(cy+r*v*Math.sin(a)).toFixed(1));
+    }
+    s += '<polygon points="'+dp.join(' ')+'" fill="'+color+'" fill-opacity="0.15" stroke="'+color+'" stroke-width="2.5"/>';
+    for (var i = 0; i < n; i++) {
+        var a = -Math.PI/2 + (2*Math.PI*i/n);
+        var v = Math.min(scores[i],5)/5;
+        var px = cx+r*v*Math.cos(a), py = cy+r*v*Math.sin(a);
+        s += '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="4" fill="'+color+'" stroke="white" stroke-width="1.5"/>';
+    }
+    for (var i = 0; i < n; i++) {
+        var a = -Math.PI/2 + (2*Math.PI*i/n);
+        var lx = cx + (r+28)*Math.cos(a), ly = cy + (r+28)*Math.sin(a);
+        var anc = (Math.abs(Math.cos(a)) < 0.15) ? 'middle' : (Math.cos(a) > 0 ? 'start' : 'end');
+        s += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="12" font-family="sans-serif" fill="#555">'+labels[i]+'</text>';
+        s += '<text x="'+lx.toFixed(1)+'" y="'+(ly+14).toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="11" font-family="sans-serif" fill="'+color+'" font-weight="bold">'+scores[i].toFixed(1)+'</text>';
+    }
+    s += '</svg>';
+    return s;
+}
+
 function matchPattern(traits) {
     const userScores = [traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy];
 
@@ -2609,12 +2662,57 @@ function generatePersonalityAnalysis(traits) {
         analysis.push('主体的に考え行動できる力があり、自ら課題を見つけて取り組む姿勢があります。');
     }
 
-    // Growth area
-    if (weakest.val < 3.5) {
-        analysis.push('「' + TRAIT_NAMES_FULL[weakest.idx] + '」は今後の成長ポイントです。研修やサポートにより伸ばしていける分野です。');
+    // Weakness analysis (弱み)
+    analysis.push('');
+    analysis.push('【弱み・克服すべき点】');
+
+    if (weakest.val < 3.0) {
+        analysis.push('「' + TRAIT_NAMES_FULL[weakest.idx] + '（' + weakest.val.toFixed(1) + '）」が課題です。この分野の強化が長期就労の鍵となります。');
+    } else if (weakest.val < 4.0) {
+        analysis.push('「' + TRAIT_NAMES_FULL[weakest.idx] + '（' + weakest.val.toFixed(1) + '）」は相対的に低い指標です。研修やサポートにより伸ばしていける分野です。');
+    }
+
+    // Specific weakness advice
+    if (traits.autonomy < 3.5) {
+        analysis.push('自律的判断力が控えめです。最初は先輩のサポートのもとで業務に慣れ、徐々に自分で考えて行動する力を養うことが重要です。');
+    }
+    if (traits.communication < 3.5) {
+        analysis.push('コミュニケーション能力の向上が必要です。日常会話の練習や、積極的に周囲と関わる姿勢を身につけることが大切です。');
+    }
+    if (traits.adaptation < 3.5) {
+        analysis.push('異文化適応力の強化が求められます。日本の文化・習慣を学び、柔軟に対応する力を伸ばしましょう。');
+    }
+    if (traits.learning < 3.0) {
+        analysis.push('日本語学習への取り組みを強化する必要があります。継続的な学習習慣を身につけることが重要です。');
+    }
+    if (traits.interest < 3.0) {
+        analysis.push('日本への関心が低い傾向があります。日本で働くモチベーションを明確にし、日本文化への理解を深めることが大切です。');
+    }
+    if (traits.careWork < 3.5) {
+        analysis.push('介護職への適応力を高めるために、介護の基本知識や心構えを事前に学ぶことをお勧めします。');
+    }
+
+    // If no specific weakness was added, add a general positive note
+    var hasWeaknessDetail = analysis.some(function(a){ return a.indexOf('克服') >= 0 || a.indexOf('必要') >= 0 || a.indexOf('強化') >= 0 || a.indexOf('課題') >= 0 || a.indexOf('低い') >= 0; });
+    if (!hasWeaknessDetail) {
+        analysis.push('全体的にバランスの取れた結果です。現在の強みを活かしながら、さらなる成長を目指しましょう。');
     }
 
     return analysis;
+}
+
+// Display mapping: convert raw values to Japanese text
+function displayEducation(val) {
+    var map = {'1':'小卒','2':'中卒','3':'高卒','4':'専門卒','5':'短大卒','6':'大卒','7':'その他'};
+    return map[String(val)] || val || '---';
+}
+function displayGender(val) {
+    var map = {'1':'女性','2':'男性','3':'回答しない','4':'その他'};
+    return map[String(val)] || val || '---';
+}
+function displayMarital(val) {
+    var map = {'1':'未婚','2':'既婚','3':'離婚','4':'死別','5':'その他'};
+    return map[String(val)] || val || '---';
 }
 
 function showResults() {
@@ -2632,21 +2730,24 @@ function showResults() {
     const table = document.createElement('table');
     table.className = 'result-table';
 
+    var nameRomaji = document.getElementById('name')?.value || '---';
+    var nameKana = document.getElementById('name_kana')?.value || '---';
+    var nameDisplay = nameRomaji + '（' + nameKana + '）';
+
     const basicInfo = [
-        { label: 'idNumber', value: appState.testId },
-        { label: 'name', value: document.getElementById('name')?.value || '---' },
+        { label: 'name', customLabel: '氏名', value: nameDisplay },
         { label: 'country', value: document.getElementById('country')?.value || '---' },
-        { label: 'education', value: document.getElementById('education')?.value || '---' },
-        { label: 'age', value: document.getElementById('age')?.value || '---' },
-        { label: 'gender', value: document.getElementById('gender')?.value || '---' },
-        { label: 'marital', value: document.getElementById('marital')?.value || '---' }
+        { label: 'education', value: displayEducation(document.getElementById('education')?.value) },
+        { label: 'age', value: (document.getElementById('age')?.value || '---') + '歳' },
+        { label: 'gender', value: displayGender(document.getElementById('gender')?.value) },
+        { label: 'marital', value: displayMarital(document.getElementById('marital')?.value) }
     ];
 
     basicInfo.forEach(info => {
         const row = table.insertRow();
         const cell1 = row.insertCell();
         const cell2 = row.insertCell();
-        cell1.innerHTML = tBi(info.label);
+        cell1.innerHTML = info.customLabel || tBi(info.label);
         cell2.textContent = info.value;
     });
 
@@ -2707,6 +2808,64 @@ function showResults() {
 
     patternDiv.innerHTML = ph;
     resultsDiv.appendChild(patternDiv);
+
+    // 3 reference type charts (長期就労者３つのタイプ)
+    const refDiv = document.createElement('div');
+    refDiv.style.cssText = 'background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin:20px 0;';
+
+    var rh = '';
+    rh += '<h3 style="color:#1e40af;font-size:17px;margin:0 0 6px;text-align:center">長期就労者３つのタイプ</h3>';
+    rh += '<p style="font-size:12px;color:#888;text-align:center;margin:0 0 20px">2年以上就労している現役介護士・看護師194名の分析から抽出された代表パターン</p>';
+    rh += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">';
+
+    ['A', 'B', 'C'].forEach(function(key) {
+        var p = PATTERNS[key];
+        var isMatch = (key === match.type);
+        rh += '<div style="background:white;border:2px solid ' + (isMatch ? p.color : '#e5e7eb') + ';border-radius:8px;padding:14px;text-align:center' + (isMatch ? ';box-shadow:0 2px 8px rgba(0,0,0,0.1)' : '') + '">';
+        rh += '<span style="background:' + p.color + ';color:white;padding:4px 12px;border-radius:16px;font-size:12px;font-weight:700">' + key + '型</span>';
+        rh += '<div style="font-size:13px;font-weight:700;color:#374151;margin:8px 0 4px">' + p.name + '</div>';
+        if (isMatch) {
+            rh += '<div style="font-size:11px;color:' + p.color + ';font-weight:700;margin-bottom:6px">← あなたに最も近い</div>';
+        }
+        rh += '<div style="height:180px"><canvas id="refChart_' + key + '"></canvas></div>';
+        rh += '<div style="font-size:11px;color:#888;margin-top:6px">' + p.shortDesc + '</div>';
+        rh += '</div>';
+    });
+
+    rh += '</div>';
+    refDiv.innerHTML = rh;
+    resultsDiv.appendChild(refDiv);
+
+    // Render reference type charts after DOM is ready
+    setTimeout(function() {
+        ['A', 'B', 'C'].forEach(function(key) {
+            var cv = document.getElementById('refChart_' + key);
+            if (!cv) return;
+            var p = PATTERNS[key];
+            new Chart(cv.getContext('2d'), {
+                type: 'radar',
+                data: {
+                    labels: ['関心', '学習', '適応', 'コミュ', '介護', '自律'],
+                    datasets: [{
+                        label: key + '型',
+                        data: p.means,
+                        borderColor: p.color,
+                        backgroundColor: p.color + '25',
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        pointBackgroundColor: p.color,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, font: { size: 8 } }, pointLabels: { font: { size: 9 } } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        });
+    }, 400);
 
     // Email section
     const emailDiv = document.createElement('div');
@@ -2882,7 +3041,7 @@ function goNextPart2Page() {
 }
 
 function validatePart1() {
-    const requiredFields = ['name', 'country', 'education', 'age', 'gender', 'marital'];
+    const requiredFields = ['name', 'name_kana', 'country', 'education', 'age', 'gender', 'marital'];
     if (appState.currentMode === 'domestic') {
         requiredFields.push('visa');
     }
@@ -2958,30 +3117,15 @@ function showEmailStatus(msg, color) {
 function buildEmailHTML() {
     const traits = calculateScores();
     const comments = generateDetailedComments();
-    const name = document.getElementById('name')?.value || '---';
+    const nameR = document.getElementById('name')?.value || '---';
+    const nameK = document.getElementById('name_kana')?.value || '---';
+    const nameDisp = nameR + '（' + nameK + '）';
     const country = document.getElementById('country')?.value || '---';
-    const age = document.getElementById('age')?.value || '---';
-    const gender = document.getElementById('gender')?.value || '---';
-    const education = document.getElementById('education')?.value || '---';
-    const marital = document.getElementById('marital')?.value || '---';
+    const age = (document.getElementById('age')?.value || '---') + '歳';
+    const gender = displayGender(document.getElementById('gender')?.value);
+    const education = displayEducation(document.getElementById('education')?.value);
+    const marital = displayMarital(document.getElementById('marital')?.value);
     const date = new Date().toISOString().slice(0, 10);
-
-    const traitKeys2 = ['interest', 'learning', 'adaptation', 'communication', 'careWork', 'autonomy'];
-
-    // Build score rows
-    let scoreRows = '';
-    traitKeys2.forEach(function(key) {
-        var label = tBi('traits.' + key);
-        const score = (traits[key] || 0).toFixed(1);
-        const barWidth = Math.round((traits[key] || 0) / 5 * 100);
-        scoreRows += `<tr>
-            <td style="padding:8px 12px;border:1px solid #ddd;font-weight:bold;">${label}</td>
-            <td style="padding:8px 12px;border:1px solid #ddd;text-align:center;width:60px;">${score}</td>
-            <td style="padding:8px 12px;border:1px solid #ddd;width:120px;">
-                <div style="background:#e0e0e0;border-radius:4px;height:16px;"><div style="background:#667eea;border-radius:4px;height:16px;width:${barWidth}%;"></div></div>
-            </td>
-        </tr>`;
-    });
 
     // Build pattern analysis HTML for email
     const match = appState.matchResult || matchPattern(traits);
@@ -3003,8 +3147,7 @@ function buildEmailHTML() {
         <h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:10px;">ユアブライト検査結果</h2>
 
         <table style="width:100%;border-collapse:collapse;margin:16px 0;">
-            <tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">ID番号</td><td style="padding:6px 12px;border:1px solid #ddd;">${appState.testId}</td></tr>
-            <tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">${tBi('name')}</td><td style="padding:6px 12px;border:1px solid #ddd;">${name}</td></tr>
+            <tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">氏名</td><td style="padding:6px 12px;border:1px solid #ddd;">${nameDisp}</td></tr>
             <tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">${tBi('country')}</td><td style="padding:6px 12px;border:1px solid #ddd;">${country}</td></tr>
             <tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">${tBi('education')}</td><td style="padding:6px 12px;border:1px solid #ddd;">${education}</td></tr>
             <tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">${tBi('age')}</td><td style="padding:6px 12px;border:1px solid #ddd;">${age}</td></tr>
@@ -3015,15 +3158,10 @@ function buildEmailHTML() {
         <h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>
         ${patternEmailHTML}
 
-        <h3 style="margin-top:24px;color:#333;">特性スコア詳細</h3>
-        <table style="width:100%;border-collapse:collapse;margin:12px 0;">
-            <tr style="background:#667eea;color:white;">
-                <th style="padding:8px 12px;border:1px solid #ddd;text-align:left;">指標名</th>
-                <th style="padding:8px 12px;border:1px solid #ddd;text-align:center;">スコア</th>
-                <th style="padding:8px 12px;border:1px solid #ddd;text-align:center;"></th>
-            </tr>
-            ${scoreRows}
-        </table>
+        <h3 style="margin-top:24px;color:#333;">応募者のレーダーチャート</h3>
+        <div style="text-align:center;margin:12px 0;">
+            ${buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 340)}
+        </div>
 
         <hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">
         <p style="color:#999;font-size:12px;">検査日: ${date} ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>
@@ -3034,28 +3172,15 @@ function buildEmailHTML() {
 function buildPdfHTML() {
     const traits = calculateScores();
     const comments = generateDetailedComments();
-    const name = document.getElementById('name')?.value || '---';
+    const nameR2 = document.getElementById('name')?.value || '---';
+    const nameK2 = document.getElementById('name_kana')?.value || '---';
+    const nameDisp2 = nameR2 + '（' + nameK2 + '）';
     const country = document.getElementById('country')?.value || '---';
-    const age = document.getElementById('age')?.value || '---';
-    const gender = document.getElementById('gender')?.value || '---';
-    const education = document.getElementById('education')?.value || '---';
-    const marital = document.getElementById('marital')?.value || '---';
+    const age = (document.getElementById('age')?.value || '---') + '歳';
+    const gender = displayGender(document.getElementById('gender')?.value);
+    const education = displayEducation(document.getElementById('education')?.value);
+    const marital = displayMarital(document.getElementById('marital')?.value);
     const date = new Date().toISOString().slice(0, 10);
-
-    const traitKeys = ['interest', 'learning', 'adaptation', 'communication', 'careWork', 'autonomy'];
-
-    let scoreRows = '';
-    traitKeys.forEach(function(key) {
-        var label = tBi('traits.' + key);
-        const score = (traits[key] || 0).toFixed(1);
-        const barWidth = Math.round((traits[key] || 0) / 5 * 100);
-        scoreRows += '<tr>' +
-            '<td style="padding:8px 12px;border:1px solid #ddd;font-weight:bold;">' + label + '</td>' +
-            '<td style="padding:8px 12px;border:1px solid #ddd;text-align:center;width:60px;">' + score + '</td>' +
-            '<td style="padding:8px 12px;border:1px solid #ddd;width:120px;">' +
-            '<div style="background:#e0e0e0;border-radius:4px;height:16px;"><div style="background:#667eea;border-radius:4px;height:16px;width:' + barWidth + '%;"></div></div>' +
-            '</td></tr>';
-    });
 
     // Build pattern analysis HTML for PDF
     const match2 = appState.matchResult || matchPattern(traits);
@@ -3075,8 +3200,7 @@ function buildPdfHTML() {
     return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#333;background:#fff;">' +
         '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:10px;">ユアブライト検査結果</h2>' +
         '<table style="width:100%;border-collapse:collapse;margin:16px 0;">' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tBi('idNumber') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + appState.testId + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('name') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + name + '</td></tr>' +
+        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">氏名</td><td style="padding:6px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('country') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + country + '</td></tr>' +
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('education') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + education + '</td></tr>' +
         '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('age') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + age + '</td></tr>' +
@@ -3085,13 +3209,10 @@ function buildPdfHTML() {
         '</table>' +
         '<h3 style="margin-top:24px;color:#333;">適性パターン分析</h3>' +
         pdfPatternHTML +
-        '<h3 style="margin-top:24px;color:#333;">特性スコア詳細</h3>' +
-        '<table style="width:100%;border-collapse:collapse;margin:12px 0;">' +
-        '<tr style="background:#667eea;color:white;">' +
-        '<th style="padding:8px 12px;border:1px solid #ddd;text-align:left;">指標名</th>' +
-        '<th style="padding:8px 12px;border:1px solid #ddd;text-align:center;">スコア</th>' +
-        '<th style="padding:8px 12px;border:1px solid #ddd;text-align:center;"></th>' +
-        '</tr>' + scoreRows + '</table>' +
+        '<h3 style="margin-top:24px;color:#333;">応募者のレーダーチャート</h3>' +
+        '<div style="text-align:center;margin:12px 0;">' +
+        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 340) +
+        '</div>' +
         '<hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">' +
         '<p style="color:#999;font-size:12px;">検査日: ' + date + ' ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>' +
         '</div>';
