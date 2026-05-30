@@ -2700,7 +2700,322 @@ const PATTERNS = {
     }
 };
 
-const TRAIT_NAMES_FULL = ['日本への関心', '日本語学習適性', '異文化適応力', 'コミュニケーション能力', '介護職適応力', '自律的判断力'];
+const PATTERN_I18N = {
+    ja: {
+        patternNames: { A: '総合エキスパート型', B: '親日コミュニケーター型', C: '堅実ランナー型' },
+        patternDesc: {
+            A: '全6指標がバランスよく高水準にあるオールラウンド型です。特に介護職適応力と日本語学習適性が突出しており、異文化環境でも安定したパフォーマンスを発揮できます。介護現場での即戦力として期待でき、長期就労の可能性が最も高いタイプです。',
+            B: '日本への関心とコミュニケーション能力が非常に高い社交的なタイプです。日本文化への強い親和性を持ち、利用者やスタッフとの信頼関係を素早く構築できます。自律的判断力も高く、主体的に考えて行動できる積極的な人材です。',
+            C: '日本語学習適性と日本への関心がバランスよく高い堅実なタイプです。コツコツと努力を積み重ね、着実に成長していきます。チームワークを大切にし、指示に忠実に業務をこなす安定感のある人材です。'
+        },
+        traitNames: ['日本への関心', '日本語学習適性', '異文化適応力', 'コミュニケーション能力', '介護職適応力', '自律的判断力'],
+        headings: {
+            typeFeature: 'このタイプの特徴',
+            similarity: '各パターンとの類似度',
+            personality: 'あなたの性格傾向・特性',
+            weakness: '【弱み・克服すべき点】'
+        },
+        analysis: {
+            topStrength: 'あなたの最も高い特性は「{0}（{1}）」と「{2}（{3}）」です。',
+            commAdapt: '社交的で柔軟性が高く、異文化環境でも円滑な人間関係を築ける傾向があります。',
+            commOnly: '人との関わりを大切にし、コミュニケーションに積極的な傾向があります。',
+            adaptOnly: '新しい環境への適応力が高く、変化に柔軟に対応できる傾向があります。',
+            interestLearn: '日本への強い関心と高い学習意欲を持ち、日本での生活・就労に対するモチベーションが非常に高いです。',
+            interestOnly: '日本の文化や生活に対する関心が高く、日本での就労への意欲が感じられます。',
+            learnOnly: '学習能力が高く、新しい知識やスキルの習得に積極的です。',
+            careAutonomy: '介護職への適応力と自律的判断力の両方が高く、即戦力としての素質があります。',
+            careOnly: '介護の仕事に必要な資質を持ち、現場での活躍が期待できます。',
+            autonomyOnly: '主体的に考え行動できる力があり、自ら課題を見つけて取り組む姿勢があります。',
+            weakSevere: '「{0}（{1}）」が最も低く、重点的な強化が必要です。{2}',
+            weakModerate: '「{0}（{1}）」が相対的に低い指標です。{2}',
+            weakMild: '6指標すべてが高水準ですが、その中で「{0}（{1}）」が相対的に低めです。{2}',
+            weakSecond: 'また、「{0}（{1}）」も今後の成長ポイントです。',
+            weakDescs: [
+                '日本への関心がやや低めです。日本の文化・生活への理解を深め、就労モチベーションをさらに高めることが大切です。',
+                '日本語学習適性が相対的に低い傾向です。継続的な学習習慣を身につけ、日本語力の向上に積極的に取り組みましょう。',
+                '異文化適応力がやや弱めです。日本の習慣やルールを積極的に学び、柔軟に対応する力を養いましょう。',
+                'コミュニケーション能力に伸びしろがあります。日常会話の練習や、周囲と積極的に関わる姿勢を身につけましょう。',
+                '介護職適応力をさらに伸ばす余地があります。介護の基本知識や利用者への接し方を事前に学ぶことをお勧めします。',
+                '自律的判断力がやや控えめです。先輩のサポートを受けながら、徐々に自分で考えて行動する力を養いましょう。'
+            ]
+        }
+    },
+    en: {
+        patternNames: { A: 'Comprehensive Expert', B: 'Pro-Japan Communicator', C: 'Steady Runner' },
+        patternDesc: {
+            A: 'An all-around type with well-balanced high scores across all 6 indicators. Particularly outstanding in care work adaptability and Japanese language learning aptitude, able to perform stably even in cross-cultural environments. Highly expected as an immediate asset in care settings with the highest potential for long-term employment.',
+            B: 'A sociable type with very high interest in Japan and communication skills. Has strong affinity for Japanese culture and can quickly build trust with users and staff. Also high in autonomous judgment, an proactive person who can think and act independently.',
+            C: 'A steady type with well-balanced Japanese language learning aptitude and interest in Japan. Accumulates effort steadily and grows consistently. Values teamwork and is a stable worker who faithfully follows instructions.'
+        },
+        traitNames: ['Interest in Japan', 'Japanese Learning', 'Cross-cultural Adapt.', 'Communication', 'Care Work Adapt.', 'Autonomous Judgment'],
+        headings: {
+            typeFeature: 'Features of This Type',
+            similarity: 'Similarity to Each Pattern',
+            personality: 'Your Personality Traits',
+            weakness: '[Areas for Improvement]'
+        },
+        analysis: {
+            topStrength: 'Your strongest traits are "{0} ({1})" and "{2} ({3})".',
+            commAdapt: 'You tend to be sociable and flexible, able to build smooth relationships even in cross-cultural environments.',
+            commOnly: 'You value interpersonal relationships and tend to be proactive in communication.',
+            adaptOnly: 'You have high adaptability to new environments and can respond flexibly to changes.',
+            interestLearn: 'You have strong interest in Japan and high motivation for learning, with very high motivation for living and working in Japan.',
+            interestOnly: 'You have high interest in Japanese culture and lifestyle, showing motivation for working in Japan.',
+            learnOnly: 'You have high learning ability and are proactive in acquiring new knowledge and skills.',
+            careAutonomy: 'You have both high care work adaptability and autonomous judgment, showing potential as an immediate asset.',
+            careOnly: 'You have the qualities needed for care work and are expected to perform well in the field.',
+            autonomyOnly: 'You have the ability to think and act independently, with an attitude of finding and tackling challenges on your own.',
+            weakSevere: '"{0} ({1})" is your lowest score and needs focused improvement. {2}',
+            weakModerate: '"{0} ({1})" is a relatively low indicator. {2}',
+            weakMild: 'All 6 indicators are at high levels, but "{0} ({1})" is relatively lower. {2}',
+            weakSecond: 'Also, "{0} ({1})" is another area for future growth.',
+            weakDescs: [
+                'Your interest in Japan is somewhat low. It is important to deepen your understanding of Japanese culture and lifestyle to further boost your work motivation.',
+                'Your Japanese language learning aptitude is relatively low. Develop consistent study habits and actively work on improving your Japanese.',
+                'Your cross-cultural adaptability is somewhat weak. Actively learn Japanese customs and rules, and develop the ability to respond flexibly.',
+                'There is room for growth in communication skills. Practice daily conversation and develop a proactive attitude toward engaging with others.',
+                'There is room to further develop care work adaptability. We recommend learning basic care knowledge and how to interact with care recipients in advance.',
+                'Your autonomous judgment is somewhat reserved. While receiving support from seniors, gradually develop the ability to think and act on your own.'
+            ]
+        }
+    },
+    vi: {
+        patternNames: { A: 'Chuyên gia toàn diện', B: 'Người giao tiếp thân Nhật', C: 'Người kiên định' },
+        patternDesc: {
+            A: 'Loại toàn diện với điểm số cân bằng cao trên tất cả 6 chỉ số. Đặc biệt nổi bật về khả năng thích ứng công việc chăm sóc và năng lực học tiếng Nhật, có thể phát huy ổn định ngay cả trong môi trường đa văn hóa. Được kỳ vọng là nhân lực chủ lực tại hiện trường chăm sóc với khả năng làm việc lâu dài cao nhất.',
+            B: 'Loại hòa đồng với sự quan tâm đến Nhật Bản và khả năng giao tiếp rất cao. Có sự gắn bó mạnh mẽ với văn hóa Nhật Bản, có thể nhanh chóng xây dựng niềm tin với người sử dụng dịch vụ và nhân viên. Khả năng phán đoán tự chủ cũng cao, là nhân lực tích cực có thể tự suy nghĩ và hành động.',
+            C: 'Loại kiên định với năng lực học tiếng Nhật và sự quan tâm đến Nhật Bản cân bằng cao. Tích lũy nỗ lực từng bước và phát triển chắc chắn. Coi trọng tinh thần đồng đội, là nhân lực ổn định thực hiện công việc trung thành theo chỉ thị.'
+        },
+        traitNames: ['Quan tâm đến Nhật', 'Học tiếng Nhật', 'Thích ứng đa VH', 'Giao tiếp', 'Thích ứng chăm sóc', 'Phán đoán tự chủ'],
+        headings: {
+            typeFeature: 'Đặc điểm loại này',
+            similarity: 'Mức độ tương đồng với các mẫu',
+            personality: 'Xu hướng tính cách của bạn',
+            weakness: '【Điểm yếu cần cải thiện】'
+        },
+        analysis: {
+            topStrength: 'Đặc tính cao nhất của bạn là "{0} ({1})" và "{2} ({3})".',
+            commAdapt: 'Bạn có xu hướng hòa đồng và linh hoạt, có thể xây dựng mối quan hệ tốt ngay cả trong môi trường đa văn hóa.',
+            commOnly: 'Bạn coi trọng mối quan hệ với mọi người và có xu hướng tích cực trong giao tiếp.',
+            adaptOnly: 'Bạn có khả năng thích ứng cao với môi trường mới và có thể đáp ứng linh hoạt với sự thay đổi.',
+            interestLearn: 'Bạn có sự quan tâm mạnh mẽ đến Nhật Bản và động lực học tập cao, rất có động lực sống và làm việc tại Nhật.',
+            interestOnly: 'Bạn có sự quan tâm cao đến văn hóa và cuộc sống Nhật Bản, thể hiện động lực làm việc tại Nhật.',
+            learnOnly: 'Bạn có khả năng học tập cao và tích cực trong việc tiếp thu kiến thức và kỹ năng mới.',
+            careAutonomy: 'Bạn có cả khả năng thích ứng chăm sóc và phán đoán tự chủ cao, có tiềm năng làm nhân lực chủ lực.',
+            careOnly: 'Bạn có phẩm chất cần thiết cho công việc chăm sóc và được kỳ vọng hoạt động tốt tại hiện trường.',
+            autonomyOnly: 'Bạn có khả năng tự suy nghĩ và hành động, với thái độ tự tìm và giải quyết vấn đề.',
+            weakSevere: '"{0} ({1})" là điểm thấp nhất, cần tập trung cải thiện. {2}',
+            weakModerate: '"{0} ({1})" là chỉ số tương đối thấp. {2}',
+            weakMild: 'Tất cả 6 chỉ số đều ở mức cao, nhưng "{0} ({1})" tương đối thấp hơn. {2}',
+            weakSecond: 'Ngoài ra, "{0} ({1})" cũng là điểm cần phát triển trong tương lai.',
+            weakDescs: [
+                'Sự quan tâm đến Nhật Bản hơi thấp. Hãy tìm hiểu sâu hơn về văn hóa và cuộc sống Nhật Bản để nâng cao động lực làm việc.',
+                'Năng lực học tiếng Nhật tương đối thấp. Hãy xây dựng thói quen học tập đều đặn và tích cực cải thiện tiếng Nhật.',
+                'Khả năng thích ứng đa văn hóa hơi yếu. Hãy tích cực học phong tục và quy tắc Nhật Bản, rèn luyện khả năng ứng biến linh hoạt.',
+                'Kỹ năng giao tiếp còn dư địa phát triển. Hãy luyện tập hội thoại hàng ngày và phát triển thái độ chủ động giao tiếp.',
+                'Khả năng thích ứng chăm sóc còn có thể phát triển thêm. Nên học kiến thức chăm sóc cơ bản và cách tiếp xúc với người được chăm sóc.',
+                'Khả năng phán đoán tự chủ hơi thụ động. Hãy dần dần phát triển khả năng tự suy nghĩ và hành động với sự hỗ trợ của đàn anh.'
+            ]
+        }
+    },
+    th: {
+        patternNames: { A: 'ผู้เชี่ยวชาญรอบด้าน', B: 'นักสื่อสารรักญี่ปุ่น', C: 'นักวิ่งมั่นคง' },
+        patternDesc: {
+            A: 'ประเภทรอบด้านที่มีคะแนนสูงสมดุลทั้ง 6 ตัวชี้วัด โดดเด่นเป็นพิเศษด้านความสามารถในการปรับตัวเข้ากับงานดูแลและความถนัดในการเรียนภาษาญี่ปุ่น สามารถทำงานได้อย่างมั่นคงในสภาพแวดล้อมข้ามวัฒนธรรม คาดหวังเป็นกำลังสำคัญในสถานดูแลและมีโอกาสทำงานระยะยาวสูงสุด',
+            B: 'ประเภทที่เข้าสังคมได้ดี มีความสนใจในญี่ปุ่นและทักษะการสื่อสารสูงมาก มีความผูกพันกับวัฒนธรรมญี่ปุ่นอย่างแข็งแกร่ง สามารถสร้างความไว้วางใจกับผู้ใช้บริการและเจ้าหน้าที่ได้อย่างรวดเร็ว มีความสามารถในการตัดสินใจด้วยตนเองสูง เป็นบุคลากรที่คิดและลงมือทำอย่างกระตือรือร้น',
+            C: 'ประเภทมั่นคงที่มีความถนัดในการเรียนภาษาญี่ปุ่นและความสนใจในญี่ปุ่นสมดุลสูง สะสมความพยายามทีละน้อยและเติบโตอย่างสม่ำเสมอ ให้ความสำคัญกับการทำงานเป็นทีม เป็นบุคลากรที่มีความมั่นคงและปฏิบัติงานตามคำสั่งอย่างซื่อสัตย์'
+        },
+        traitNames: ['ความสนใจในญี่ปุ่น', 'การเรียนภาษาญี่ปุ่น', 'การปรับตัวข้ามวัฒนธรรม', 'การสื่อสาร', 'การปรับตัวงานดูแล', 'การตัดสินใจด้วยตนเอง'],
+        headings: {
+            typeFeature: 'คุณสมบัติของประเภทนี้',
+            similarity: 'ความคล้ายคลึงกับแต่ละรูปแบบ',
+            personality: 'แนวโน้มบุคลิกภาพของคุณ',
+            weakness: '【จุดอ่อนที่ควรปรับปรุง】'
+        },
+        analysis: {
+            topStrength: 'คุณสมบัติที่สูงที่สุดของคุณคือ "{0} ({1})" และ "{2} ({3})"',
+            commAdapt: 'คุณมีแนวโน้มที่จะเข้าสังคมได้ดีและยืดหยุ่น สามารถสร้างความสัมพันธ์ที่ดีได้แม้ในสภาพแวดล้อมข้ามวัฒนธรรม',
+            commOnly: 'คุณให้ความสำคัญกับความสัมพันธ์กับผู้คนและมีแนวโน้มที่จะสื่อสารอย่างกระตือรือร้น',
+            adaptOnly: 'คุณมีความสามารถในการปรับตัวสูงกับสภาพแวดล้อมใหม่และสามารถตอบสนองต่อการเปลี่ยนแปลงได้อย่างยืดหยุ่น',
+            interestLearn: 'คุณมีความสนใจในญี่ปุ่นอย่างแรงกล้าและแรงจูงใจในการเรียนรู้สูง มีแรงจูงใจในการใช้ชีวิตและทำงานในญี่ปุ่นสูงมาก',
+            interestOnly: 'คุณมีความสนใจสูงในวัฒนธรรมและชีวิตญี่ปุ่น แสดงให้เห็นแรงจูงใจในการทำงานที่ญี่ปุ่น',
+            learnOnly: 'คุณมีความสามารถในการเรียนรู้สูงและกระตือรือร้นในการเรียนรู้ความรู้และทักษะใหม่ๆ',
+            careAutonomy: 'คุณมีทั้งความสามารถในการปรับตัวกับงานดูแลและการตัดสินใจด้วยตนเองสูง มีศักยภาพเป็นกำลังสำคัญ',
+            careOnly: 'คุณมีคุณสมบัติที่จำเป็นสำหรับงานดูแลและคาดว่าจะทำงานได้ดีในสถานที่ทำงาน',
+            autonomyOnly: 'คุณมีความสามารถในการคิดและลงมือทำด้วยตนเอง มีท่าทีในการค้นหาและจัดการปัญหาด้วยตนเอง',
+            weakSevere: '"{0} ({1})" เป็นคะแนนต่ำที่สุด จำเป็นต้องปรับปรุงอย่างเข้มข้น {2}',
+            weakModerate: '"{0} ({1})" เป็นตัวชี้วัดที่ค่อนข้างต่ำ {2}',
+            weakMild: 'ตัวชี้วัดทั้ง 6 อยู่ในระดับสูง แต่ "{0} ({1})" ค่อนข้างต่ำกว่า {2}',
+            weakSecond: 'นอกจากนี้ "{0} ({1})" ก็เป็นจุดที่ควรพัฒนาในอนาคตเช่นกัน',
+            weakDescs: [
+                'ความสนใจในญี่ปุ่นค่อนข้างต่ำ ควรเรียนรู้วัฒนธรรมและชีวิตญี่ปุ่นให้ลึกซึ้งขึ้นเพื่อเพิ่มแรงจูงใจในการทำงาน',
+                'ความถนัดในการเรียนภาษาญี่ปุ่นค่อนข้างต่ำ ควรสร้างนิสัยการเรียนอย่างสม่ำเสมอและพยายามพัฒนาภาษาญี่ปุ่นอย่างจริงจัง',
+                'ความสามารถในการปรับตัวข้ามวัฒนธรรมค่อนข้างอ่อน ควรเรียนรู้ธรรมเนียมและกฎของญี่ปุ่นอย่างจริงจัง และพัฒนาความสามารถในการตอบสนองอย่างยืดหยุ่น',
+                'ทักษะการสื่อสารยังมีที่ว่างให้เติบโต ควรฝึกการสนทนาในชีวิตประจำวันและพัฒนาท่าทีที่กระตือรือร้นในการมีปฏิสัมพันธ์กับผู้อื่น',
+                'ความสามารถในการปรับตัวกับงานดูแลยังมีที่ว่างให้พัฒนา แนะนำให้เรียนรู้ความรู้พื้นฐานเกี่ยวกับการดูแลและวิธีปฏิสัมพันธ์กับผู้รับบริการล่วงหน้า',
+                'การตัดสินใจด้วยตนเองค่อนข้างสงวนตัว ควรค่อยๆ พัฒนาความสามารถในการคิดและลงมือทำด้วยตนเองโดยได้รับการสนับสนุนจากรุ่นพี่'
+            ]
+        }
+    },
+    my: {
+        patternNames: { A: 'ဘက်စုံကျွမ်းကျင်သူ', B: 'ဂျပန်ချစ်ဆက်သွယ်ရေးသမား', C: 'တည်ငြိမ်သောပြေးသမား' },
+        patternDesc: {
+            A: 'ညွှန်ကိန်း ၆ ခုလုံးတွင် မျှတစွာ အမှတ်မြင့်ရရှိသော ဘက်စုံအမျိုးအစားဖြစ်သည်။ အထူးသဖြင့် စောင့်ရှောက်မှုလုပ်ငန်း လိုက်လျောညီထွေဖြစ်မှုနှင့် ဂျပန်ဘာသာ သင်ယူနိုင်စွမ်းတွင် ထူးချွန်ပြီး ယဉ်ကျေးမှုဖြတ်ကျော် ပတ်ဝန်းကျင်တွင်ပင် တည်ငြိမ်စွာ လုပ်ဆောင်နိုင်သည်။',
+            B: 'ဂျပန်အပေါ် စိတ်ဝင်စားမှုနှင့် ဆက်သွယ်ရေးစွမ်းရည် အလွန်မြင့်သော လူမှုရေးကျွမ်းကျင်သည့် အမျိုးအစားဖြစ်သည်။ ဂျပန်ယဉ်ကျေးမှုနှင့် ခိုင်မာသော ဆက်နွယ်မှုရှိပြီး အသုံးပြုသူများနှင့် ဝန်ထမ်းများနှင့် ယုံကြည်မှုကို လျင်မြန်စွာ တည်ဆောက်နိုင်သည်။',
+            C: 'ဂျပန်ဘာသာ သင်ယူနိုင်စွမ်းနှင့် ဂျပန်အပေါ် စိတ်ဝင်စားမှု မျှတစွာ မြင့်မားသော တည်ငြိမ်သည့် အမျိုးအစားဖြစ်သည်။ ကြိုးစားအားထုတ်မှုကို တစ်စတစ်စ စုဆောင်းပြီး တိုးတက်မှု ခိုင်မာသည်။ အဖွဲ့လုပ်ငန်းကို တန်ဖိုးထားပြီး ညွှန်ကြားချက်များကို သစ္စာရှိစွာ လုပ်ဆောင်သည်။'
+        },
+        traitNames: ['ဂျပန်စိတ်ဝင်စားမှု', 'ဂျပန်ဘာသာသင်ယူ', 'ယဉ်ကျေးမှုလိုက်လျော', 'ဆက်သွယ်ရေး', 'စောင့်ရှောက်မှုလိုက်လျော', 'ကိုယ်ပိုင်ဆုံးဖြတ်'],
+        headings: {
+            typeFeature: 'ဤအမျိုးအစား၏ လက္ခဏာများ',
+            similarity: 'ပုံစံတစ်ခုစီနှင့် ဆင်တူမှု',
+            personality: 'သင့်ကိုယ်ရည်ကိုယ်သွေး လမ်းညွှန်',
+            weakness: '【အားနည်းချက်နှင့် ပြင်ဆင်ရမည့်အချက်များ】'
+        },
+        analysis: {
+            topStrength: 'သင့်အမြင့်ဆုံး လက္ခဏာများမှာ "{0} ({1})" နှင့် "{2} ({3})" ဖြစ်သည်။',
+            commAdapt: 'သင်သည် လူမှုရေးကျွမ်းကျင်ပြီး ပျော့ပျောင်းမှုရှိကာ ယဉ်ကျေးမှုဖြတ်ကျော် ပတ်ဝန်းကျင်တွင်ပင် ကောင်းမွန်သော ဆက်ဆံရေးကို တည်ဆောက်နိုင်သည်။',
+            commOnly: 'သင်သည် လူများနှင့် ဆက်ဆံရေးကို တန်ဖိုးထားပြီး ဆက်သွယ်ရေးတွင် တက်ကြွစွာ ပါဝင်သည်။',
+            adaptOnly: 'သင်သည် ပတ်ဝန်းကျင်အသစ်သို့ လိုက်လျောညီထွေမှု မြင့်မားပြီး ပြောင်းလဲမှုများကို ပျော့ပျောင်းစွာ တုံ့ပြန်နိုင်သည်။',
+            interestLearn: 'သင်သည် ဂျပန်အပေါ် ခိုင်မာသော စိတ်ဝင်စားမှုနှင့် သင်ယူလိုစိတ် မြင့်မားပြီး ဂျပန်တွင် နေထိုင်အလုပ်လုပ်ရန် အလွန် စိတ်အားထက်သန်သည်။',
+            interestOnly: 'သင်သည် ဂျပန်ယဉ်ကျေးမှုနှင့် လူနေမှုပုံစံအပေါ် စိတ်ဝင်စားမှု မြင့်မားပြီး ဂျပန်တွင် အလုပ်လုပ်ရန် စိတ်အားထက်သန်မှု ပြသည်။',
+            learnOnly: 'သင်သည် သင်ယူနိုင်စွမ်း မြင့်မားပြီး အသိပညာနှင့် ကျွမ်းကျင်မှုအသစ်များ ရယူရန် တက်ကြွစွာ ဆောင်ရွက်သည်။',
+            careAutonomy: 'သင်သည် စောင့်ရှောက်မှုလုပ်ငန်း လိုက်လျောမှုနှင့် ကိုယ်ပိုင်ဆုံးဖြတ်နိုင်မှု နှစ်ခုလုံး မြင့်မားပြီး အဓိကအင်အားစု ဖြစ်နိုင်ခြေ ရှိသည်။',
+            careOnly: 'သင်သည် စောင့်ရှောက်မှုလုပ်ငန်းအတွက် လိုအပ်သော အရည်အချင်းများ ရှိပြီး လုပ်ငန်းခွင်တွင် ကောင်းစွာ လုပ်ဆောင်နိုင်ရန် မျှော်လင့်ရသည်။',
+            autonomyOnly: 'သင်သည် ကိုယ်တိုင်စဉ်းစားပြီး လုပ်ဆောင်နိုင်သော စွမ်းရည်ရှိပြီး ပြဿနာများကို ကိုယ်တိုင် ရှာဖွေဖြေရှင်းသော သဘောထားရှိသည်။',
+            weakSevere: '"{0} ({1})" သည် အနိမ့်ဆုံးဖြစ်ပြီး အထူးတိုးတက်ရန် လိုအပ်သည်။ {2}',
+            weakModerate: '"{0} ({1})" သည် အတော်အတန် နိမ့်သော ညွှန်ကိန်းဖြစ်သည်။ {2}',
+            weakMild: 'ညွှန်ကိန်း ၆ ခုလုံး မြင့်မားသော်လည်း "{0} ({1})" သည် အတော်အတန် နိမ့်သည်။ {2}',
+            weakSecond: 'ထို့ပြင် "{0} ({1})" သည်လည်း အနာဂတ်တွင် ဖွံ့ဖြိုးရမည့် အချက်ဖြစ်သည်။',
+            weakDescs: [
+                'ဂျပန်အပေါ် စိတ်ဝင်စားမှု အနည်းငယ် နိမ့်သည်။ ဂျပန်ယဉ်ကျေးမှုနှင့် လူနေမှုပုံစံကို ပိုမိုနက်ရှိုင်းစွာ နားလည်ရန် အလုပ်လုပ်ရန် စိတ်အားထက်သန်မှုကို မြှင့်တင်ပါ။',
+                'ဂျပန်ဘာသာ သင်ယူနိုင်စွမ်း အတော်အတန် နိမ့်သည်။ စဉ်ဆက်မပြတ် သင်ယူမှု အလေ့အကျင့်ကို တည်ဆောက်ပြီး ဂျပန်ဘာသာ တိုးတက်ရန် တက်ကြွစွာ ကြိုးစားပါ။',
+                'ယဉ်ကျေးမှုဖြတ်ကျော် လိုက်လျောမှု အနည်းငယ် အားနည်းသည်။ ဂျပန်ဓလေ့ထုံးစံနှင့် စည်းကမ်းများကို တက်ကြွစွာ သင်ယူပြီး ပျော့ပျောင်းစွာ တုံ့ပြန်နိုင်စွမ်း ဖွံ့ဖြိုးပါ။',
+                'ဆက်သွယ်ရေး ကျွမ်းကျင်မှုတွင် တိုးတက်ရန် နေရာ ရှိသေးသည်။ နေ့စဉ် စကားပြောလေ့ကျင့်ပြီး အခြားသူများနှင့် တက်ကြွစွာ ဆက်ဆံပါ။',
+                'စောင့်ရှောက်မှုလုပ်ငန်း လိုက်လျောမှုကို ပိုမိုဖွံ့ဖြိုးရန် နေရာ ရှိသေးသည်။ စောင့်ရှောက်မှု အခြေခံအသိပညာနှင့် အသုံးပြုသူများနှင့် ဆက်ဆံပုံကို ကြိုတင်သင်ယူရန် အကြံပြုသည်။',
+                'ကိုယ်ပိုင်ဆုံးဖြတ်နိုင်မှု အနည်းငယ် သိမ်မွေ့သည်။ အကြီးအကဲများ၏ ပံ့ပိုးမှုဖြင့် ကိုယ်တိုင်စဉ်းစားပြီး လုပ်ဆောင်နိုင်စွမ်းကို တဖြည်းဖြည်း ဖွံ့ဖြိုးပါ။'
+            ]
+        }
+    },
+    id: {
+        patternNames: { A: 'Ahli Komprehensif', B: 'Komunikator Pro-Jepang', C: 'Pelari Mantap' },
+        patternDesc: {
+            A: 'Tipe serba bisa dengan skor tinggi seimbang di semua 6 indikator. Sangat menonjol dalam kemampuan adaptasi kerja perawatan dan bakat belajar bahasa Jepang, mampu berkinerja stabil bahkan di lingkungan lintas budaya. Sangat diharapkan sebagai tenaga siap pakai di tempat perawatan dengan potensi kerja jangka panjang tertinggi.',
+            B: 'Tipe yang supel dengan minat terhadap Jepang dan kemampuan komunikasi yang sangat tinggi. Memiliki afinitas kuat dengan budaya Jepang dan dapat dengan cepat membangun kepercayaan dengan pengguna layanan dan staf. Kemampuan penilaian mandiri juga tinggi, merupakan tenaga kerja yang proaktif dalam berpikir dan bertindak.',
+            C: 'Tipe mantap dengan bakat belajar bahasa Jepang dan minat terhadap Jepang yang seimbang tinggi. Mengumpulkan usaha secara bertahap dan tumbuh secara konsisten. Menghargai kerja tim dan merupakan tenaga kerja stabil yang menjalankan tugas dengan setia.'
+        },
+        traitNames: ['Minat pada Jepang', 'Belajar Bhs Jepang', 'Adaptasi Lintas Budaya', 'Komunikasi', 'Adaptasi Kerja Perawatan', 'Penilaian Mandiri'],
+        headings: {
+            typeFeature: 'Ciri-ciri Tipe Ini',
+            similarity: 'Kesamaan dengan Setiap Pola',
+            personality: 'Kecenderungan Kepribadian Anda',
+            weakness: '【Kelemahan yang Perlu Diperbaiki】'
+        },
+        analysis: {
+            topStrength: 'Sifat tertinggi Anda adalah "{0} ({1})" dan "{2} ({3})".',
+            commAdapt: 'Anda cenderung supel dan fleksibel, mampu membangun hubungan baik bahkan di lingkungan lintas budaya.',
+            commOnly: 'Anda menghargai hubungan interpersonal dan cenderung proaktif dalam berkomunikasi.',
+            adaptOnly: 'Anda memiliki kemampuan adaptasi tinggi terhadap lingkungan baru dan dapat merespons perubahan secara fleksibel.',
+            interestLearn: 'Anda memiliki minat kuat terhadap Jepang dan motivasi belajar tinggi, dengan motivasi sangat tinggi untuk hidup dan bekerja di Jepang.',
+            interestOnly: 'Anda memiliki minat tinggi terhadap budaya dan gaya hidup Jepang, menunjukkan motivasi untuk bekerja di Jepang.',
+            learnOnly: 'Anda memiliki kemampuan belajar tinggi dan proaktif dalam memperoleh pengetahuan dan keterampilan baru.',
+            careAutonomy: 'Anda memiliki kemampuan adaptasi kerja perawatan dan penilaian mandiri yang tinggi, berpotensi sebagai tenaga siap pakai.',
+            careOnly: 'Anda memiliki kualitas yang diperlukan untuk pekerjaan perawatan dan diharapkan berkinerja baik di lapangan.',
+            autonomyOnly: 'Anda memiliki kemampuan untuk berpikir dan bertindak mandiri, dengan sikap menemukan dan mengatasi tantangan sendiri.',
+            weakSevere: '"{0} ({1})" adalah skor terendah dan perlu peningkatan intensif. {2}',
+            weakModerate: '"{0} ({1})" adalah indikator yang relatif rendah. {2}',
+            weakMild: 'Semua 6 indikator berada di level tinggi, tetapi "{0} ({1})" relatif lebih rendah. {2}',
+            weakSecond: 'Selain itu, "{0} ({1})" juga merupakan area untuk pertumbuhan di masa depan.',
+            weakDescs: [
+                'Minat terhadap Jepang agak rendah. Penting untuk memperdalam pemahaman tentang budaya dan kehidupan Jepang untuk meningkatkan motivasi kerja.',
+                'Bakat belajar bahasa Jepang relatif rendah. Bangun kebiasaan belajar yang konsisten dan aktif berusaha meningkatkan bahasa Jepang.',
+                'Kemampuan adaptasi lintas budaya agak lemah. Pelajari kebiasaan dan aturan Jepang secara aktif dan kembangkan kemampuan merespons secara fleksibel.',
+                'Keterampilan komunikasi masih ada ruang untuk berkembang. Latih percakapan sehari-hari dan kembangkan sikap proaktif dalam berinteraksi dengan orang lain.',
+                'Kemampuan adaptasi kerja perawatan masih bisa dikembangkan. Disarankan untuk mempelajari pengetahuan dasar perawatan dan cara berinteraksi dengan penerima layanan.',
+                'Penilaian mandiri agak tertahan. Secara bertahap kembangkan kemampuan berpikir dan bertindak sendiri dengan dukungan dari senior.'
+            ]
+        }
+    },
+    km: {
+        patternNames: { A: 'អ្នកជំនាញគ្រប់ជ្រុង', B: 'អ្នកទំនាក់ទំនងស្រលាញ់ជប៉ុន', C: 'អ្នករត់ស្ថិតស្ថេរ' },
+        patternDesc: {
+            A: 'ប្រភេទគ្រប់ជ្រុងដែលមានពិន្ទុខ្ពស់ស្មើគ្នាក្នុងសូចនាករទាំង ៦។ ពូកែជាពិសេសក្នុងការសម្របខ្លួនក្នុងការងារថែទាំ និងសមត្ថភាពរៀនភាសាជប៉ុន អាចបំពេញការងារបានស្ថិរភាពក្នុងបរិស្ថានឆ្លងវប្បធម៌។',
+            B: 'ប្រភេទសង្គមដែលមានចំណាប់អារម្មណ៍ខ្ពស់ក្នុងប្រទេសជប៉ុន និងសមត្ថភាពទំនាក់ទំនងខ្ពស់បំផុត។ មានទំនាក់ទំនងជិតស្និទ្ធជាមួយវប្បធម៌ជប៉ុន អាចបង្កើតទំនុកចិត្តជាមួយអ្នកប្រើប្រាស់សេវា និងបុគ្គលិកបានយ៉ាងរហ័ស។',
+            C: 'ប្រភេទស្ថិតស្ថេរដែលមានសមត្ថភាពរៀនភាសាជប៉ុន និងចំណាប់អារម្មណ៍ក្នុងប្រទេសជប៉ុនខ្ពស់ស្មើគ្នា។ ប្រមូលផ្តុំកិច្ចខិតខំប្រឹងប្រែងបន្តិចម្តងៗ ហើយរីកចម្រើនដោយស្ថិរភាព។ ឲ្យតម្លៃការធ្វើការជាក្រុម។'
+        },
+        traitNames: ['ចំណាប់អារម្មណ៍ជប៉ុន', 'រៀនភាសាជប៉ុន', 'សម្របវប្បធម៌', 'ទំនាក់ទំនង', 'សម្របការថែទាំ', 'វិនិច្ឆ័យខ្លួនឯង'],
+        headings: {
+            typeFeature: 'លក្ខណៈពិសេសនៃប្រភេទនេះ',
+            similarity: 'ភាពស្រដៀងគ្នាជាមួយគ្រប់គំរូ',
+            personality: 'និន្នាការបុគ្គលិកលក្ខណៈរបស់អ្នក',
+            weakness: '【ចំណុចខ្សោយដែលត្រូវកែលម្អ】'
+        },
+        analysis: {
+            topStrength: 'លក្ខណៈខ្ពស់បំផុតរបស់អ្នកគឺ "{0} ({1})" និង "{2} ({3})"។',
+            commAdapt: 'អ្នកមានទំនោរក្នុងការសង្គម និងមានភាពបត់បែន អាចបង្កើតទំនាក់ទំនងល្អក្នុងបរិស្ថានឆ្លងវប្បធម៌។',
+            commOnly: 'អ្នកផ្តល់តម្លៃលើទំនាក់ទំនងជាមួយមនុស្ស និងមានទំនោរក្នុងការទំនាក់ទំនងយ៉ាងសកម្ម។',
+            adaptOnly: 'អ្នកមានសមត្ថភាពសម្របខ្លួនខ្ពស់ចំពោះបរិស្ថានថ្មី អាចឆ្លើយតបនឹងការផ្លាស់ប្តូរដោយបត់បែន។',
+            interestLearn: 'អ្នកមានចំណាប់អារម្មណ៍ខ្លាំងក្នុងប្រទេសជប៉ុន និងកម្លាំងចិត្តខ្ពស់ក្នុងការរៀន មានកម្លាំងចិត្តខ្ពស់បំផុតក្នុងការរស់នៅ និងធ្វើការនៅជប៉ុន។',
+            interestOnly: 'អ្នកមានចំណាប់អារម្មណ៍ខ្ពស់ក្នុងវប្បធម៌ និងជីវិតជប៉ុន បង្ហាញពីកម្លាំងចិត្តក្នុងការធ្វើការនៅជប៉ុន។',
+            learnOnly: 'អ្នកមានសមត្ថភាពរៀនខ្ពស់ និងសកម្មក្នុងការទទួលចំណេះដឹង និងជំនាញថ្មីៗ។',
+            careAutonomy: 'អ្នកមានទាំងសមត្ថភាពសម្របការថែទាំ និងវិនិច្ឆ័យខ្លួនឯងខ្ពស់ មានសក្តានុពលជាកម្លាំងចម្បង។',
+            careOnly: 'អ្នកមានគុណសម្បត្តិចាំបាច់សម្រាប់ការងារថែទាំ ហើយត្រូវបានរំពឹងថានឹងធ្វើការបានល្អក្នុងកន្លែងការងារ។',
+            autonomyOnly: 'អ្នកមានសមត្ថភាពគិត និងធ្វើសកម្មភាពដោយខ្លួនឯង មានទស្សនវិស័យក្នុងការស្វែងរក និងដោះស្រាយបញ្ហាដោយខ្លួនឯង។',
+            weakSevere: '"{0} ({1})" គឺជាពិន្ទុទាបបំផុត ត្រូវការការកែលម្អយ៉ាងខ្លាំង។ {2}',
+            weakModerate: '"{0} ({1})" គឺជាសូចនាករដែលទាបជាងគេ។ {2}',
+            weakMild: 'សូចនាករទាំង ៦ សុទ្ធតែខ្ពស់ ប៉ុន្តែ "{0} ({1})" ទាបជាងគេបន្តិច។ {2}',
+            weakSecond: 'ក្រៅពីនេះ "{0} ({1})" ក៏ជាចំណុចដែលត្រូវអភិវឌ្ឍន៍ផងដែរ។',
+            weakDescs: [
+                'ចំណាប់អារម្មណ៍ក្នុងប្រទេសជប៉ុនទាបបន្តិច។ ត្រូវស្វែងយល់ពីវប្បធម៌ និងជីវិតជប៉ុនឱ្យកាន់តែជ្រៅ ដើម្បីបង្កើនកម្លាំងចិត្តក្នុងការធ្វើការ។',
+                'សមត្ថភាពរៀនភាសាជប៉ុនទាបជាងគេ។ ត្រូវបង្កើតទម្លាប់រៀនជាប្រចាំ និងខិតខំកែលម្អភាសាជប៉ុនយ៉ាងសកម្ម។',
+                'សមត្ថភាពសម្របវប្បធម៌ឆ្លងខ្សោយបន្តិច។ ត្រូវរៀនទម្លាប់ និងច្បាប់ជប៉ុនយ៉ាងសកម្ម និងអភិវឌ្ឍសមត្ថភាពឆ្លើយតបដោយបត់បែន។',
+                'ជំនាញទំនាក់ទំនងនៅមានកន្លែងអភិវឌ្ឍន៍។ ត្រូវហ្វឹកហាត់សន្ទនាប្រចាំថ្ងៃ និងអភិវឌ្ឍទស្សនវិស័យសកម្មក្នុងការទំនាក់ទំនងជាមួយអ្នកដទៃ។',
+                'សមត្ថភាពសម្របការថែទាំនៅអាចអភិវឌ្ឍបន្ថែម។ គួររៀនចំណេះដឹងថែទាំមូលដ្ឋាន និងរបៀបទំនាក់ទំនងជាមួយអ្នកទទួលសេវា។',
+                'វិនិច្ឆ័យខ្លួនឯងបន្តិចរក្សាខ្លួន។ ត្រូវអភិវឌ្ឍសមត្ថភាពគិត និងធ្វើសកម្មភាពដោយខ្លួនឯងបន្តិចម្តងៗ ដោយមានការគាំទ្រពីរុក្ខជាន់ខ្ពស់។'
+            ]
+        }
+    },
+    bn: {
+        patternNames: { A: 'সর্বজনীন বিশেষজ্ঞ', B: 'জাপানপ্রেমী যোগাযোগকারী', C: 'স্থিতিশীল ধাবক' },
+        patternDesc: {
+            A: 'সকল ৬টি সূচকে সমানভাবে উচ্চ স্কোর সহ সর্বজনীন ধরন। বিশেষত কেয়ারওয়ার্ক অভিযোজন এবং জাপানি ভাষা শেখার যোগ্যতায় অসাধারণ, আন্তঃসাংস্কৃতিক পরিবেশেও স্থিতিশীল কর্মক্ষমতা দেখাতে পারে। কেয়ার সেটিংয়ে তাৎক্ষণিক সম্পদ হিসেবে প্রত্যাশিত।',
+            B: 'জাপানের প্রতি আগ্রহ এবং যোগাযোগ দক্ষতা অত্যন্ত উচ্চ সামাজিক ধরন। জাপানি সংস্কৃতির সাথে দৃঢ় সম্পর্ক রয়েছে, ব্যবহারকারী এবং কর্মীদের সাথে দ্রুত বিশ্বাস তৈরি করতে পারে। স্বায়ত্তশাসিত রায় দেওয়ার ক্ষমতাও উচ্চ।',
+            C: 'জাপানি ভাষা শেখার যোগ্যতা এবং জাপানের প্রতি আগ্রহ সমানভাবে উচ্চ স্থিতিশীল ধরন। ধীরে ধীরে প্রচেষ্টা সঞ্চয় করে এবং স্থিরভাবে বৃদ্ধি পায়। দলগত কাজকে মূল্য দেয় এবং নির্দেশনা অনুসারে বিশ্বস্তভাবে কাজ করে।'
+        },
+        traitNames: ['জাপানে আগ্রহ', 'জাপানি ভাষা শিক্ষা', 'আন্তঃসাংস্কৃতিক অভিযোজন', 'যোগাযোগ', 'কেয়ারওয়ার্ক অভিযোজন', 'স্বায়ত্তশাসিত রায়'],
+        headings: {
+            typeFeature: 'এই ধরনের বৈশিষ্ট্য',
+            similarity: 'প্রতিটি প্যাটার্নের সাথে সাদৃশ্য',
+            personality: 'আপনার ব্যক্তিত্বের প্রবণতা',
+            weakness: '【দুর্বলতা ও উন্নতির ক্ষেত্র】'
+        },
+        analysis: {
+            topStrength: 'আপনার সর্বোচ্চ বৈশিষ্ট্য হলো "{0} ({1})" এবং "{2} ({3})"।',
+            commAdapt: 'আপনি সামাজিক এবং নমনীয়, আন্তঃসাংস্কৃতিক পরিবেশেও ভালো সম্পর্ক তৈরি করতে পারেন।',
+            commOnly: 'আপনি মানুষের সাথে সম্পর্ককে মূল্য দেন এবং যোগাযোগে সক্রিয় থাকেন।',
+            adaptOnly: 'আপনি নতুন পরিবেশে উচ্চ অভিযোজনযোগ্যতা রাখেন এবং পরিবর্তনে নমনীয়ভাবে সাড়া দিতে পারেন।',
+            interestLearn: 'জাপানের প্রতি আপনার প্রবল আগ্রহ এবং উচ্চ শেখার প্রেরণা রয়েছে, জাপানে বসবাস ও কাজ করার প্রেরণা অত্যন্ত উচ্চ।',
+            interestOnly: 'জাপানি সংস্কৃতি ও জীবনধারার প্রতি আপনার উচ্চ আগ্রহ রয়েছে, জাপানে কাজ করার প্রেরণা দেখাচ্ছে।',
+            learnOnly: 'আপনার শেখার ক্ষমতা উচ্চ এবং নতুন জ্ঞান ও দক্ষতা অর্জনে সক্রিয়।',
+            careAutonomy: 'কেয়ারওয়ার্ক অভিযোজন এবং স্বায়ত্তশাসিত রায় দুটোই উচ্চ, তাৎক্ষণিক সম্পদ হওয়ার সম্ভাবনা রয়েছে।',
+            careOnly: 'কেয়ার কাজের জন্য প্রয়োজনীয় গুণাবলী রয়েছে এবং কর্মক্ষেত্রে ভালো পারফরম্যান্স প্রত্যাশিত।',
+            autonomyOnly: 'নিজে চিন্তা করে কাজ করার ক্ষমতা রয়েছে, নিজেই সমস্যা খুঁজে বের করে সমাধান করার মনোভাব আছে।',
+            weakSevere: '"{0} ({1})" সর্বনিম্ন স্কোর, নিবিড় উন্নতি প্রয়োজন। {2}',
+            weakModerate: '"{0} ({1})" তুলনামূলকভাবে কম সূচক। {2}',
+            weakMild: 'সকল ৬ সূচক উচ্চ মাত্রায়, তবে "{0} ({1})" তুলনামূলকভাবে কম। {2}',
+            weakSecond: 'এছাড়াও, "{0} ({1})" ভবিষ্যতে উন্নয়নের একটি ক্ষেত্র।',
+            weakDescs: [
+                'জাপানের প্রতি আগ্রহ কিছুটা কম। কাজের প্রেরণা বাড়াতে জাপানি সংস্কৃতি ও জীবনধারা সম্পর্কে গভীর বোঝাপড়া গড়ে তুলুন।',
+                'জাপানি ভাষা শেখার যোগ্যতা তুলনামূলক কম। ধারাবাহিক অধ্যয়নের অভ্যাস গড়ে তুলুন এবং জাপানি ভাষা উন্নয়নে সক্রিয়ভাবে চেষ্টা করুন।',
+                'আন্তঃসাংস্কৃতিক অভিযোজন কিছুটা দুর্বল। জাপানি রীতি-নীতি ও নিয়ম সক্রিয়ভাবে শিখুন এবং নমনীয়ভাবে সাড়া দেওয়ার ক্ষমতা গড়ে তুলুন।',
+                'যোগাযোগ দক্ষতায় বৃদ্ধির সুযোগ রয়েছে। দৈনন্দিন কথোপকথন অনুশীলন করুন এবং অন্যদের সাথে সক্রিয়ভাবে যোগাযোগ করুন।',
+                'কেয়ারওয়ার্ক অভিযোজন আরও উন্নত করার সুযোগ রয়েছে। কেয়ারের মৌলিক জ্ঞান এবং সেবা গ্রহণকারীদের সাথে আচরণের উপায় আগে থেকে শিখুন।',
+                'স্বায়ত্তশাসিত রায় কিছুটা সংরক্ষিত। সিনিয়রদের সহায়তায় ধীরে ধীরে নিজে চিন্তা করে কাজ করার ক্ষমতা গড়ে তুলুন।'
+            ]
+        }
+    }
+};
+
+const TRAIT_NAMES_FULL = PATTERN_I18N['ja'].traitNames;
 
 // Build SVG radar chart for email/PDF (no canvas needed)
 function buildRadarSVG(scores, color, size, customLabels) {
@@ -2789,7 +3104,12 @@ function matchPattern(traits) {
     return { type: bestMatch, distance: bestDist, distances: distances, similarities: similarities, pattern: PATTERNS[bestMatch] };
 }
 
-function generatePersonalityAnalysis(traits) {
+function generatePersonalityAnalysis(traits, lang) {
+    var pLang = lang || appState.currentLanguage || 'ja';
+    var i18n = PATTERN_I18N[pLang] || PATTERN_I18N['ja'];
+    var a = i18n.analysis;
+    var tn = i18n.traitNames;
+
     const userScores = [traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy];
 
     // Find top 2 strengths and weakest
@@ -2802,62 +3122,52 @@ function generatePersonalityAnalysis(traits) {
     var analysis = [];
 
     // Strength description
-    analysis.push('あなたの最も高い特性は「' + TRAIT_NAMES_FULL[strengths[0].idx] + '（' + strengths[0].val.toFixed(1) + '）」と「' + TRAIT_NAMES_FULL[strengths[1].idx] + '（' + strengths[1].val.toFixed(1) + '）」です。');
+    analysis.push(a.topStrength.replace('{0}', tn[strengths[0].idx]).replace('{1}', strengths[0].val.toFixed(1)).replace('{2}', tn[strengths[1].idx]).replace('{3}', strengths[1].val.toFixed(1)));
 
     // Personality tendency based on score combinations
     if (traits.communication >= 4.0 && traits.adaptation >= 4.0) {
-        analysis.push('社交的で柔軟性が高く、異文化環境でも円滑な人間関係を築ける傾向があります。');
+        analysis.push(a.commAdapt);
     } else if (traits.communication >= 4.0) {
-        analysis.push('人との関わりを大切にし、コミュニケーションに積極的な傾向があります。');
+        analysis.push(a.commOnly);
     } else if (traits.adaptation >= 4.0) {
-        analysis.push('新しい環境への適応力が高く、変化に柔軟に対応できる傾向があります。');
+        analysis.push(a.adaptOnly);
     }
 
     if (traits.interest >= 4.0 && traits.learning >= 4.0) {
-        analysis.push('日本への強い関心と高い学習意欲を持ち、日本での生活・就労に対するモチベーションが非常に高いです。');
+        analysis.push(a.interestLearn);
     } else if (traits.interest >= 4.0) {
-        analysis.push('日本の文化や生活に対する関心が高く、日本での就労への意欲が感じられます。');
+        analysis.push(a.interestOnly);
     } else if (traits.learning >= 4.0) {
-        analysis.push('学習能力が高く、新しい知識やスキルの習得に積極的です。');
+        analysis.push(a.learnOnly);
     }
 
     if (traits.careWork >= 4.0 && traits.autonomy >= 4.0) {
-        analysis.push('介護職への適応力と自律的判断力の両方が高く、即戦力としての素質があります。');
+        analysis.push(a.careAutonomy);
     } else if (traits.careWork >= 4.0) {
-        analysis.push('介護の仕事に必要な資質を持ち、現場での活躍が期待できます。');
+        analysis.push(a.careOnly);
     } else if (traits.autonomy >= 4.0) {
-        analysis.push('主体的に考え行動できる力があり、自ら課題を見つけて取り組む姿勢があります。');
+        analysis.push(a.autonomyOnly);
     }
 
-    // Weakness analysis (弱み) - always analyze relative weakness
+    // Weakness analysis
     analysis.push('');
-    analysis.push('【弱み・克服すべき点】');
+    analysis.push(i18n.headings.weakness);
 
-    // Always report the weakest trait (relative weakness)
     var weak1 = indexed[indexed.length - 1];
     var weak2 = indexed[indexed.length - 2];
 
-    // Weakness descriptions per trait
-    var weakDesc = {};
-    weakDesc[0] = '日本への関心がやや低めです。日本の文化・生活への理解を深め、就労モチベーションをさらに高めることが大切です。';
-    weakDesc[1] = '日本語学習適性が相対的に低い傾向です。継続的な学習習慣を身につけ、日本語力の向上に積極的に取り組みましょう。';
-    weakDesc[2] = '異文化適応力がやや弱めです。日本の習慣やルールを積極的に学び、柔軟に対応する力を養いましょう。';
-    weakDesc[3] = 'コミュニケーション能力に伸びしろがあります。日常会話の練習や、周囲と積極的に関わる姿勢を身につけましょう。';
-    weakDesc[4] = '介護職適応力をさらに伸ばす余地があります。介護の基本知識や利用者への接し方を事前に学ぶことをお勧めします。';
-    weakDesc[5] = '自律的判断力がやや控えめです。先輩のサポートを受けながら、徐々に自分で考えて行動する力を養いましょう。';
-
     // Severity-based prefix
     if (weak1.val < 3.0) {
-        analysis.push('「' + TRAIT_NAMES_FULL[weak1.idx] + '（' + weak1.val.toFixed(1) + '）」が最も低く、重点的な強化が必要です。' + weakDesc[weak1.idx]);
+        analysis.push(a.weakSevere.replace('{0}', tn[weak1.idx]).replace('{1}', weak1.val.toFixed(1)).replace('{2}', a.weakDescs[weak1.idx]));
     } else if (weak1.val < 4.0) {
-        analysis.push('「' + TRAIT_NAMES_FULL[weak1.idx] + '（' + weak1.val.toFixed(1) + '）」が相対的に低い指標です。' + weakDesc[weak1.idx]);
+        analysis.push(a.weakModerate.replace('{0}', tn[weak1.idx]).replace('{1}', weak1.val.toFixed(1)).replace('{2}', a.weakDescs[weak1.idx]));
     } else {
-        analysis.push('6指標すべてが高水準ですが、その中で「' + TRAIT_NAMES_FULL[weak1.idx] + '（' + weak1.val.toFixed(1) + '）」が相対的に低めです。' + weakDesc[weak1.idx]);
+        analysis.push(a.weakMild.replace('{0}', tn[weak1.idx]).replace('{1}', weak1.val.toFixed(1)).replace('{2}', a.weakDescs[weak1.idx]));
     }
 
     // Second weakest if notably different from strongest
     if (weak2.val < strengths[0].val - 0.5) {
-        analysis.push('また、「' + TRAIT_NAMES_FULL[weak2.idx] + '（' + weak2.val.toFixed(1) + '）」も今後の成長ポイントです。');
+        analysis.push(a.weakSecond.replace('{0}', tn[weak2.idx]).replace('{1}', weak2.val.toFixed(1)));
     }
 
     return analysis;
@@ -2927,6 +3237,7 @@ function showResults() {
     }, 100);
 
     // Pattern matching section (replaces old comment section)
+    var pi18n = PATTERN_I18N[appState.currentLanguage] || PATTERN_I18N['ja'];
     const patternDiv = document.createElement('div');
     patternDiv.style.cssText = 'background:' + match.pattern.bg + ';border:2px solid ' + match.pattern.border + ';border-radius:12px;padding:24px;margin:20px 0;';
 
@@ -2934,25 +3245,25 @@ function showResults() {
     // Header with pattern badge
     ph += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">';
     ph += '<span style="background:' + match.pattern.color + ';color:white;padding:8px 20px;border-radius:24px;font-size:16px;font-weight:700">' + match.type + '型</span>';
-    ph += '<span style="font-size:18px;font-weight:700;color:#374151">' + match.pattern.name + '</span>';
+    ph += '<span style="font-size:18px;font-weight:700;color:#374151">' + (pi18n.patternNames[match.type] || match.pattern.name) + '</span>';
     ph += '<span style="font-size:13px;color:#666;background:white;padding:4px 12px;border-radius:12px;border:1px solid #e5e7eb">一致度: ' + match.similarities[match.type] + '%</span>';
     ph += '</div>';
 
     // Pattern description
     ph += '<div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid #e5e7eb">';
-    ph += '<h3 style="color:' + match.pattern.color + ';font-size:15px;margin:0 0 10px 0">このタイプの特徴</h3>';
-    ph += '<p style="font-size:14px;color:#374151;line-height:1.8;margin:0">' + match.pattern.description + '</p>';
+    ph += '<h3 style="color:' + match.pattern.color + ';font-size:15px;margin:0 0 10px 0">' + pi18n.headings.typeFeature + '</h3>';
+    ph += '<p style="font-size:14px;color:#374151;line-height:1.8;margin:0">' + (pi18n.patternDesc[match.type] || match.pattern.description) + '</p>';
     ph += '</div>';
 
     // Similarity bars for all 3 patterns
     ph += '<div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid #e5e7eb">';
-    ph += '<h3 style="color:#374151;font-size:14px;margin:0 0 12px 0">各パターンとの類似度</h3>';
-    ['A', 'B', 'C'].forEach(function(key) {
-        var p = PATTERNS[key];
-        var sim = match.similarities[key];
-        var isMatch = (key === match.type);
+    ph += '<h3 style="color:#374151;font-size:14px;margin:0 0 12px 0">' + pi18n.headings.similarity + '</h3>';
+    ['A', 'B', 'C'].forEach(function(pType) {
+        var p = PATTERNS[pType];
+        var sim = match.similarities[pType];
+        var isMatch = (pType === match.type);
         ph += '<div style="display:flex;align-items:center;margin-bottom:8px">';
-        ph += '<span style="width:180px;font-size:13px;font-weight:' + (isMatch ? '700' : '400') + ';color:' + (isMatch ? p.color : '#666') + '">' + key + '型 ' + p.name + '</span>';
+        ph += '<span style="width:180px;font-size:13px;font-weight:' + (isMatch ? '700' : '400') + ';color:' + (isMatch ? p.color : '#666') + '">' + pType + '型 ' + (pi18n.patternNames[pType] || p.name) + '</span>';
         ph += '<div style="flex:1;background:#f3f4f6;border-radius:4px;height:10px;margin:0 10px"><div style="background:' + p.color + ';height:10px;border-radius:4px;width:' + sim + '%;opacity:' + (isMatch ? '1' : '0.5') + '"></div></div>';
         ph += '<span style="width:40px;text-align:right;font-size:13px;font-weight:' + (isMatch ? '700' : '400') + ';color:' + (isMatch ? p.color : '#888') + '">' + sim + '%</span>';
         ph += '</div>';
@@ -2962,7 +3273,7 @@ function showResults() {
     // Personality analysis
     var personalityItems = generatePersonalityAnalysis(traits);
     ph += '<div style="background:white;border-radius:8px;padding:16px;border:1px solid #e5e7eb">';
-    ph += '<h3 style="color:#374151;font-size:15px;margin:0 0 12px 0">あなたの性格傾向・特性</h3>';
+    ph += '<h3 style="color:#374151;font-size:15px;margin:0 0 12px 0">' + pi18n.headings.personality + '</h3>';
     personalityItems.forEach(function(item) {
         ph += '<p style="font-size:13px;color:#555;line-height:1.7;margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + match.pattern.color + ';border-radius:0 4px 4px 0">' + item + '</p>';
     });
@@ -3298,15 +3609,16 @@ function buildPdfHTML(lang) {
     var shortLabels = radarLabels;
 
     // Build pattern analysis HTML for PDF
+    var pi18n = PATTERN_I18N[pdfLang] || PATTERN_I18N['ja'];
     const match2 = appState.matchResult || matchPattern(traits);
-    const personalityItems2 = generatePersonalityAnalysis(traits);
+    const personalityItems2 = generatePersonalityAnalysis(traits, pdfLang);
     var pdfPatternHTML = '';
     pdfPatternHTML += '<div style="background:' + match2.pattern.bg + ';border:2px solid ' + match2.pattern.border + ';border-radius:8px;padding:16px;margin:12px 0;">';
-    pdfPatternHTML += '<div style="margin-bottom:10px"><span style="background:' + match2.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + match2.type + '型 ' + match2.pattern.name + '</span>';
+    pdfPatternHTML += '<div style="margin-bottom:10px"><span style="background:' + match2.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + match2.type + '型 ' + (pi18n.patternNames[match2.type] || match2.pattern.name) + '</span>';
     pdfPatternHTML += ' <span style="font-size:13px;color:#666">（一致度: ' + match2.similarities[match2.type] + '%）</span></div>';
-    pdfPatternHTML += '<p style="font-size:14px;color:#374151;line-height:1.7;margin:10px 0">' + match2.pattern.description + '</p>';
+    pdfPatternHTML += '<p style="font-size:14px;color:#374151;line-height:1.7;margin:10px 0">' + (pi18n.patternDesc[match2.type] || match2.pattern.description) + '</p>';
     pdfPatternHTML += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb">';
-    pdfPatternHTML += '<p style="font-weight:700;font-size:14px;color:#374151;margin:0 0 8px">性格傾向・特性</p>';
+    pdfPatternHTML += '<p style="font-weight:700;font-size:14px;color:#374151;margin:0 0 8px">' + pi18n.headings.personality + '</p>';
     personalityItems2.forEach(function(item) {
         pdfPatternHTML += '<p style="margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + match2.pattern.color + ';font-size:13px;line-height:1.6">' + item + '</p>';
     });
@@ -3447,9 +3759,15 @@ async function sendResultsEmail() {
 
         // Step 2: Generate local language PDF (skip if already Japanese)
         var pdfBase64Local = null;
+        console.log('User language:', userLang);
         if (userLang !== 'ja') {
             showEmailStatus('📄 PDFを生成しています（現地語版）...', '#667eea');
-            pdfBase64Local = await generatePdfBase64(userLang);
+            try {
+                pdfBase64Local = await generatePdfBase64(userLang);
+                console.log('Local PDF generated, length:', pdfBase64Local ? pdfBase64Local.length : 0);
+            } catch (localErr) {
+                console.error('Local PDF generation failed:', localErr);
+            }
         }
 
         showEmailStatus('📧 メールを送信しています...', '#667eea');
@@ -3503,7 +3821,11 @@ async function sendResultsEmail() {
 
         // Step 4: Always save locally as backup (like rirekisho)
         localSavePdf(pdfBase64Ja, pdfFilenameJa);
-        if (pdfBase64Local) localSavePdf(pdfBase64Local, pdfFilenameLocal);
+        if (pdfBase64Local) {
+            // Delay 2nd download to avoid browser blocking
+            await new Promise(function(r) { setTimeout(r, 1500); });
+            localSavePdf(pdfBase64Local, pdfFilenameLocal);
+        }
 
         if (emailSent) {
             showEmailStatus('✅ メール送信完了！PDFも保存しました。（送信先: ' + toEmail + '）', 'green');
@@ -3521,6 +3843,7 @@ async function sendResultsEmail() {
             const fb1 = await generatePdfBase64('ja');
             if (fb1) localSavePdf(fb1, pdfFilenameJa);
             if (userLang !== 'ja') {
+                await new Promise(function(r) { setTimeout(r, 1500); });
                 const fb2 = await generatePdfBase64(userLang);
                 if (fb2) localSavePdf(fb2, pdfFilenameLocal);
             }
