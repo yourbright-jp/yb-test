@@ -133,10 +133,55 @@
         option .ja-sub { display: none; }
         .header .ja-sub { color: rgba(255,255,255,0.7); font-size: 0.6em; }
         .lang-btn .ja-sub { font-size: 0.75em; color: #aaa; }
+
+        /* Gate Screen */
+        .gate-screen { display:flex; align-items:center; justify-content:center; min-height:80vh; }
+        .gate-card { background:#fff; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.12); padding:48px 40px; max-width:460px; width:100%; text-align:center; }
+        .gate-card h2 { font-size:22px; color:#333; margin-bottom:8px; border:none; padding:0; }
+        .gate-card p { font-size:14px; color:#888; margin-bottom:28px; }
+        .gate-card .code-input { width:200px; text-align:center; font-size:28px; letter-spacing:8px; font-weight:700; padding:14px; border:2px solid #ddd; border-radius:8px; margin:0 auto 20px; display:block; }
+        .gate-card .code-input:focus { border-color:#667eea; box-shadow:0 0 0 3px rgba(102,126,234,0.15); outline:none; }
+        .gate-card .gate-error { color:#ef4444; font-size:13px; margin-bottom:12px; display:none; }
+        .gate-card .btn-primary { width:200px; }
+        .gate-admin-link { margin-top:24px; font-size:12px; color:#bbb; cursor:pointer; }
+        .gate-admin-link:hover { color:#667eea; }
+
+        /* Admin Panel */
+        .admin-panel { display:none; margin-top:24px; padding:20px; background:#f0f4ff; border-radius:8px; text-align:center; }
+        .admin-panel .admin-code-display { font-size:36px; font-weight:700; color:#667eea; letter-spacing:6px; margin:12px 0; }
+        .admin-panel .admin-timer { font-size:14px; color:#666; margin-bottom:12px; }
+        .admin-panel .admin-password { width:180px; text-align:center; padding:10px; border:2px solid #ddd; border-radius:8px; font-size:14px; margin-bottom:12px; }
+        .admin-panel .admin-password:focus { border-color:#667eea; outline:none; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Gate Screen -->
+    <div id="gateScreen" class="gate-screen">
+        <div class="gate-card">
+            <h2>ユアブライト適性検査</h2>
+            <p>アクセスコードを入力してください</p>
+            <input type="text" id="gateCodeInput" class="code-input" maxlength="6" placeholder="------" inputmode="numeric" autocomplete="off">
+            <div id="gateError" class="gate-error">コードが無効または期限切れです</div>
+            <button type="button" class="btn-primary" onclick="validateGateCode()">開始</button>
+
+            <div class="gate-admin-link" onclick="toggleAdminPanel()">管理者</div>
+            <div id="adminPanel" class="admin-panel">
+                <input type="password" id="adminPassword" class="admin-password" placeholder="管理者パスワード">
+                <br>
+                <button type="button" class="btn-primary" style="width:180px;margin-bottom:16px;font-size:14px;" onclick="adminLogin()">ログイン</button>
+                <div id="adminContent" style="display:none;">
+                    <button type="button" class="btn-primary" style="width:180px;font-size:14px;" onclick="issueCode()">コード発行</button>
+                    <div id="adminCodeDisplay" class="admin-code-display" style="display:none;"></div>
+                    <div id="adminTimer" class="admin-timer" style="display:none;"></div>
+                    <div style="margin-top:16px;">
+                        <button type="button" class="btn-outline" style="font-size:13px;" onclick="adminEnterTest()">テストを開始（管理者）</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer" style="display:none;">
         <!-- Header -->
         <div class="header">
             <h1 data-i18n="title">ユアブライト適性検査テスト</h1>
@@ -1524,7 +1569,7 @@ const translations = {
         workplace: "สถานที่ทำงาน",
         facility: "ชื่อสถานที่",
         jpLanguage: "ระดับภาษาญี่ปุ่น",
-        jpYears: "จำนวนปีในญี่ปุ่น",
+        jpYears: "จำนวนปีอาศัยอยู่ในญี่ปุ่น",
         qualifications: "คุณวุฒิ",
         cohabitants: "จำนวนผู้อยู่ร่วม",
         housing: "ประเภทที่พัก",
@@ -1591,11 +1636,11 @@ const translations = {
         housing3: "Share House",
         housing4: "บ้านของตัวเอง",
         housing5: "อื่นๆ",
-        duty1: "ช่วยรับประทานอาหาร",
-        duty2: "ช่วยอาบน้ำ",
-        duty3: "ช่วยห้องน้ำ",
-        duty4: "ช่วยเคลื่อนย้าย",
-        duty5: "ช่วยแต่งตัว",
+        duty1: "ดูแลรับประทานอาหาร",
+        duty2: "ดูแลอาบน้ำ",
+        duty3: "ดูแลเรื่องขับถ่าย",
+        duty4: "ดูแลเคลื่อนย้าย",
+        duty5: "ดูแลแต่งตัว",
         duty6: "ดูแลช่องปาก",
         duty7: "เปลี่ยนท่า",
         duty8: "ทำความสะอาด/ซักผ้า",
@@ -1641,7 +1686,7 @@ const translations = {
         q10: "หลังจากถูกแก้ไข วิจารณ์ หรือหัวเราะ ฉันปรับปรุงและลองใหม่",
         q11: "คุณเคยหมกมุ่นกับบางสิ่งจนกลายเป็นส่วนหนึ่งของชีวิตประจำวันไหม?",
         q11o1: "ใช่",
-        q11o2: "บ้าง",
+        q11o2: "มีบ้าง",
         q11o3: "ไม่แน่ใจ",
         q11o4: "คงไม่",
         q11o5: "ไม่",
@@ -1906,6 +1951,103 @@ const translations = {
     }
 };
 
+// ==================== ACCESS CODE SYSTEM ====================
+var ADMIN_PASSWORD = 'YBtest2026';
+var CODE_SALT = 3571;
+var CODE_VALIDITY_MINUTES = 30;
+var adminTimerInterval = null;
+
+function getCodeForMinute(mins) {
+    return ((mins * CODE_SALT) % 900000 + 100000).toString();
+}
+
+function generateAccessCode() {
+    var mins = Math.floor(Date.now() / 60000);
+    return { code: getCodeForMinute(mins), generatedAt: mins };
+}
+
+function validateAccessCode(input) {
+    if (!input || input.length !== 6) return false;
+    var nowMins = Math.floor(Date.now() / 60000);
+    for (var i = 0; i < CODE_VALIDITY_MINUTES; i++) {
+        if (input === getCodeForMinute(nowMins - i)) return true;
+    }
+    return false;
+}
+
+function validateGateCode() {
+    var code = document.getElementById('gateCodeInput').value.trim();
+    var errEl = document.getElementById('gateError');
+    if (validateAccessCode(code)) {
+        errEl.style.display = 'none';
+        document.getElementById('gateScreen').style.display = 'none';
+        document.getElementById('mainContainer').style.display = 'block';
+    } else {
+        errEl.style.display = 'block';
+        document.getElementById('gateCodeInput').value = '';
+        document.getElementById('gateCodeInput').focus();
+    }
+}
+
+function toggleAdminPanel() {
+    var panel = document.getElementById('adminPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function adminLogin() {
+    var pw = document.getElementById('adminPassword').value;
+    if (pw === ADMIN_PASSWORD) {
+        document.getElementById('adminContent').style.display = 'block';
+        document.getElementById('adminPassword').style.display = 'none';
+        document.getElementById('adminPassword').previousElementSibling && 0;
+        // Hide the login button
+        document.getElementById('adminPassword').parentElement.querySelector('.btn-primary').style.display = 'none';
+    } else {
+        alert('パスワードが正しくありません');
+    }
+}
+
+function issueCode() {
+    var result = generateAccessCode();
+    var codeEl = document.getElementById('adminCodeDisplay');
+    var timerEl = document.getElementById('adminTimer');
+    codeEl.textContent = result.code;
+    codeEl.style.display = 'block';
+    timerEl.style.display = 'block';
+
+    if (adminTimerInterval) clearInterval(adminTimerInterval);
+    var expiryTime = Date.now() + CODE_VALIDITY_MINUTES * 60 * 1000;
+
+    function updateTimer() {
+        var remaining = Math.max(0, expiryTime - Date.now());
+        var mins = Math.floor(remaining / 60000);
+        var secs = Math.floor((remaining % 60000) / 1000);
+        timerEl.textContent = '有効期限：残り ' + mins + '分' + (secs < 10 ? '0' : '') + secs + '秒';
+        if (remaining <= 0) {
+            clearInterval(adminTimerInterval);
+            timerEl.textContent = 'コードの有効期限が切れました';
+            codeEl.style.color = '#999';
+        }
+    }
+    updateTimer();
+    adminTimerInterval = setInterval(updateTimer, 1000);
+}
+
+function adminEnterTest() {
+    document.getElementById('gateScreen').style.display = 'none';
+    document.getElementById('mainContainer').style.display = 'block';
+}
+
+// Enter key on code input
+document.addEventListener('DOMContentLoaded', function() {
+    var codeInput = document.getElementById('gateCodeInput');
+    if (codeInput) {
+        codeInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); validateGateCode(); }
+        });
+    }
+});
+
 // ==================== APPLICATION STATE ====================
 let appState = {
     currentLanguage: 'ja',
@@ -1932,6 +2074,17 @@ function t(key) {
         }
     }
     return value || key;
+}
+
+function tLang(key, lang) {
+    const keys = key.split('.');
+    let value = translations[lang] || translations['ja'];
+    for (const k of keys) {
+        if (value && typeof value === 'object') {
+            value = value[k];
+        }
+    }
+    return value || tJa(key) || key;
 }
 
 function tJa(key) {
@@ -2550,8 +2703,8 @@ const PATTERNS = {
 const TRAIT_NAMES_FULL = ['日本への関心', '日本語学習適性', '異文化適応力', 'コミュニケーション能力', '介護職適応力', '自律的判断力'];
 
 // Build SVG radar chart for email/PDF (no canvas needed)
-function buildRadarSVG(scores, color, size) {
-    var labels = ['関心', '学習', '適応', 'コミュ', '介護', '自律'];
+function buildRadarSVG(scores, color, size, customLabels) {
+    var labels = customLabels || ['関心', '学習', '適応', 'コミュ', '介護', '自律'];
     var n = 6;
     var w = size, h = size;
     var cx = w/2, cy = h/2, r = Math.min(w,h) * 0.33;
@@ -2756,7 +2909,7 @@ function showResults() {
         const row = table.insertRow();
         const cell1 = row.insertCell();
         const cell2 = row.insertCell();
-        cell1.innerHTML = info.customLabel || tBi(info.label);
+        cell1.innerHTML = info.customLabel || t(info.label);
         cell2.textContent = info.value;
     });
 
@@ -2877,12 +3030,12 @@ function createRadarChart(traits, match) {
         type: 'radar',
         data: {
             labels: [
-                tBiText('traits.interest'),
-                tBiText('traits.learning'),
-                tBiText('traits.adaptation'),
-                tBiText('traits.communication'),
-                tBiText('traits.careWork'),
-                tBiText('traits.autonomy')
+                t('traits.interest'),
+                t('traits.learning'),
+                t('traits.adaptation'),
+                t('traits.communication'),
+                t('traits.careWork'),
+                t('traits.autonomy')
             ],
             datasets: datasets
         },
@@ -3121,7 +3274,9 @@ function buildEmailHTML() {
 }
 
 // ==================== PDF GENERATION ====================
-function buildPdfHTML() {
+function buildPdfHTML(lang) {
+    var pdfLang = lang || 'ja';
+    var tP = function(key) { return tLang(key, pdfLang); };
     const traits = calculateScores();
     const comments = generateDetailedComments();
     const nameR2 = document.getElementById('name')?.value || '---';
@@ -3133,6 +3288,14 @@ function buildPdfHTML() {
     const education = displayEducation(document.getElementById('education')?.value);
     const marital = displayMarital(document.getElementById('marital')?.value);
     const date = new Date().toISOString().slice(0, 10);
+
+    // Radar chart labels in the target language
+    var radarLabels = [
+        tP('traits.interest'), tP('traits.learning'), tP('traits.adaptation'),
+        tP('traits.communication'), tP('traits.careWork'), tP('traits.autonomy')
+    ];
+    // Use full labels for SVG (720px is wide enough)
+    var shortLabels = radarLabels;
 
     // Build pattern analysis HTML for PDF
     const match2 = appState.matchResult || matchPattern(traits);
@@ -3152,16 +3315,16 @@ function buildPdfHTML() {
     return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#333;background:#fff;">' +
         '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:10px;">ユアブライト検査結果</h2>' +
         '<table style="width:100%;border-collapse:collapse;margin:16px 0;">' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">氏名</td><td style="padding:6px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('country') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + country + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('education') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + education + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('age') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + age + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('gender') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + gender + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tBi('marital') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
+        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tP('name') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
+        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('country') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + country + '</td></tr>' +
+        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('education') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + education + '</td></tr>' +
+        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('age') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + age + '</td></tr>' +
+        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('gender') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + gender + '</td></tr>' +
+        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('marital') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
         '</table>' +
         '<h3 style="margin-top:24px;color:#333;text-align:left;">応募者のレーダーチャート</h3>' +
         '<div style="text-align:left;margin:20px 0;">' +
-        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 720) +
+        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 720, shortLabels) +
         '</div>' +
         '<div style="margin-top:200px;"></div>' +
         '<h3 style="margin-top:0;color:#333;">適性パターン分析</h3>' +
@@ -3171,13 +3334,13 @@ function buildPdfHTML() {
         '</div>';
 }
 
-async function generatePdfBase64() {
+async function generatePdfBase64(lang) {
     // Create container positioned at document origin (top-left)
     // MUST be position:absolute at top:0 so html2canvas captures from (0,0)
     const container = document.createElement('div');
     container.id = 'pdfRenderContainer';
     container.style.cssText = 'position:absolute;left:0;top:0;width:800px;background:#fff;padding:20px;margin:0;z-index:99999;';
-    container.innerHTML = buildPdfHTML();
+    container.innerHTML = buildPdfHTML(lang);
 
     var oldScroll = window.scrollY;
     document.body.appendChild(container);
@@ -3269,33 +3432,48 @@ async function sendResultsEmail() {
 
     // Disable button while sending
     if (btn) { btn.disabled = true; btn.textContent = '📧 PDF作成中...'; }
-    showEmailStatus('📄 PDFを生成しています...', '#667eea');
+    showEmailStatus('📄 PDFを生成しています（日本語版）...', '#667eea');
 
     const name = document.getElementById('name')?.value || '---';
     const date = new Date().toISOString().slice(0, 10);
-    const pdfFilename = 'YB_Result_' + (name.replace(/\s+/g, '_')) + '_' + date + '.pdf';
+    const userLang = appState.currentLanguage;
+    const pdfFilenameJa = 'YB_Result_' + (name.replace(/\s+/g, '_')) + '_' + date + '_JA.pdf';
+    const pdfFilenameLocal = 'YB_Result_' + (name.replace(/\s+/g, '_')) + '_' + date + '_' + userLang.toUpperCase() + '.pdf';
 
     try {
-        // Step 1: Generate PDF as base64
-        const pdfBase64 = await generatePdfBase64();
-        if (!pdfBase64) throw new Error('PDF生成に失敗しました');
+        // Step 1: Generate Japanese PDF
+        const pdfBase64Ja = await generatePdfBase64('ja');
+        if (!pdfBase64Ja) throw new Error('PDF生成に失敗しました（日本語版）');
+
+        // Step 2: Generate local language PDF (skip if already Japanese)
+        var pdfBase64Local = null;
+        if (userLang !== 'ja') {
+            showEmailStatus('📄 PDFを生成しています（現地語版）...', '#667eea');
+            pdfBase64Local = await generatePdfBase64(userLang);
+        }
 
         showEmailStatus('📧 メールを送信しています...', '#667eea');
         if (btn) btn.textContent = '📧 送信中...';
 
-        // Step 2: Send via Apps Script (rirekisho pattern: redirect:follow + no-cors fallback)
+        // Step 3: Send via Apps Script with both PDFs
         let emailSent = false;
-        const payload = JSON.stringify({
+        var payloadObj = {
             type: 'yb_test_result',
             emails: [toEmail],
             subject: '【ユアブライト検査結果】' + name + ' (' + appState.testId + ') - ' + date,
             html_body: buildEmailHTML(),
-            pdf_base64: pdfBase64,
-            pdf_filename: pdfFilename,
+            pdf_base64: pdfBase64Ja,
+            pdf_filename: pdfFilenameJa,
             candidate_name: name,
             test_id: appState.testId,
             test_date: date
-        });
+        };
+        // Add local language PDF if available
+        if (pdfBase64Local) {
+            payloadObj.pdf_base64_local = pdfBase64Local;
+            payloadObj.pdf_filename_local = pdfFilenameLocal;
+        }
+        const payload = JSON.stringify(payloadObj);
 
         try {
             const resp = await fetch(APPS_SCRIPT_URL, {
@@ -3323,8 +3501,9 @@ async function sendResultsEmail() {
             }
         }
 
-        // Step 3: Always save locally as backup (like rirekisho)
-        localSavePdf(pdfBase64, pdfFilename);
+        // Step 4: Always save locally as backup (like rirekisho)
+        localSavePdf(pdfBase64Ja, pdfFilenameJa);
+        if (pdfBase64Local) localSavePdf(pdfBase64Local, pdfFilenameLocal);
 
         if (emailSent) {
             showEmailStatus('✅ メール送信完了！PDFも保存しました。（送信先: ' + toEmail + '）', 'green');
@@ -3339,8 +3518,12 @@ async function sendResultsEmail() {
         showEmailStatus('❌ エラー: ' + error.message + ' - PDFダウンロードを試みます...', 'red');
         // Try to at least download PDF locally
         try {
-            const pdfBase64 = await generatePdfBase64();
-            if (pdfBase64) localSavePdf(pdfBase64, pdfFilename);
+            const fb1 = await generatePdfBase64('ja');
+            if (fb1) localSavePdf(fb1, pdfFilenameJa);
+            if (userLang !== 'ja') {
+                const fb2 = await generatePdfBase64(userLang);
+                if (fb2) localSavePdf(fb2, pdfFilenameLocal);
+            }
         } catch (e) {}
         if (btn) { btn.disabled = false; btn.textContent = '📧 結果を送信（再試行）'; }
     }
