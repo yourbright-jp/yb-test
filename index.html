@@ -3236,8 +3236,20 @@ function showResults() {
         createRadarChart(traits, match);
     }, 100);
 
-    // Pattern matching section (replaces old comment section)
+    // Pattern matching section - bilingual (Japanese + user language)
     var pi18n = PATTERN_I18N[appState.currentLanguage] || PATTERN_I18N['ja'];
+    var jaI18n = PATTERN_I18N['ja'];
+    var isJa = (appState.currentLanguage === 'ja');
+    // Helper: show Japanese + local translation
+    function biling(jaText, localText) {
+        if (isJa || jaText === localText) return jaText;
+        return jaText + '<br><span style="color:#888;font-size:0.85em">' + localText + '</span>';
+    }
+    function bilingInline(jaText, localText) {
+        if (isJa || jaText === localText) return jaText;
+        return jaText + ' <span style="color:#888;font-size:0.85em">(' + localText + ')</span>';
+    }
+
     const patternDiv = document.createElement('div');
     patternDiv.style.cssText = 'background:' + match.pattern.bg + ';border:2px solid ' + match.pattern.border + ';border-radius:12px;padding:24px;margin:20px 0;';
 
@@ -3245,38 +3257,42 @@ function showResults() {
     // Header with pattern badge
     ph += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">';
     ph += '<span style="background:' + match.pattern.color + ';color:white;padding:8px 20px;border-radius:24px;font-size:16px;font-weight:700">' + match.type + '型</span>';
-    ph += '<span style="font-size:18px;font-weight:700;color:#374151">' + (pi18n.patternNames[match.type] || match.pattern.name) + '</span>';
+    ph += '<span style="font-size:18px;font-weight:700;color:#374151">' + bilingInline(match.pattern.name, pi18n.patternNames[match.type]) + '</span>';
     ph += '<span style="font-size:13px;color:#666;background:white;padding:4px 12px;border-radius:12px;border:1px solid #e5e7eb">一致度: ' + match.similarities[match.type] + '%</span>';
     ph += '</div>';
 
     // Pattern description
     ph += '<div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid #e5e7eb">';
-    ph += '<h3 style="color:' + match.pattern.color + ';font-size:15px;margin:0 0 10px 0">' + pi18n.headings.typeFeature + '</h3>';
-    ph += '<p style="font-size:14px;color:#374151;line-height:1.8;margin:0">' + (pi18n.patternDesc[match.type] || match.pattern.description) + '</p>';
+    ph += '<h3 style="color:' + match.pattern.color + ';font-size:15px;margin:0 0 10px 0">' + bilingInline(jaI18n.headings.typeFeature, pi18n.headings.typeFeature) + '</h3>';
+    ph += '<p style="font-size:14px;color:#374151;line-height:1.8;margin:0">' + biling(match.pattern.description, pi18n.patternDesc[match.type]) + '</p>';
     ph += '</div>';
 
     // Similarity bars for all 3 patterns
     ph += '<div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid #e5e7eb">';
-    ph += '<h3 style="color:#374151;font-size:14px;margin:0 0 12px 0">' + pi18n.headings.similarity + '</h3>';
+    ph += '<h3 style="color:#374151;font-size:14px;margin:0 0 12px 0">' + bilingInline(jaI18n.headings.similarity, pi18n.headings.similarity) + '</h3>';
     ['A', 'B', 'C'].forEach(function(pType) {
         var p = PATTERNS[pType];
         var sim = match.similarities[pType];
         var isMatch = (pType === match.type);
         ph += '<div style="display:flex;align-items:center;margin-bottom:8px">';
-        ph += '<span style="width:180px;font-size:13px;font-weight:' + (isMatch ? '700' : '400') + ';color:' + (isMatch ? p.color : '#666') + '">' + pType + '型 ' + (pi18n.patternNames[pType] || p.name) + '</span>';
+        ph += '<span style="width:220px;font-size:13px;font-weight:' + (isMatch ? '700' : '400') + ';color:' + (isMatch ? p.color : '#666') + '">' + pType + '型 ' + bilingInline(p.name, pi18n.patternNames[pType]) + '</span>';
         ph += '<div style="flex:1;background:#f3f4f6;border-radius:4px;height:10px;margin:0 10px"><div style="background:' + p.color + ';height:10px;border-radius:4px;width:' + sim + '%;opacity:' + (isMatch ? '1' : '0.5') + '"></div></div>';
         ph += '<span style="width:40px;text-align:right;font-size:13px;font-weight:' + (isMatch ? '700' : '400') + ';color:' + (isMatch ? p.color : '#888') + '">' + sim + '%</span>';
         ph += '</div>';
     });
     ph += '</div>';
 
-    // Personality analysis
-    var personalityItems = generatePersonalityAnalysis(traits);
+    // Personality analysis - bilingual
+    var personalityItemsJa = generatePersonalityAnalysis(traits, 'ja');
+    var personalityItemsLocal = isJa ? personalityItemsJa : generatePersonalityAnalysis(traits, appState.currentLanguage);
     ph += '<div style="background:white;border-radius:8px;padding:16px;border:1px solid #e5e7eb">';
-    ph += '<h3 style="color:#374151;font-size:15px;margin:0 0 12px 0">' + pi18n.headings.personality + '</h3>';
-    personalityItems.forEach(function(item) {
-        ph += '<p style="font-size:13px;color:#555;line-height:1.7;margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + match.pattern.color + ';border-radius:0 4px 4px 0">' + item + '</p>';
-    });
+    ph += '<h3 style="color:#374151;font-size:15px;margin:0 0 12px 0">' + bilingInline(jaI18n.headings.personality, pi18n.headings.personality) + '</h3>';
+    for (var pi = 0; pi < personalityItemsJa.length; pi++) {
+        var jaItem = personalityItemsJa[pi];
+        var localItem = personalityItemsLocal[pi] || '';
+        if (!jaItem && !localItem) { ph += '<div style="height:4px"></div>'; continue; }
+        ph += '<div style="font-size:13px;color:#555;line-height:1.7;margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + match.pattern.color + ';border-radius:0 4px 4px 0">' + biling(jaItem, localItem) + '</div>';
+    }
     ph += '</div>';
 
     patternDiv.innerHTML = ph;
@@ -3647,6 +3663,11 @@ function buildPdfHTML(lang) {
 }
 
 async function generatePdfBase64(lang) {
+    // Remove any leftover container from previous PDF generation
+    var oldContainer = document.getElementById('pdfRenderContainer');
+    if (oldContainer) oldContainer.parentNode.removeChild(oldContainer);
+
+    console.log('generatePdfBase64 called with lang:', lang);
     // Create container positioned at document origin (top-left)
     // MUST be position:absolute at top:0 so html2canvas captures from (0,0)
     const container = document.createElement('div');
@@ -3822,9 +3843,11 @@ async function sendResultsEmail() {
         // Step 4: Always save locally as backup (like rirekisho)
         localSavePdf(pdfBase64Ja, pdfFilenameJa);
         if (pdfBase64Local) {
-            // Delay 2nd download to avoid browser blocking
-            await new Promise(function(r) { setTimeout(r, 1500); });
+            // Delay 2nd download to avoid browser blocking multiple downloads
+            showEmailStatus('📄 現地語版PDFをダウンロード中...', '#667eea');
+            await new Promise(function(r) { setTimeout(r, 2000); });
             localSavePdf(pdfBase64Local, pdfFilenameLocal);
+            console.log('Local PDF saved:', pdfFilenameLocal);
         }
 
         if (emailSent) {
