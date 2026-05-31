@@ -3628,6 +3628,7 @@ function buildEmailHTML() {
 function buildPdfHTML(lang) {
     var pdfLang = lang || 'ja';
     var tP = function(key) { return tLang(key, pdfLang); };
+    var pi18n = PATTERN_I18N[pdfLang] || PATTERN_I18N['ja'];
     const traits = calculateScores();
     const comments = generateDetailedComments();
     const nameR2 = document.getElementById('name')?.value || '---';
@@ -3642,9 +3643,6 @@ function buildPdfHTML(lang) {
 
     // Radar chart labels - use short names from PATTERN_I18N (fits in SVG)
     var shortLabels = pi18n.traitNames;
-
-    // Build pattern analysis HTML for PDF
-    var pi18n = PATTERN_I18N[pdfLang] || PATTERN_I18N['ja'];
     const match2 = appState.matchResult || matchPattern(traits);
     const personalityItems2 = generatePersonalityAnalysis(traits, pdfLang);
     var pdfPatternHTML = '';
