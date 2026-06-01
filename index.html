@@ -2718,7 +2718,8 @@ const PATTERN_I18N = {
             radarTitle: '応募者のレーダーチャート',
             patternTitle: '適性パターン分析',
             threeTypes: '長期就労者３つのタイプ',
-            scoreDetail: '特性スコア詳細'
+            scoreDetail: '特性スコア詳細',
+            yourScore: 'あなたのスコア'
         },
         analysis: {
             topStrength: 'あなたの最も高い特性は「{0}（{1}）」と「{2}（{3}）」です。',
@@ -2762,7 +2763,8 @@ const PATTERN_I18N = {
             radarTitle: "Applicant's Radar Chart",
             patternTitle: 'Aptitude Pattern Analysis',
             threeTypes: '3 Types of Long-term Workers',
-            scoreDetail: 'Trait Score Details'
+            scoreDetail: 'Trait Score Details',
+            yourScore: 'Your Score'
         },
         analysis: {
             topStrength: 'Your strongest traits are "{0} ({1})" and "{2} ({3})".',
@@ -2806,7 +2808,8 @@ const PATTERN_I18N = {
             radarTitle: 'Biểu đồ radar của ứng viên',
             patternTitle: 'Phân tích mẫu thích ứng',
             threeTypes: '3 loại lao động dài hạn',
-            scoreDetail: 'Chi tiết điểm đặc tính'
+            scoreDetail: 'Chi tiết điểm đặc tính',
+            yourScore: 'Điểm của bạn'
         },
         analysis: {
             topStrength: 'Đặc tính cao nhất của bạn là "{0} ({1})" và "{2} ({3})".',
@@ -2850,7 +2853,8 @@ const PATTERN_I18N = {
             radarTitle: 'แผนภูมิเรดาร์ของผู้สมัคร',
             patternTitle: 'การวิเคราะห์รูปแบบความถนัด',
             threeTypes: '3 ประเภทผู้ทำงานระยะยาว',
-            scoreDetail: 'รายละเอียดคะแนนคุณสมบัติ'
+            scoreDetail: 'รายละเอียดคะแนนคุณสมบัติ',
+            yourScore: 'คะแนนของคุณ'
         },
         analysis: {
             topStrength: 'คุณสมบัติที่สูงที่สุดของคุณคือ "{0} ({1})" และ "{2} ({3})"',
@@ -2894,7 +2898,8 @@ const PATTERN_I18N = {
             radarTitle: 'လျှောက်ထားသူ၏ ရေဒါဇယား',
             patternTitle: 'သင့်လျော်မှုပုံစံ ခွဲခြမ်းစိတ်ဖြာမှု',
             threeTypes: 'ရေရှည်အလုပ်သမား ၃ မျိုး',
-            scoreDetail: 'လက္ခဏာအမှတ် အသေးစိတ်'
+            scoreDetail: 'လက္ခဏာအမှတ် အသေးစိတ်',
+            yourScore: 'သင့်အမှတ်'
         },
         analysis: {
             topStrength: 'သင့်အမြင့်ဆုံး လက္ခဏာများမှာ "{0} ({1})" နှင့် "{2} ({3})" ဖြစ်သည်။',
@@ -2938,7 +2943,8 @@ const PATTERN_I18N = {
             radarTitle: 'Grafik Radar Pelamar',
             patternTitle: 'Analisis Pola Kecocokan',
             threeTypes: '3 Tipe Pekerja Jangka Panjang',
-            scoreDetail: 'Detail Skor Sifat'
+            scoreDetail: 'Detail Skor Sifat',
+            yourScore: 'Skor Anda'
         },
         analysis: {
             topStrength: 'Sifat tertinggi Anda adalah "{0} ({1})" dan "{2} ({3})".',
@@ -2982,7 +2988,8 @@ const PATTERN_I18N = {
             radarTitle: 'គំនូសតាងរ៉ាដាររបស់អ្នកដាក់ពាក្យ',
             patternTitle: 'ការវិភាគគំរូភាពសមស្រប',
             threeTypes: 'ប្រភេទកម្មកររយៈពេលវែង ៣',
-            scoreDetail: 'ព័ត៌មានលម្អិតពិន្ទុលក្ខណៈ'
+            scoreDetail: 'ព័ត៌មានលម្អិតពិន្ទុលក្ខណៈ',
+            yourScore: 'ពិន្ទុរបស់អ្នក'
         },
         analysis: {
             topStrength: 'លក្ខណៈខ្ពស់បំផុតរបស់អ្នកគឺ "{0} ({1})" និង "{2} ({3})"។',
@@ -3026,7 +3033,8 @@ const PATTERN_I18N = {
             radarTitle: 'আবেদনকারীর রাডার চার্ট',
             patternTitle: 'যোগ্যতা প্যাটার্ন বিশ্লেষণ',
             threeTypes: '৩ ধরনের দীর্ঘমেয়াদী কর্মী',
-            scoreDetail: 'বৈশিষ্ট্য স্কোর বিবরণ'
+            scoreDetail: 'বৈশিষ্ট্য স্কোর বিবরণ',
+            yourScore: 'আপনার স্কোর'
         },
         analysis: {
             topStrength: 'আপনার সর্বোচ্চ বৈশিষ্ট্য হলো "{0} ({1})" এবং "{2} ({3})"।',
@@ -3062,7 +3070,7 @@ function buildRadarSVG(scores, color, size, customLabels) {
     var labels = customLabels || ['関心', '学習', '適応', 'コミュ', '介護', '自律'];
     var n = 6;
     var w = size, h = size;
-    var cx = w/2, cy = h/2, r = Math.min(w,h) * 0.33;
+    var cx = w/2, cy = h/2, r = Math.min(w,h) * (size <= 300 ? 0.25 : 0.33);
     var s = '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="display:block;">';
     s += '<rect width="'+w+'" height="'+h+'" fill="white" rx="8"/>';
     // Grid pentagons
@@ -3097,18 +3105,22 @@ function buildRadarSVG(scores, color, size, customLabels) {
         var px = cx+r*v*Math.cos(a), py = cy+r*v*Math.sin(a);
         s += '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="4" fill="'+color+'" stroke="white" stroke-width="1.5"/>';
     }
-    // Labels + scores
+    // Labels + scores (auto-size for small charts)
+    var labelFs = size <= 300 ? 9 : 13;
+    var scoreFs = size <= 300 ? 8 : 12;
+    var labelDist = size <= 300 ? r + 14 : r + 22;
+    var scoreDist = size <= 300 ? 10 : 15;
     for (var i = 0; i < n; i++) {
         var a = -Math.PI/2 + (2*Math.PI*i/n);
-        var ld = r + 22;
+        var ld = labelDist;
         var lx = cx + ld*Math.cos(a), ly = cy + ld*Math.sin(a);
         var anc = 'middle';
         if (Math.cos(a) > 0.3) anc = 'start';
         else if (Math.cos(a) < -0.3) anc = 'end';
-        s += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="13" font-family="sans-serif" fill="#374151" font-weight="bold">'+labels[i]+'</text>';
-        var sx = lx, sy2 = ly + 15;
-        if (i === 0) { sx = lx; sy2 = ly - 15; } // top label: score above
-        s += '<text x="'+sx.toFixed(1)+'" y="'+sy2.toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="12" font-family="sans-serif" fill="'+color+'" font-weight="bold">'+scores[i].toFixed(1)+'</text>';
+        s += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="'+labelFs+'" font-family="sans-serif" fill="#374151" font-weight="bold">'+labels[i]+'</text>';
+        var sx = lx, sy2 = ly + scoreDist;
+        if (i === 0) { sx = lx; sy2 = ly - scoreDist; }
+        s += '<text x="'+sx.toFixed(1)+'" y="'+sy2.toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="'+scoreFs+'" font-family="sans-serif" fill="'+color+'" font-weight="bold">'+scores[i].toFixed(1)+'</text>';
     }
     s += '</svg>';
     return s;
@@ -3367,8 +3379,8 @@ function showResults() {
     ['A','B','C'].forEach(function(pKey) {
         var p = PATTERNS[pKey];
         refH += '<div style="background:' + p.bg + ';border:1px solid ' + p.border + ';border-radius:8px;padding:12px;text-align:center;">';
-        refH += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;margin-bottom:8px;">' + pKey + '型 ' + bilingInline(p.name, pi18n.patternNames[pKey]) + '</div>';
-        refH += buildRadarSVG(p.means, p.color, 240);
+        refH += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:6px 12px;border-radius:12px;font-size:12px;font-weight:700;margin-bottom:8px;line-height:1.5;text-align:center;">' + pKey + '型 ' + p.name + (isJa ? '' : '<br><span style="color:white;font-size:11px;font-weight:400;">' + pi18n.patternNames[pKey] + '</span>') + '</div>';
+        refH += buildRadarSVG(p.means, p.color, 240, pi18n.traitNames);
         refH += '</div>';
     });
     refH += '</div>';
@@ -3463,7 +3475,7 @@ function createRadarChart(traits, match) {
 
     var _pi = PATTERN_I18N[appState.currentLanguage] || PATTERN_I18N['ja'];
     var datasets = [{
-        label: appState.currentLanguage === 'ja' ? 'あなたのスコア' : 'Your Score',
+        label: appState.currentLanguage === 'ja' ? 'あなたのスコア' : 'あなたのスコア (' + _pi.headings.yourScore + ')',
         data: [
             traits.interest,
             traits.learning,
@@ -3485,7 +3497,7 @@ function createRadarChart(traits, match) {
     // Add matched pattern overlay
     if (match && match.pattern) {
         datasets.push({
-            label: match.type + '型 ' + (_pi.patternNames[match.type] || match.pattern.name) + (appState.currentLanguage === 'ja' ? '（参考）' : ' (Ref)'),
+            label: match.type + '型 ' + match.pattern.name + '（参考）' + (appState.currentLanguage === 'ja' ? '' : ' / ' + (_pi.patternNames[match.type] || match.pattern.name)),
             data: match.pattern.means,
             borderColor: match.pattern.color,
             backgroundColor: match.pattern.color + '15',
