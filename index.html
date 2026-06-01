@@ -2674,9 +2674,9 @@ const PATTERNS = {
     A: {
         name: '総合エキスパート型',
         means: [3.42, 4.57, 4.44, 4.55, 4.65, 3.51],
-        color: '#2563eb',
-        bg: '#eff6ff',
-        border: '#bfdbfe',
+        color: '#e11d48',
+        bg: '#fff1f2',
+        border: '#fecdd3',
         description: '全6指標がバランスよく高水準にあるオールラウンド型です。特に介護職適応力と日本語学習適性が突出しており、異文化環境でも安定したパフォーマンスを発揮できます。介護現場での即戦力として期待でき、長期就労の可能性が最も高いタイプです。',
         shortDesc: '万能型・即戦力'
     },
@@ -2719,7 +2719,8 @@ const PATTERN_I18N = {
             patternTitle: '適性パターン分析',
             threeTypes: '長期就労者３つのタイプ',
             scoreDetail: '特性スコア詳細',
-            yourScore: 'あなたのスコア'
+            yourScore: 'あなたのスコア',
+            typePrefix: '型'
         },
         analysis: {
             topStrength: 'あなたの最も高い特性は「{0}（{1}）」と「{2}（{3}）」です。',
@@ -2764,7 +2765,8 @@ const PATTERN_I18N = {
             patternTitle: 'Aptitude Pattern Analysis',
             threeTypes: '3 Types of Long-term Workers',
             scoreDetail: 'Trait Score Details',
-            yourScore: 'Your Score'
+            yourScore: 'Your Score',
+            typePrefix: 'Type'
         },
         analysis: {
             topStrength: 'Your strongest traits are "{0} ({1})" and "{2} ({3})".',
@@ -2809,7 +2811,8 @@ const PATTERN_I18N = {
             patternTitle: 'Phân tích mẫu thích ứng',
             threeTypes: '3 loại lao động dài hạn',
             scoreDetail: 'Chi tiết điểm đặc tính',
-            yourScore: 'Điểm của bạn'
+            yourScore: 'Điểm của bạn',
+            typePrefix: 'Nhóm'
         },
         analysis: {
             topStrength: 'Đặc tính cao nhất của bạn là "{0} ({1})" và "{2} ({3})".',
@@ -2854,7 +2857,8 @@ const PATTERN_I18N = {
             patternTitle: 'การวิเคราะห์รูปแบบความถนัด',
             threeTypes: '3 ประเภทผู้ทำงานระยะยาว',
             scoreDetail: 'รายละเอียดคะแนนคุณสมบัติ',
-            yourScore: 'คะแนนของคุณ'
+            yourScore: 'คะแนนของคุณ',
+            typePrefix: 'ประเภท'
         },
         analysis: {
             topStrength: 'คุณสมบัติที่สูงที่สุดของคุณคือ "{0} ({1})" และ "{2} ({3})"',
@@ -2899,7 +2903,8 @@ const PATTERN_I18N = {
             patternTitle: 'သင့်လျော်မှုပုံစံ ခွဲခြမ်းစိတ်ဖြာမှု',
             threeTypes: 'ရေရှည်အလုပ်သမား ၃ မျိုး',
             scoreDetail: 'လက္ခဏာအမှတ် အသေးစိတ်',
-            yourScore: 'သင့်အမှတ်'
+            yourScore: 'သင့်အမှတ်',
+            typePrefix: 'အမျိုးအစား'
         },
         analysis: {
             topStrength: 'သင့်အမြင့်ဆုံး လက္ခဏာများမှာ "{0} ({1})" နှင့် "{2} ({3})" ဖြစ်သည်။',
@@ -2944,7 +2949,8 @@ const PATTERN_I18N = {
             patternTitle: 'Analisis Pola Kecocokan',
             threeTypes: '3 Tipe Pekerja Jangka Panjang',
             scoreDetail: 'Detail Skor Sifat',
-            yourScore: 'Skor Anda'
+            yourScore: 'Skor Anda',
+            typePrefix: 'Tipe'
         },
         analysis: {
             topStrength: 'Sifat tertinggi Anda adalah "{0} ({1})" dan "{2} ({3})".',
@@ -2989,7 +2995,8 @@ const PATTERN_I18N = {
             patternTitle: 'ការវិភាគគំរូភាពសមស្រប',
             threeTypes: 'ប្រភេទកម្មកររយៈពេលវែង ៣',
             scoreDetail: 'ព័ត៌មានលម្អិតពិន្ទុលក្ខណៈ',
-            yourScore: 'ពិន្ទុរបស់អ្នក'
+            yourScore: 'ពិន្ទុរបស់អ្នក',
+            typePrefix: 'ប្រភេទ'
         },
         analysis: {
             topStrength: 'លក្ខណៈខ្ពស់បំផុតរបស់អ្នកគឺ "{0} ({1})" និង "{2} ({3})"។',
@@ -3034,7 +3041,8 @@ const PATTERN_I18N = {
             patternTitle: 'যোগ্যতা প্যাটার্ন বিশ্লেষণ',
             threeTypes: '৩ ধরনের দীর্ঘমেয়াদী কর্মী',
             scoreDetail: 'বৈশিষ্ট্য স্কোর বিবরণ',
-            yourScore: 'আপনার স্কোর'
+            yourScore: 'আপনার স্কোর',
+            typePrefix: 'ধরন'
         },
         analysis: {
             topStrength: 'আপনার সর্বোচ্চ বৈশিষ্ট্য হলো "{0} ({1})" এবং "{2} ({3})"।',
@@ -3105,11 +3113,12 @@ function buildRadarSVG(scores, color, size, customLabels) {
         var px = cx+r*v*Math.cos(a), py = cy+r*v*Math.sin(a);
         s += '<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="4" fill="'+color+'" stroke="white" stroke-width="1.5"/>';
     }
-    // Labels + scores (auto-size for small charts)
+    // Labels + scores (auto-size for small charts, with word wrap)
     var labelFs = size <= 300 ? 9 : 13;
     var scoreFs = size <= 300 ? 8 : 12;
     var labelDist = size <= 300 ? r + 14 : r + 22;
     var scoreDist = size <= 300 ? 10 : 15;
+    var maxChars = size <= 300 ? 6 : 8; // max chars per line before wrapping
     for (var i = 0; i < n; i++) {
         var a = -Math.PI/2 + (2*Math.PI*i/n);
         var ld = labelDist;
@@ -3117,9 +3126,25 @@ function buildRadarSVG(scores, color, size, customLabels) {
         var anc = 'middle';
         if (Math.cos(a) > 0.3) anc = 'start';
         else if (Math.cos(a) < -0.3) anc = 'end';
-        s += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="'+labelFs+'" font-family="sans-serif" fill="#374151" font-weight="bold">'+labels[i]+'</text>';
+        // Word wrap long labels using tspan
+        var lbl = labels[i];
+        if (lbl.length > maxChars) {
+            var mid = Math.ceil(lbl.length / 2);
+            var sp = lbl.lastIndexOf(' ', mid);
+            if (sp < 1) sp = lbl.indexOf(' ', mid);
+            if (sp < 1) sp = mid;
+            var line1 = lbl.substring(0, sp).trim();
+            var line2 = lbl.substring(sp).trim();
+            var lh = labelFs * 1.2;
+            s += '<text x="'+lx.toFixed(1)+'" y="'+(ly - lh/2).toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="'+labelFs+'" font-family="sans-serif" fill="#374151" font-weight="bold">';
+            s += '<tspan x="'+lx.toFixed(1)+'" dy="0">'+line1+'</tspan>';
+            s += '<tspan x="'+lx.toFixed(1)+'" dy="'+lh.toFixed(0)+'">'+line2+'</tspan>';
+            s += '</text>';
+        } else {
+            s += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="'+labelFs+'" font-family="sans-serif" fill="#374151" font-weight="bold">'+lbl+'</text>';
+        }
         var sx = lx, sy2 = ly + scoreDist;
-        if (i === 0) { sx = lx; sy2 = ly - scoreDist; }
+        if (i === 0) { sx = lx; sy2 = ly - scoreDist - (lbl.length > maxChars ? labelFs : 0); }
         s += '<text x="'+sx.toFixed(1)+'" y="'+sy2.toFixed(1)+'" text-anchor="'+anc+'" dominant-baseline="middle" font-size="'+scoreFs+'" font-family="sans-serif" fill="'+color+'" font-weight="bold">'+scores[i].toFixed(1)+'</text>';
     }
     s += '</svg>';
@@ -3350,7 +3375,7 @@ function showResults() {
     // Radar chart with pattern overlay (smaller)
     const chartContainer = document.createElement('div');
     chartContainer.className = 'chart-container';
-    chartContainer.style.height = '320px';
+    chartContainer.style.height = '260px';
     chartContainer.innerHTML = '<canvas id="resultsChart"></canvas>';
     resultsDiv.appendChild(chartContainer);
 
@@ -3440,11 +3465,12 @@ function showResults() {
     scoreDiv.style.cssText = 'margin:24px 0;background:white;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.1);';
     var scoreH = '<h3 style="font-size:15px;color:#374151;margin:0 0 16px;border-bottom:2px solid #667eea;padding-bottom:8px;">' + biling(jaI18n.headings.scoreDetail, pi18n.headings.scoreDetail) + '</h3>';
     var traitVals = [traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy];
+    var traitColors = ['#e11d48', '#f59e0b', '#22c55e', '#3b82f6', '#8b5cf6', '#06b6d4'];
     var jaNames = PATTERN_I18N['ja'].traitNames;
     var localNames = pi18n.traitNames;
     traitVals.forEach(function(val, i) {
         var pct = (val / 5 * 100).toFixed(0);
-        var barColor = val >= 4.5 ? '#22c55e' : val >= 4.0 ? '#4ade80' : val >= 3.5 ? '#facc15' : val >= 3.0 ? '#f97316' : '#ef4444';
+        var barColor = traitColors[i];
         scoreH += '<div style="display:flex;align-items:center;margin-bottom:10px;">';
         scoreH += '<span style="width:120px;font-size:13px;font-weight:600;color:#374151;">' + biling(jaNames[i], localNames[i]) + '</span>';
         scoreH += '<div style="flex:1;background:#f3f4f6;border-radius:4px;height:14px;margin:0 12px;"><div style="background:' + barColor + ';height:14px;border-radius:4px;width:' + pct + '%;"></div></div>';
@@ -3780,7 +3806,7 @@ function buildPdfHTML(lang) {
     const personalityItems2 = generatePersonalityAnalysis(traits, pdfLang);
     var pdfPatternHTML = '';
     pdfPatternHTML += '<div style="background:' + match2.pattern.bg + ';border:2px solid ' + match2.pattern.border + ';border-radius:8px;padding:16px;margin:12px 0;">';
-    pdfPatternHTML += '<div style="margin-bottom:10px"><span style="background:' + match2.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + match2.type + '型 ' + (pi18n.patternNames[match2.type] || match2.pattern.name) + '</span>';
+    pdfPatternHTML += '<div style="margin-bottom:10px"><span style="background:' + match2.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + (pdfLang === 'ja' ? match2.type + '型 ' : pi18n.headings.typePrefix + ' ' + match2.type + ' ') + (pi18n.patternNames[match2.type] || match2.pattern.name) + '</span>';
     pdfPatternHTML += ' <span style="font-size:13px;color:#666">（一致度: ' + match2.similarities[match2.type] + '%）</span></div>';
     pdfPatternHTML += '<p style="font-size:14px;color:#374151;line-height:1.7;margin:10px 0">' + (pi18n.patternDesc[match2.type] || match2.pattern.description) + '</p>';
     pdfPatternHTML += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb">';
@@ -3802,7 +3828,7 @@ function buildPdfHTML(lang) {
         '</table>' +
         '<h3 style="margin-top:24px;color:#333;text-align:left;">' + pi18n.headings.radarTitle + '</h3>' +
         '<div style="text-align:left;margin:20px 0;">' +
-        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 720, shortLabels) +
+        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 550, shortLabels) +
         '</div>' +
         // 3 Reference pattern types (right after radar chart)
         '<h3 style="margin-top:24px;color:#333;">' + pi18n.headings.threeTypes + '</h3>' +
@@ -3812,7 +3838,7 @@ function buildPdfHTML(lang) {
             ['A','B','C'].forEach(function(k) {
                 var p = PATTERNS[k];
                 h += '<div style="flex:1;background:' + p.bg + ';border:1px solid ' + p.border + ';border-radius:6px;padding:8px;text-align:center;">';
-                h += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-bottom:4px;">' + k + '型 ' + (pi18n.patternNames[k] || p.name) + '</div>';
+                h += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-bottom:4px;">' + (pdfLang === 'ja' ? k + '型 ' : pi18n.headings.typePrefix + ' ' + k + ' ') + (pi18n.patternNames[k] || p.name) + '</div>';
                 h += buildRadarSVG(p.means, p.color, 220, pi18n.traitNames);
                 h += '</div>';
             });
@@ -3828,9 +3854,10 @@ function buildPdfHTML(lang) {
             var h = '';
             var tv = [traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy];
             var tn = pi18n.traitNames;
+            var tColors = ['#e11d48', '#f59e0b', '#22c55e', '#3b82f6', '#8b5cf6', '#06b6d4'];
             tv.forEach(function(val, i) {
                 var pct = (val / 5 * 100).toFixed(0);
-                var bc = val >= 4.5 ? '#22c55e' : val >= 4.0 ? '#4ade80' : val >= 3.5 ? '#facc15' : val >= 3.0 ? '#f97316' : '#ef4444';
+                var bc = tColors[i];
                 h += '<div style="display:flex;align-items:center;margin-bottom:6px;">';
                 h += '<span style="width:100px;font-size:12px;font-weight:600;color:#374151;">' + tn[i] + '</span>';
                 h += '<div style="flex:1;background:#f3f4f6;border-radius:3px;height:12px;margin:0 8px;"><div style="background:' + bc + ';height:12px;border-radius:3px;width:' + pct + '%;"></div></div>';
