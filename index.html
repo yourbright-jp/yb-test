@@ -3289,20 +3289,31 @@ function showResults() {
     var nameKana = document.getElementById('name_kana')?.value || '---';
     var nameDisplay = nameRomaji + '（' + nameKana + '）';
 
+    var isJaScreen = (appState.currentLanguage === 'ja');
+    var eduVal = document.getElementById('education')?.value;
+    var genderVal = document.getElementById('gender')?.value;
+    var maritalVal = document.getElementById('marital')?.value;
+    var ageVal = document.getElementById('age')?.value || '---';
+
+    function biVal(jaText, localText) {
+        if (isJaScreen || jaText === localText) return jaText;
+        return jaText + ' <span style="color:#888;font-size:0.85em">(' + localText + ')</span>';
+    }
+
     const basicInfo = [
         { label: 'name', customLabel: '氏名', value: nameDisplay },
         { label: 'country', value: document.getElementById('country')?.value || '---' },
-        { label: 'education', value: displayEducation(document.getElementById('education')?.value) },
-        { label: 'age', value: (document.getElementById('age')?.value || '---') + '歳' },
-        { label: 'gender', value: displayGender(document.getElementById('gender')?.value) },
-        { label: 'marital', value: displayMarital(document.getElementById('marital')?.value) }
+        { label: 'education', value: biVal(displayEducation(eduVal, 'ja'), displayEducation(eduVal)) },
+        { label: 'age', value: biVal(ageVal + '歳', displayAge(ageVal)) },
+        { label: 'gender', value: biVal(displayGender(genderVal, 'ja'), displayGender(genderVal)) },
+        { label: 'marital', value: biVal(displayMarital(maritalVal, 'ja'), displayMarital(maritalVal)) }
     ];
 
     basicInfo.forEach(info => {
         const row = table.insertRow();
         const cell1 = row.insertCell();
         const cell2 = row.insertCell();
-        cell1.innerHTML = info.customLabel || t(info.label);
+        cell1.innerHTML = info.customLabel || tBi(info.label);
         cell2.textContent = info.value;
     });
 
