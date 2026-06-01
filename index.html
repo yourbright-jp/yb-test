@@ -3197,18 +3197,77 @@ function generatePersonalityAnalysis(traits, lang) {
     return analysis;
 }
 
-// Display mapping: convert raw values to Japanese text
-function displayEducation(val) {
-    var map = {'1':'小卒','2':'中卒','3':'高卒','4':'専門卒','5':'短大卒','6':'大卒','7':'その他'};
+/// Display mapping: convert raw values to text (with i18n support)
+var DISPLAY_I18N = {
+    ja: {
+        education: {'1':'小卒','2':'中卒','3':'高卒','4':'専門卒','5':'短大卒','6':'大卒','7':'その他'},
+        gender: {'1':'女性','2':'男性','3':'回答しない','4':'その他'},
+        marital: {'1':'未婚','2':'既婚','3':'離婚','4':'死別','5':'その他'},
+        ageSuffix: '歳'
+    },
+    en: {
+        education: {'1':'Elementary','2':'Junior High','3':'High School','4':'Vocational','5':'Associate','6':'University','7':'Other'},
+        gender: {'1':'Female','2':'Male','3':'Prefer not to say','4':'Other'},
+        marital: {'1':'Single','2':'Married','3':'Divorced','4':'Widowed','5':'Other'},
+        ageSuffix: ' years old'
+    },
+    vi: {
+        education: {'1':'Tiểu học','2':'THCS','3':'THPT','4':'CĐ nghề','5':'CĐ','6':'Đại học','7':'Khác'},
+        gender: {'1':'Nữ','2':'Nam','3':'Không trả lời','4':'Khác'},
+        marital: {'1':'Độc thân','2':'Đã kết hôn','3':'Ly hôn','4':'Góa','5':'Khác'},
+        ageSuffix: ' tuổi'
+    },
+    th: {
+        education: {'1':'ประถม','2':'มัธยมต้น','3':'มัธยมปลาย','4':'อาชีวะ','5':'อนุปริญญา','6':'ปริญญาตรี','7':'อื่นๆ'},
+        gender: {'1':'หญิง','2':'ชาย','3':'ไม่ระบุ','4':'อื่นๆ'},
+        marital: {'1':'โสด','2':'สมรส','3':'หย่าร้าง','4':'หม้าย','5':'อื่นๆ'},
+        ageSuffix: ' ปี'
+    },
+    my: {
+        education: {'1':'မူလတန်း','2':'အလယ်တန်း','3':'အထက်တန်း','4':'သက်မွေး','5':'ဒီပလိုမာ','6':'ဘွဲ့ရ','7':'အခြား'},
+        gender: {'1':'အမျိုးသမီး','2':'အမျိုးသား','3':'မဖြေလို','4':'အခြား'},
+        marital: {'1':'လူပျို/အပျို','2':'အိမ်ထောင်ရှိ','3':'ကွာရှင်း','4':'မုဆိုး','5':'အခြား'},
+        ageSuffix: ' နှစ်'
+    },
+    id: {
+        education: {'1':'SD','2':'SMP','3':'SMA','4':'D3','5':'D3','6':'S1','7':'Lainnya'},
+        gender: {'1':'Perempuan','2':'Laki-laki','3':'Tidak menjawab','4':'Lainnya'},
+        marital: {'1':'Belum menikah','2':'Menikah','3':'Cerai','4':'Janda/Duda','5':'Lainnya'},
+        ageSuffix: ' tahun'
+    },
+    km: {
+        education: {'1':'បឋមសិក្សា','2':'មធ្យមសិក្សា','3':'វិទ្យាល័យ','4':'វិជ្ជាជីវៈ','5':'បរិញ្ញាបត្រ','6':'បរិញ្ញាបត្រ','7':'ផ្សេងទៀត'},
+        gender: {'1':'ស្រី','2':'ប្រុស','3':'មិនឆ្លើយ','4':'ផ្សេងទៀត'},
+        marital: {'1':'នៅលីវ','2':'រៀបការ','3':'លែងលះ','4':'មេម៉ាយ','5':'ផ្សេងទៀត'},
+        ageSuffix: ' ឆ្នាំ'
+    },
+    bn: {
+        education: {'1':'প্রাথমিক','2':'মাধ্যমিক','3':'উচ্চমাধ্যমিক','4':'বৃত্তিমূলক','5':'ডিপ্লোমা','6':'স্নাতক','7':'অন্যান্য'},
+        gender: {'1':'মহিলা','2':'পুরুষ','3':'বলতে চাই না','4':'অন্যান্য'},
+        marital: {'1':'অবিবাহিত','2':'বিবাহিত','3':'তালাকপ্রাপ্ত','4':'বিধবা','5':'অন্যান্য'},
+        ageSuffix: ' বছর'
+    }
+};
+
+function displayEducation(val, lang) {
+    var l = lang || appState.currentLanguage || 'ja';
+    var map = (DISPLAY_I18N[l] || DISPLAY_I18N['ja']).education;
     return map[String(val)] || val || '---';
 }
-function displayGender(val) {
-    var map = {'1':'女性','2':'男性','3':'回答しない','4':'その他'};
+function displayGender(val, lang) {
+    var l = lang || appState.currentLanguage || 'ja';
+    var map = (DISPLAY_I18N[l] || DISPLAY_I18N['ja']).gender;
     return map[String(val)] || val || '---';
 }
-function displayMarital(val) {
-    var map = {'1':'未婚','2':'既婚','3':'離婚','4':'死別','5':'その他'};
+function displayMarital(val, lang) {
+    var l = lang || appState.currentLanguage || 'ja';
+    var map = (DISPLAY_I18N[l] || DISPLAY_I18N['ja']).marital;
     return map[String(val)] || val || '---';
+}
+function displayAge(val, lang) {
+    var l = lang || appState.currentLanguage || 'ja';
+    var suffix = (DISPLAY_I18N[l] || DISPLAY_I18N['ja']).ageSuffix;
+    return (val || '---') + suffix;
 }
 
 function showResults() {
@@ -3635,10 +3694,10 @@ function buildPdfHTML(lang) {
     const nameK2 = document.getElementById('name_kana')?.value || '---';
     const nameDisp2 = nameR2 + '（' + nameK2 + '）';
     const country = document.getElementById('country')?.value || '---';
-    const age = (document.getElementById('age')?.value || '---') + '歳';
-    const gender = displayGender(document.getElementById('gender')?.value);
-    const education = displayEducation(document.getElementById('education')?.value);
-    const marital = displayMarital(document.getElementById('marital')?.value);
+    const age = displayAge(document.getElementById('age')?.value, pdfLang);
+    const gender = displayGender(document.getElementById('gender')?.value, pdfLang);
+    const education = displayEducation(document.getElementById('education')?.value, pdfLang);
+    const marital = displayMarital(document.getElementById('marital')?.value, pdfLang);
     const date = new Date().toISOString().slice(0, 10);
 
     // Radar chart labels - use short names from PATTERN_I18N (fits in SVG)
