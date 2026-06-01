@@ -3319,16 +3319,52 @@ function showResults() {
 
     resultsDiv.appendChild(table);
 
-    // Radar chart with pattern overlay
+    // Radar chart with pattern overlay (smaller)
     const chartContainer = document.createElement('div');
     chartContainer.className = 'chart-container';
-    chartContainer.style.height = '420px';
+    chartContainer.style.height = '320px';
     chartContainer.innerHTML = '<canvas id="resultsChart"></canvas>';
     resultsDiv.appendChild(chartContainer);
 
     setTimeout(() => {
         createRadarChart(traits, match);
     }, 100);
+
+    // 3 Reference pattern radar charts
+    var refDiv = document.createElement('div');
+    refDiv.style.cssText = 'margin:24px 0;';
+    var refH = '<h3 style="font-size:15px;color:#374151;margin-bottom:16px;border-bottom:2px solid #667eea;padding-bottom:8px;">長期就労者３つのタイプ</h3>';
+    refH += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">';
+    ['A','B','C'].forEach(function(pKey) {
+        var p = PATTERNS[pKey];
+        refH += '<div style="background:' + p.bg + ';border:1px solid ' + p.border + ';border-radius:8px;padding:12px;text-align:center;">';
+        refH += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;margin-bottom:8px;">' + pKey + '型 ' + p.name + '</div>';
+        refH += buildRadarSVG(p.means, p.color, 200);
+        refH += '</div>';
+    });
+    refH += '</div>';
+    refDiv.innerHTML = refH;
+    resultsDiv.appendChild(refDiv);
+
+    // Trait score bars section
+    var scoreDiv = document.createElement('div');
+    scoreDiv.style.cssText = 'margin:24px 0;background:white;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.1);';
+    var scoreH = '<h3 style="font-size:15px;color:#374151;margin:0 0 16px;border-bottom:2px solid #667eea;padding-bottom:8px;">特性スコア詳細</h3>';
+    var traitKeys = ['interest','learning','adaptation','communication','careWork','autonomy'];
+    var traitVals = [traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy];
+    var jaNames = PATTERN_I18N['ja'].traitNames;
+    traitKeys.forEach(function(key, i) {
+        var val = traitVals[i];
+        var pct = (val / 5 * 100).toFixed(0);
+        var barColor = val >= 4.5 ? '#22c55e' : val >= 4.0 ? '#4ade80' : val >= 3.5 ? '#facc15' : val >= 3.0 ? '#f97316' : '#ef4444';
+        scoreH += '<div style="display:flex;align-items:center;margin-bottom:10px;">';
+        scoreH += '<span style="width:100px;font-size:13px;font-weight:600;color:#374151;">' + jaNames[i] + '</span>';
+        scoreH += '<div style="flex:1;background:#f3f4f6;border-radius:4px;height:14px;margin:0 12px;"><div style="background:' + barColor + ';height:14px;border-radius:4px;width:' + pct + '%;"></div></div>';
+        scoreH += '<span style="width:40px;text-align:right;font-size:14px;font-weight:700;color:#374151;">' + val.toFixed(2) + '</span>';
+        scoreH += '</div>';
+    });
+    scoreDiv.innerHTML = scoreH;
+    resultsDiv.appendChild(scoreDiv);
 
     // Pattern matching section - bilingual (Japanese + user language)
     var pi18n = PATTERN_I18N[appState.currentLanguage] || PATTERN_I18N['ja'];
