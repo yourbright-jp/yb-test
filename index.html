@@ -3077,8 +3077,9 @@ const TRAIT_NAMES_FULL = PATTERN_I18N['ja'].traitNames;
 function buildRadarSVG(scores, color, size, customLabels) {
     var labels = customLabels || ['関心', '学習', '適応', 'コミュ', '介護', '自律'];
     var n = 6;
-    var w = size, h = size;
-    var cx = w/2, cy = h/2, r = Math.min(w,h) * (size <= 300 ? 0.25 : 0.33);
+    var pad = size <= 300 ? 50 : 60;
+    var w = size + pad*2, h = size + pad*2;
+    var cx = w/2, cy = h/2, r = size * (size <= 300 ? 0.28 : 0.30);
     var s = '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="display:block;">';
     s += '<rect width="'+w+'" height="'+h+'" fill="white" rx="8"/>';
     // Grid pentagons
@@ -3422,7 +3423,8 @@ function showResults() {
     ph += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">';
     ph += '<span style="background:' + match.pattern.color + ';color:white;padding:8px 20px;border-radius:24px;font-size:16px;font-weight:700">' + match.type + '型</span>';
     ph += '<span style="font-size:18px;font-weight:700;color:#374151">' + bilingInline(match.pattern.name, pi18n.headings.typePrefix + ' ' + match.type + ' ' + pi18n.patternNames[match.type]) + '</span>';
-    ph += '<span style="font-size:13px;color:#666;background:white;padding:4px 12px;border-radius:12px;border:1px solid #e5e7eb">一致度' + (isJa ? '' : ' (Match)') + ': ' + match.similarities[match.type] + '%</span>';
+    var webMatchLabel = isJa ? '一致度' : appState.currentLanguage === 'vi' ? 'Mức tương đồng' : appState.currentLanguage === 'en' ? 'Match' : appState.currentLanguage === 'th' ? 'ความตรงกัน' : appState.currentLanguage === 'my' ? 'ကိုက်ညီမှု' : appState.currentLanguage === 'id' ? 'Kecocokan' : appState.currentLanguage === 'km' ? 'ភាពស្រដៀង' : appState.currentLanguage === 'bn' ? 'মিল' : 'Match';
+    ph += '<span style="font-size:13px;color:#666;background:white;padding:4px 12px;border-radius:12px;border:1px solid #e5e7eb">' + biling('一致度', webMatchLabel) + ': ' + match.similarities[match.type] + '%</span>';
     ph += '</div>';
 
     // Pattern description
@@ -3525,7 +3527,7 @@ function createRadarChart(traits, match) {
     // Add matched pattern overlay
     if (match && match.pattern) {
         datasets.push({
-            label: match.type + '型 ' + match.pattern.name + '（参考）' + (appState.currentLanguage === 'ja' ? '' : ' / ' + (_pi.patternNames[match.type] || match.pattern.name)),
+            label: match.type + '型 ' + match.pattern.name + '（参考）' + (appState.currentLanguage === 'ja' ? '' : ' / ' + _pi.headings.typePrefix + ' ' + match.type + ' ' + (_pi.patternNames[match.type] || match.pattern.name)),
             data: match.pattern.means,
             borderColor: match.pattern.color,
             backgroundColor: match.pattern.color + '15',
