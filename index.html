@@ -3330,47 +3330,10 @@ function showResults() {
         createRadarChart(traits, match);
     }, 100);
 
-    // 3 Reference pattern radar charts
-    var refDiv = document.createElement('div');
-    refDiv.style.cssText = 'margin:24px 0;';
-    var refH = '<h3 style="font-size:15px;color:#374151;margin-bottom:16px;border-bottom:2px solid #667eea;padding-bottom:8px;">長期就労者３つのタイプ</h3>';
-    refH += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">';
-    ['A','B','C'].forEach(function(pKey) {
-        var p = PATTERNS[pKey];
-        refH += '<div style="background:' + p.bg + ';border:1px solid ' + p.border + ';border-radius:8px;padding:12px;text-align:center;">';
-        refH += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;margin-bottom:8px;">' + pKey + '型 ' + p.name + '</div>';
-        refH += buildRadarSVG(p.means, p.color, 200);
-        refH += '</div>';
-    });
-    refH += '</div>';
-    refDiv.innerHTML = refH;
-    resultsDiv.appendChild(refDiv);
-
-    // Trait score bars section
-    var scoreDiv = document.createElement('div');
-    scoreDiv.style.cssText = 'margin:24px 0;background:white;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.1);';
-    var scoreH = '<h3 style="font-size:15px;color:#374151;margin:0 0 16px;border-bottom:2px solid #667eea;padding-bottom:8px;">特性スコア詳細</h3>';
-    var traitKeys = ['interest','learning','adaptation','communication','careWork','autonomy'];
-    var traitVals = [traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy];
-    var jaNames = PATTERN_I18N['ja'].traitNames;
-    traitKeys.forEach(function(key, i) {
-        var val = traitVals[i];
-        var pct = (val / 5 * 100).toFixed(0);
-        var barColor = val >= 4.5 ? '#22c55e' : val >= 4.0 ? '#4ade80' : val >= 3.5 ? '#facc15' : val >= 3.0 ? '#f97316' : '#ef4444';
-        scoreH += '<div style="display:flex;align-items:center;margin-bottom:10px;">';
-        scoreH += '<span style="width:100px;font-size:13px;font-weight:600;color:#374151;">' + jaNames[i] + '</span>';
-        scoreH += '<div style="flex:1;background:#f3f4f6;border-radius:4px;height:14px;margin:0 12px;"><div style="background:' + barColor + ';height:14px;border-radius:4px;width:' + pct + '%;"></div></div>';
-        scoreH += '<span style="width:40px;text-align:right;font-size:14px;font-weight:700;color:#374151;">' + val.toFixed(2) + '</span>';
-        scoreH += '</div>';
-    });
-    scoreDiv.innerHTML = scoreH;
-    resultsDiv.appendChild(scoreDiv);
-
-    // Pattern matching section - bilingual (Japanese + user language)
+    // Bilingual helpers
     var pi18n = PATTERN_I18N[appState.currentLanguage] || PATTERN_I18N['ja'];
     var jaI18n = PATTERN_I18N['ja'];
     var isJa = (appState.currentLanguage === 'ja');
-    // Helper: show Japanese + local translation
     function biling(jaText, localText) {
         if (isJa || jaText === localText) return jaText;
         return jaText + '<br><span style="color:#888;font-size:0.85em">' + localText + '</span>';
@@ -3379,6 +3342,22 @@ function showResults() {
         if (isJa || jaText === localText) return jaText;
         return jaText + ' <span style="color:#888;font-size:0.85em">(' + localText + ')</span>';
     }
+
+    // 3 Reference pattern radar charts
+    var refDiv = document.createElement('div');
+    refDiv.style.cssText = 'margin:24px 0;';
+    var refH = '<h3 style="font-size:15px;color:#374151;margin-bottom:16px;border-bottom:2px solid #667eea;padding-bottom:8px;">' + biling('長期就労者３つのタイプ', pi18n.headings.resultTitle ? 'Long-term Worker 3 Types' : '') + '</h3>';
+    refH += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">';
+    ['A','B','C'].forEach(function(pKey) {
+        var p = PATTERNS[pKey];
+        refH += '<div style="background:' + p.bg + ';border:1px solid ' + p.border + ';border-radius:8px;padding:12px;text-align:center;">';
+        refH += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;margin-bottom:8px;">' + pKey + '型 ' + bilingInline(p.name, pi18n.patternNames[pKey]) + '</div>';
+        refH += buildRadarSVG(p.means, p.color, 200);
+        refH += '</div>';
+    });
+    refH += '</div>';
+    refDiv.innerHTML = refH;
+    resultsDiv.appendChild(refDiv);
 
     const patternDiv = document.createElement('div');
     patternDiv.style.cssText = 'background:' + match.pattern.bg + ';border:2px solid ' + match.pattern.border + ';border-radius:12px;padding:24px;margin:20px 0;';
@@ -3427,6 +3406,25 @@ function showResults() {
 
     patternDiv.innerHTML = ph;
     resultsDiv.appendChild(patternDiv);
+
+    // Trait score bars section (at the bottom)
+    var scoreDiv = document.createElement('div');
+    scoreDiv.style.cssText = 'margin:24px 0;background:white;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.1);';
+    var scoreH = '<h3 style="font-size:15px;color:#374151;margin:0 0 16px;border-bottom:2px solid #667eea;padding-bottom:8px;">' + biling('特性スコア詳細', pi18n.headings.personality) + '</h3>';
+    var traitVals = [traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy];
+    var jaNames = PATTERN_I18N['ja'].traitNames;
+    var localNames = pi18n.traitNames;
+    traitVals.forEach(function(val, i) {
+        var pct = (val / 5 * 100).toFixed(0);
+        var barColor = val >= 4.5 ? '#22c55e' : val >= 4.0 ? '#4ade80' : val >= 3.5 ? '#facc15' : val >= 3.0 ? '#f97316' : '#ef4444';
+        scoreH += '<div style="display:flex;align-items:center;margin-bottom:10px;">';
+        scoreH += '<span style="width:120px;font-size:13px;font-weight:600;color:#374151;">' + biling(jaNames[i], localNames[i]) + '</span>';
+        scoreH += '<div style="flex:1;background:#f3f4f6;border-radius:4px;height:14px;margin:0 12px;"><div style="background:' + barColor + ';height:14px;border-radius:4px;width:' + pct + '%;"></div></div>';
+        scoreH += '<span style="width:40px;text-align:right;font-size:14px;font-weight:700;color:#374151;">' + val.toFixed(2) + '</span>';
+        scoreH += '</div>';
+    });
+    scoreDiv.innerHTML = scoreH;
+    resultsDiv.appendChild(scoreDiv);
 
     // Email section
     const emailDiv = document.createElement('div');
@@ -3780,6 +3778,38 @@ function buildPdfHTML(lang) {
         '<div style="margin-top:200px;"></div>' +
         '<h3 style="margin-top:0;color:#333;">' + pi18n.headings.patternTitle + '</h3>' +
         pdfPatternHTML +
+        // 3 Reference pattern types
+        '<h3 style="margin-top:24px;color:#333;">長期就労者３つのタイプ</h3>' +
+        '<div style="display:flex;gap:8px;margin:12px 0;">' +
+        (function() {
+            var h = '';
+            ['A','B','C'].forEach(function(k) {
+                var p = PATTERNS[k];
+                h += '<div style="flex:1;background:' + p.bg + ';border:1px solid ' + p.border + ';border-radius:6px;padding:8px;text-align:center;">';
+                h += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-bottom:4px;">' + k + '型 ' + (pi18n.patternNames[k] || p.name) + '</div>';
+                h += buildRadarSVG(p.means, p.color, 180, pi18n.traitNames);
+                h += '</div>';
+            });
+            return h;
+        })() +
+        '</div>' +
+        // Score bars
+        '<h3 style="margin-top:24px;color:#333;">' + pi18n.headings.personality + '</h3>' +
+        (function() {
+            var h = '';
+            var tv = [traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy];
+            var tn = pi18n.traitNames;
+            tv.forEach(function(val, i) {
+                var pct = (val / 5 * 100).toFixed(0);
+                var bc = val >= 4.5 ? '#22c55e' : val >= 4.0 ? '#4ade80' : val >= 3.5 ? '#facc15' : val >= 3.0 ? '#f97316' : '#ef4444';
+                h += '<div style="display:flex;align-items:center;margin-bottom:6px;">';
+                h += '<span style="width:100px;font-size:12px;font-weight:600;color:#374151;">' + tn[i] + '</span>';
+                h += '<div style="flex:1;background:#f3f4f6;border-radius:3px;height:12px;margin:0 8px;"><div style="background:' + bc + ';height:12px;border-radius:3px;width:' + pct + '%;"></div></div>';
+                h += '<span style="width:35px;text-align:right;font-size:12px;font-weight:700;color:#374151;">' + val.toFixed(2) + '</span>';
+                h += '</div>';
+            });
+            return h;
+        })() +
         '<hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">' +
         '<p style="color:#999;font-size:12px;">検査日: ' + date + ' ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>' +
         '</div>';
