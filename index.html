@@ -3846,7 +3846,7 @@ function buildPdfHTML(lang) {
                 var p = PATTERNS[k];
                 h += '<div style="flex:1;background:' + p.bg + ';border:1px solid ' + p.border + ';border-radius:6px;padding:8px;text-align:center;">';
                 h += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-bottom:4px;">' + (pdfLang === 'ja' ? k + '型 ' : pi18n.headings.typePrefix + ' ' + k + ' ') + (pi18n.patternNames[k] || p.name) + '</div>';
-                h += buildRadarSVG(p.means, p.color, 280, pi18n.traitNames);
+                h += buildRadarSVG(p.means, p.color, 340, pi18n.traitNames);
                 h += '</div>';
             });
             return h;
