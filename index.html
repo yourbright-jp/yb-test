@@ -3853,7 +3853,7 @@ function buildPdfHTML(lang) {
             return h;
         })() +
         '</div>' +
-        '<div class="html2pdf__page-break"></div>' +
+        '<div class="pdf-page-spacer"></div>' +
         '<h3 style="margin-top:0;color:#333;">' + pi18n.headings.patternTitle + '</h3>' +
         pdfPatternHTML +
         // Score bars
@@ -3897,6 +3897,31 @@ async function generatePdfBase64(lang) {
 
     // Wait for DOM rendering
     await new Promise(function(r) { setTimeout(r, 800); });
+
+    // Dynamic page-break: measure where page 1 content ends,
+    // then pad it so 適性パターン分析 starts cleanly on page 2.
+    // html2pdf scales 800px container → 210mm A4 width (ignoring its own margins internally).
+    // Effective page content height in source pixels:
+    //   A4 = 297mm, side margins don't affect height, top+bottom margins = 10+10 = 20mm
+    //   usable height = 277mm, scale = 210/800 mm/px → pageH = 277 / (210/800) = 1054px
+    // (html2pdf maps the full container width including padding to the page width minus margins)
+    var pageHeightPx = Math.round(277 * 800 / 210);  // ≈ 1054px
+    var spacer = container.querySelector('.pdf-page-spacer');
+    if (spacer) {
+        var spacerTop = spacer.offsetTop - container.offsetTop;
+        var posInPage = spacerTop % pageHeightPx;
+        var remainder = pageHeightPx - posInPage;
+        // If already near top of a new page, just add small gap
+        if (posInPage < pageHeightPx * 0.15) {
+            spacer.style.height = '10px';
+        } else {
+            spacer.style.height = (remainder + 10) + 'px';
+        }
+        console.log('PDF spacer: spacerTop=' + spacerTop + ', pageH=' + pageHeightPx + ', posInPage=' + posInPage + ', spacerH=' + spacer.style.height);
+    }
+
+    // Re-wait after spacer adjustment
+    await new Promise(function(r) { setTimeout(r, 300); });
 
     var containerHeight = container.scrollHeight;
     console.log('PDF container height:', containerHeight);
