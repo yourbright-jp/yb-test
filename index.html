@@ -3077,11 +3077,13 @@ const TRAIT_NAMES_FULL = PATTERN_I18N['ja'].traitNames;
 function buildRadarSVG(scores, color, size, customLabels) {
     var labels = customLabels || ['関心', '学習', '適応', 'コミュ', '介護', '自律'];
     var n = 6;
-    var pad = size <= 300 ? 50 : 60;
+    var pad = size <= 300 ? 50 : 38;
     var w = size + pad*2, h = size + pad*2;
     var cx = w/2, cy = h/2, r = size * (size <= 300 ? 0.28 : 0.30);
-    var s = '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" style="display:block;">';
-    s += '<rect width="'+w+'" height="'+h+'" fill="white" rx="8"/>';
+    var cropY = size <= 300 ? 0 : 35;
+    var svgH = h - cropY*2;
+    var s = '<svg width="'+w+'" height="'+svgH+'" viewBox="0 '+cropY+' '+w+' '+svgH+'" xmlns="http://www.w3.org/2000/svg" style="display:block;">';
+    s += '<rect y="'+cropY+'" width="'+w+'" height="'+svgH+'" fill="white" rx="8"/>';
     // Grid pentagons
     for (var ring = 1; ring <= 5; ring++) {
         var pts = [];
@@ -3823,20 +3825,20 @@ function buildPdfHTML(lang) {
 
     return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#333;background:#fff;">' +
         '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:10px;">' + pi18n.headings.resultTitle + '</h2>' +
-        '<table style="width:100%;border-collapse:collapse;margin:16px 0;">' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tP('name') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('country') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + country + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('education') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + education + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('age') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + age + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('gender') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + gender + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('marital') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
+        '<table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:12px;">' +
+        '<tr><td style="padding:4px 10px;border:1px solid #ddd;background:#f0f4ff;width:100px;font-weight:bold;">' + tP('name') + '</td><td style="padding:4px 10px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
+        '<tr><td style="padding:4px 10px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('country') + '</td><td style="padding:4px 10px;border:1px solid #ddd;">' + country + '</td></tr>' +
+        '<tr><td style="padding:4px 10px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('education') + '</td><td style="padding:4px 10px;border:1px solid #ddd;">' + education + '</td></tr>' +
+        '<tr><td style="padding:4px 10px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('age') + '</td><td style="padding:4px 10px;border:1px solid #ddd;">' + age + '</td></tr>' +
+        '<tr><td style="padding:4px 10px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('gender') + '</td><td style="padding:4px 10px;border:1px solid #ddd;">' + gender + '</td></tr>' +
+        '<tr><td style="padding:4px 10px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('marital') + '</td><td style="padding:4px 10px;border:1px solid #ddd;">' + marital + '</td></tr>' +
         '</table>' +
-        '<h3 style="margin-top:24px;color:#333;text-align:left;">' + pi18n.headings.radarTitle + '</h3>' +
-        '<div style="text-align:left;margin:20px 0;">' +
+        '<h3 style="margin-top:16px;margin-bottom:0;color:#333;text-align:left;">' + pi18n.headings.radarTitle + '</h3>' +
+        '<div style="text-align:left;margin:0;">' +
         buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 420, shortLabels) +
         '</div>' +
         // 3 Reference pattern types (right after radar chart)
-        '<h3 style="margin-top:24px;color:#333;">' + pi18n.headings.threeTypes + '</h3>' +
+        '<h3 style="margin-top:8px;color:#333;">' + pi18n.headings.threeTypes + '</h3>' +
         '<div style="display:flex;gap:8px;margin:12px 0;">' +
         (function() {
             var h = '';
