@@ -3824,35 +3824,35 @@ function buildPdfHTML(lang) {
     pdfPatternHTML += '</div></div>';
 
     return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#333;background:#fff;">' +
-        '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:10px;">' + pi18n.headings.resultTitle + '</h2>' +
-        '<table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tP('name') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('country') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + country + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('education') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + education + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('age') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + age + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('gender') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + gender + '</td></tr>' +
-        '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('marital') + '</td><td style="padding:6px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
+        '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:8px;margin-bottom:8px;">' + pi18n.headings.resultTitle + '</h2>' +
+        '<table style="width:100%;border-collapse:collapse;margin:0 0 8px 0;font-size:14px;">' +
+        '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tP('name') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
+        '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('country') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + country + '</td></tr>' +
+        '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('education') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + education + '</td></tr>' +
+        '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('age') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + age + '</td></tr>' +
+        '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('gender') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + gender + '</td></tr>' +
+        '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('marital') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
         '</table>' +
-        '<h3 style="margin-top:16px;margin-bottom:0;color:#333;text-align:left;">' + pi18n.headings.radarTitle + '</h3>' +
-        '<div style="text-align:left;margin:0;">' +
-        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 420, shortLabels) +
+        '<h3 style="margin:8px 0 0 0;color:#333;text-align:left;">' + pi18n.headings.radarTitle + '</h3>' +
+        '<div style="text-align:center;margin:0;">' +
+        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 500, shortLabels) +
         '</div>' +
         // 3 Reference pattern types (right after radar chart)
-        '<h3 style="margin-top:8px;color:#333;">' + pi18n.headings.threeTypes + '</h3>' +
-        '<div style="display:flex;gap:8px;margin:12px 0;">' +
+        '<h3 style="margin:4px 0;color:#333;">' + pi18n.headings.threeTypes + '</h3>' +
+        '<div style="display:flex;gap:8px;margin:4px 0;">' +
         (function() {
             var h = '';
             ['A','B','C'].forEach(function(k) {
                 var p = PATTERNS[k];
-                h += '<div style="flex:1;background:' + p.bg + ';border:1px solid ' + p.border + ';border-radius:6px;padding:8px;text-align:center;">';
-                h += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-bottom:4px;">' + (pdfLang === 'ja' ? k + '型 ' : pi18n.headings.typePrefix + ' ' + k + ' ') + (pi18n.patternNames[k] || p.name) + '</div>';
-                h += buildRadarSVG(p.means, p.color, 340, pi18n.traitNames);
+                h += '<div style="flex:1;background:' + p.bg + ';border:1px solid ' + p.border + ';border-radius:6px;padding:6px;text-align:center;">';
+                h += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-bottom:2px;">' + (pdfLang === 'ja' ? k + '型 ' : pi18n.headings.typePrefix + ' ' + k + ' ') + (pi18n.patternNames[k] || p.name) + '</div>';
+                var svg = buildRadarSVG(p.means, p.color, 340, pi18n.traitNames);
+                h += svg.replace('style="display:block;"', 'style="display:block;width:100%;height:auto;"');
                 h += '</div>';
             });
             return h;
         })() +
         '</div>' +
-        '<div style="margin-top:20px;"></div>' +
         '<h3 style="margin-top:0;color:#333;">' + pi18n.headings.patternTitle + '</h3>' +
         pdfPatternHTML +
         // Score bars
