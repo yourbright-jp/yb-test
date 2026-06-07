@@ -3875,9 +3875,9 @@ function buildPdfHTML(lang) {
     pdfPatternHTML += '</div></div>';
 
     return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#333;background:#fff;">' +
-        '<div class="pdf-page1" style="display:flex;flex-direction:column;justify-content:space-between;">' +
+        '<div class="pdf-page1">' +
         // Group 1: Title + Info table
-        '<div>' +
+        '<div class="pdf-g1">' +
         '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:8px;margin-bottom:8px;">' + pi18n.headings.resultTitle + '</h2>' +
         '<table style="width:100%;border-collapse:collapse;margin:0 0 8px 0;font-size:14px;">' +
         '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tP('name') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
@@ -3889,14 +3889,14 @@ function buildPdfHTML(lang) {
         '</table>' +
         '</div>' +
         // Group 2: Radar chart
-        '<div>' +
+        '<div class="pdf-g2">' +
         '<h3 style="margin:0 0 0 0;color:#333;text-align:left;">' + pi18n.headings.radarTitle + '</h3>' +
         '<div style="text-align:center;margin:0;">' +
         buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 380, shortLabels) +
         '</div>' +
         '</div>' +
         // Group 3: 3 Reference pattern types
-        '<div>' +
+        '<div class="pdf-g3">' +
         '<h3 style="margin:0 0 4px 0;color:#333;">' + pi18n.headings.threeTypes + '</h3>' +
         '<div style="display:flex;gap:8px;margin:4px 0;">' +
         (function() {
@@ -3970,16 +3970,35 @@ async function generatePdfBase64(lang) {
     // Wait for DOM rendering
     await new Promise(function(r) { setTimeout(r, 800); });
 
-    // Fixed page 1: flex container fills exactly 1 A4 page, content distributes evenly.
-    // html2pdf margin [10,10,10,10] → content area = 190mm × 277mm.
-    // 800px container maps to 190mm width. Scale = 190/800 mm/px.
-    // Page height in px: 277mm / (190/800) = 277 * 800 / 190 ≈ 1166px.
-    // Subtract ~80px for container padding (20px) + inner wrapper padding (20px) + top/bottom flex margins.
-    var pageHeightPx = Math.round(277 * 800 / 190) - 80;  // ≈ 1086px
+    // Dynamic page 1 spacing: measure actual content, calculate gap to fill 1 A4 page.
+    // html2pdf: canvas 800px (logical) at scale 2 → 1600px canvas → maps to 190mm content width.
+    // Page content height: 277mm * 1600 / 190 = 2332.6 canvas px → 1166.3 logical px.
+    var pageHeightPx = Math.round(277 * 800 / 190);  // ≈ 1166px (1 A4 page in logical px)
     var page1 = container.querySelector('.pdf-page1');
-    if (page1) {
-        page1.style.height = pageHeightPx + 'px';
-        console.log('PDF page1 height set to:', pageHeightPx + 'px');
+    var g1 = page1 ? page1.querySelector('.pdf-g1') : null;
+    var g2 = page1 ? page1.querySelector('.pdf-g2') : null;
+    var g3 = page1 ? page1.querySelector('.pdf-g3') : null;
+    if (page1 && g1 && g2 && g3) {
+        var cRect = container.getBoundingClientRect();
+        var p1Rect = page1.getBoundingClientRect();
+        var p1Offset = Math.round(p1Rect.top - cRect.top);
+        var g1H = g1.offsetHeight;
+        var g2H = g2.offsetHeight;
+        var g3H = g3.offsetHeight;
+        var totalContentH = g1H + g2H + g3H;
+        var availableH = pageHeightPx - p1Offset;
+        var extraSpace = availableH - totalContentH;
+        console.log('[PDF] p1Offset:', p1Offset, 'g1H:', g1H, 'g2H:', g2H, 'g3H:', g3H,
+            'total:', totalContentH, 'pageH:', pageHeightPx, 'available:', availableH, 'extra:', extraSpace);
+        if (extraSpace > 20) {
+            // Distribute extra space as margins between the 3 groups (2 gaps)
+            var gap = Math.floor(extraSpace / 2);
+            g2.style.marginTop = gap + 'px';
+            g3.style.marginTop = gap + 'px';
+            console.log('[PDF] Added ' + gap + 'px margin-top to g2 and g3');
+        } else {
+            console.log('[PDF] No extra space to distribute, content fills page naturally');
+        }
     }
 
     // Re-wait after height adjustment
