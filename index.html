@@ -2615,8 +2615,19 @@ function scoreQuestion(qNum, answer) {
 }
 
 function generateComment(traits) {
-    // Simple version for display (backward compat)
-    return generateDetailedComments().join('\n\n');
+    // Simple version for display (backward compat) - returns plain text
+    var keys = generateDetailedComments();
+    return keys.map(function(key) { return t(key); }).join('\n\n');
+}
+
+function generateCommentHTML(lang) {
+    // Returns translated comments as HTML paragraphs
+    var keys = generateDetailedComments();
+    var useLang = lang || appState.currentLanguage || 'ja';
+    return keys.map(function(key) {
+        var text = tLang(key, useLang);
+        return '<p style="margin:8px 0;line-height:1.7;color:#555;">' + text + '</p>';
+    }).join('');
 }
 
 function generateDetailedComments() {
@@ -3397,7 +3408,7 @@ function showResults() {
 
     // 3 Reference pattern radar charts
     var refDiv = document.createElement('div');
-    refDiv.style.cssText = 'margin:24px 0;';
+    refDiv.style.cssText = 'margin:40px 0 24px 0;';
     var refH = '<h3 style="font-size:15px;color:#374151;margin-bottom:16px;border-bottom:2px solid #667eea;padding-bottom:8px;">' + biling(jaI18n.headings.threeTypes, pi18n.headings.threeTypes) + '</h3>';
     refH += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">';
     ['A','B','C'].forEach(function(pKey) {
@@ -3405,6 +3416,18 @@ function showResults() {
         refH += '<div style="background:' + p.bg + ';border:1px solid ' + p.border + ';border-radius:8px;padding:12px;text-align:center;">';
         refH += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:6px 12px;border-radius:12px;font-size:12px;font-weight:700;margin-bottom:8px;line-height:1.5;text-align:center;">' + pKey + '型 ' + p.name + (isJa ? '' : '<br><span style="color:white;font-size:11px;font-weight:400;">' + pi18n.patternNames[pKey] + '</span>') + '</div>';
         refH += buildRadarSVG(p.means, p.color, 240, pi18n.traitNames);
+        refH += '<div style="text-align:left;margin-top:4px;padding:0 8px;">';
+        var tn = pi18n.traitNames;
+        p.means.forEach(function(val, i) {
+            var barW = Math.round((val/5)*100);
+            var barCol = val >= 4.5 ? '#059669' : val >= 3.5 ? '#eab308' : '#ef4444';
+            refH += '<div style="display:flex;align-items:center;margin-bottom:3px;font-size:11px;">';
+            refH += '<span style="width:90px;color:#555;font-weight:600;text-align:left;flex-shrink:0;">' + tn[i] + '</span>';
+            refH += '<div style="flex:1;background:#e5e7eb;border-radius:3px;height:8px;margin:0 6px;"><div style="background:' + barCol + ';height:8px;border-radius:3px;width:' + barW + '%;"></div></div>';
+            refH += '<span style="width:30px;text-align:right;font-weight:800;font-size:13px;color:' + p.color + ';">' + val.toFixed(1) + '</span>';
+            refH += '</div>';
+        });
+        refH += '</div>';
         refH += '</div>';
     });
     refH += '</div>';
@@ -3479,6 +3502,19 @@ function showResults() {
     });
     scoreDiv.innerHTML = scoreH;
     resultsDiv.appendChild(scoreDiv);
+
+    // Comment section
+    var commentDiv = document.createElement('div');
+    commentDiv.className = 'comment-section';
+    var commentH = '<h3 style="margin-top:0;color:#667eea;">' + biling('コメント', t('commentTitle')) + '</h3>';
+    commentH += generateCommentHTML('ja');
+    if (!isJa) {
+        commentH += '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed #ddd;">';
+        commentH += generateCommentHTML(appState.currentLanguage);
+        commentH += '</div>';
+    }
+    commentDiv.innerHTML = commentH;
+    resultsDiv.appendChild(commentDiv);
 
     // Email section
     const emailDiv = document.createElement('div');
@@ -3778,6 +3814,11 @@ function buildEmailHTML() {
         <h3 style="margin-top:24px;color:#333;">${nameR}さんの適性パターン分析</h3>
         ${patternEmailHTML}
 
+        <div style="background:#f9f9f9;padding:20px;border-radius:6px;margin:20px 0;">
+            <h3 style="margin-top:0;color:#667eea;">コメント</h3>
+            ${generateCommentHTML('ja')}
+        </div>
+
         <hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">
         <p style="color:#999;font-size:12px;">検査日: ${date} ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>
     </div>`;
@@ -3880,6 +3921,10 @@ function buildPdfHTML(lang) {
             });
             return h;
         })() +
+        '<div style="background:#f9f9f9;padding:20px;border-radius:6px;margin:20px 0;">' +
+        '<h3 style="margin-top:0;color:#667eea;">' + tP('commentTitle') + '</h3>' +
+        generateCommentHTML(pdfLang) +
+        '</div>' +
         '<hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">' +
         '<p style="color:#999;font-size:12px;">検査日: ' + date + ' ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>' +
         '</div>';
