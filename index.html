@@ -3449,7 +3449,7 @@ function showResults() {
         var noMatchJa = 'いずれのパターンにも該当しません';
         var noMatchLocal = appState.currentLanguage === 'vi' ? 'Không thuộc nhóm nào' : appState.currentLanguage === 'en' ? 'Does not match any pattern' : appState.currentLanguage === 'th' ? 'ไม่ตรงกับรูปแบบใดเลย' : appState.currentLanguage === 'my' ? 'မည်သည့်ပုံစံနှင့်မှ မကိုက်ညီပါ' : appState.currentLanguage === 'id' ? 'Tidak cocok dengan pola manapun' : appState.currentLanguage === 'km' ? 'មិនត្រូវគ្នាជាមួយគំរូណាមួយទេ' : appState.currentLanguage === 'bn' ? 'কোনো প্যাটার্নের সাথে মেলে না' : noMatchJa;
         ph += '<div style="text-align:center;margin-bottom:16px">';
-        ph += '<span style="background:#6b7280;color:white;padding:10px 24px;border-radius:24px;font-size:16px;font-weight:700">' + biling(noMatchJa, noMatchLocal) + '</span>';
+        ph += '<span style="background:#6b7280;color:white;padding:10px 24px;border-radius:24px;font-size:16px;font-weight:700;display:inline-block;line-height:1.5;text-align:center">' + biling(noMatchJa, noMatchLocal) + '</span>';
         ph += '</div>';
     } else {
         // Header with pattern badge
@@ -3875,7 +3875,9 @@ function buildPdfHTML(lang) {
     pdfPatternHTML += '</div></div>';
 
     return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#333;background:#fff;">' +
-        '<div class="pdf-page1">' +
+        '<div class="pdf-page1" style="page-break-after:always;display:flex;flex-direction:column;justify-content:space-between;">' +
+        // Group 1: Title + Info table
+        '<div>' +
         '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:8px;margin-bottom:8px;">' + pi18n.headings.resultTitle + '</h2>' +
         '<table style="width:100%;border-collapse:collapse;margin:0 0 8px 0;font-size:14px;">' +
         '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tP('name') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
@@ -3885,12 +3887,17 @@ function buildPdfHTML(lang) {
         '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('gender') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + gender + '</td></tr>' +
         '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('marital') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
         '</table>' +
-        '<h3 style="margin:16px 0 0 0;color:#333;text-align:left;">' + pi18n.headings.radarTitle + '</h3>' +
+        '</div>' +
+        // Group 2: Radar chart
+        '<div>' +
+        '<h3 style="margin:0 0 0 0;color:#333;text-align:left;">' + pi18n.headings.radarTitle + '</h3>' +
         '<div style="text-align:center;margin:0;">' +
         buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 380, shortLabels) +
         '</div>' +
-        // 3 Reference pattern types (right after radar chart)
-        '<h3 style="margin:24px 0 4px 0;color:#333;">' + pi18n.headings.threeTypes + '</h3>' +
+        '</div>' +
+        // Group 3: 3 Reference pattern types
+        '<div>' +
+        '<h3 style="margin:0 0 4px 0;color:#333;">' + pi18n.headings.threeTypes + '</h3>' +
         '<div style="display:flex;gap:8px;margin:4px 0;">' +
         (function() {
             var h = '';
@@ -3916,6 +3923,7 @@ function buildPdfHTML(lang) {
             });
             return h;
         })() +
+        '</div>' +
         '</div>' +
         '</div>' +
         '<h3 style="margin-top:0;color:#333;">' + nameR2 + (pdfLang === 'ja' ? 'さんの' : pdfLang === 'vi' ? ' - ' : pdfLang === 'th' ? ' - ' : ' - ') + pi18n.headings.patternTitle + '</h3>' +
@@ -3962,16 +3970,16 @@ async function generatePdfBase64(lang) {
     // Wait for DOM rendering
     await new Promise(function(r) { setTimeout(r, 800); });
 
-    // Fixed page 1: set min-height so page 1 always fills exactly 1 A4 page.
-    // html2pdf scales 800px container → A4 width (210mm - 20mm margins = 190mm usable).
-    // Page height in px: A4 height 297mm - 20mm margins = 277mm usable.
-    // Scale = 800px / (210-20)mm → pageH = 277 * 800 / 190 ≈ 1166px
-    // But html2pdf uses full 210mm width mapping, so: pageH = 277 * 800 / 210 ≈ 1054px
-    var pageHeightPx = Math.round(277 * 800 / 210);  // ≈ 1054px
+    // Fixed page 1: flex container fills exactly 1 A4 page, content distributes evenly.
+    // html2pdf margin [10,10,10,10] → content area = 190mm × 277mm.
+    // 800px container maps to 190mm width. Scale = 190/800 mm/px.
+    // Page height in px: 277mm / (190/800) = 277 * 800 / 190 ≈ 1166px.
+    // Subtract ~80px for container padding (20px) + inner wrapper padding (20px) + top/bottom flex margins.
+    var pageHeightPx = Math.round(277 * 800 / 190) - 80;  // ≈ 1086px
     var page1 = container.querySelector('.pdf-page1');
     if (page1) {
-        page1.style.minHeight = pageHeightPx + 'px';
-        console.log('PDF page1 min-height set to:', pageHeightPx + 'px');
+        page1.style.height = pageHeightPx + 'px';
+        console.log('PDF page1 height set to:', pageHeightPx + 'px');
     }
 
     // Re-wait after height adjustment
