@@ -3503,19 +3503,6 @@ function showResults() {
     scoreDiv.innerHTML = scoreH;
     resultsDiv.appendChild(scoreDiv);
 
-    // Comment section
-    var commentDiv = document.createElement('div');
-    commentDiv.className = 'comment-section';
-    var commentH = '<h3 style="margin-top:0;color:#667eea;">' + biling('コメント', t('commentTitle')) + '</h3>';
-    commentH += generateCommentHTML('ja');
-    if (!isJa) {
-        commentH += '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed #ddd;">';
-        commentH += generateCommentHTML(appState.currentLanguage);
-        commentH += '</div>';
-    }
-    commentDiv.innerHTML = commentH;
-    resultsDiv.appendChild(commentDiv);
-
     // Email section
     const emailDiv = document.createElement('div');
     emailDiv.className = 'email-section';
@@ -3814,11 +3801,6 @@ function buildEmailHTML() {
         <h3 style="margin-top:24px;color:#333;">${nameR}さんの適性パターン分析</h3>
         ${patternEmailHTML}
 
-        <div style="background:#f9f9f9;padding:20px;border-radius:6px;margin:20px 0;">
-            <h3 style="margin-top:0;color:#667eea;">コメント</h3>
-            ${generateCommentHTML('ja')}
-        </div>
-
         <hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">
         <p style="color:#999;font-size:12px;">検査日: ${date} ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>
     </div>`;
@@ -3921,10 +3903,6 @@ function buildPdfHTML(lang) {
             });
             return h;
         })() +
-        '<div style="background:#f9f9f9;padding:20px;border-radius:6px;margin:20px 0;">' +
-        '<h3 style="margin-top:0;color:#667eea;">' + tP('commentTitle') + '</h3>' +
-        generateCommentHTML(pdfLang) +
-        '</div>' +
         '<hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">' +
         '<p style="color:#999;font-size:12px;">検査日: ' + date + ' ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>' +
         '</div>';
