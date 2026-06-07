@@ -3875,6 +3875,7 @@ function buildPdfHTML(lang) {
     pdfPatternHTML += '</div></div>';
 
     return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#333;background:#fff;">' +
+        '<div class="pdf-page1">' +
         '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:8px;margin-bottom:8px;">' + pi18n.headings.resultTitle + '</h2>' +
         '<table style="width:100%;border-collapse:collapse;margin:0 0 8px 0;font-size:14px;">' +
         '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tP('name') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
@@ -3890,7 +3891,7 @@ function buildPdfHTML(lang) {
         '</div>' +
         // 3 Reference pattern types (right after radar chart)
         '<h3 style="margin:24px 0 4px 0;color:#333;">' + pi18n.headings.threeTypes + '</h3>' +
-        '<div style="display:flex;gap:8px;margin:4px 0;padding-bottom:100px;">' +
+        '<div style="display:flex;gap:8px;margin:4px 0;">' +
         (function() {
             var h = '';
             var tn = pi18n.traitNames;
@@ -3916,7 +3917,7 @@ function buildPdfHTML(lang) {
             return h;
         })() +
         '</div>' +
-        '<div class="pdf-page-spacer"></div>' +
+        '</div>' +
         '<h3 style="margin-top:0;color:#333;">' + nameR2 + (pdfLang === 'ja' ? 'さんの' : pdfLang === 'vi' ? ' - ' : pdfLang === 'th' ? ' - ' : ' - ') + pi18n.headings.patternTitle + '</h3>' +
         pdfPatternHTML +
         // Score bars
@@ -3961,29 +3962,19 @@ async function generatePdfBase64(lang) {
     // Wait for DOM rendering
     await new Promise(function(r) { setTimeout(r, 800); });
 
-    // Dynamic page-break: measure where page 1 content ends,
-    // then pad it so 適性パターン分析 starts cleanly on page 2.
-    // html2pdf scales 800px container → 210mm A4 width (ignoring its own margins internally).
-    // Effective page content height in source pixels:
-    //   A4 = 297mm, side margins don't affect height, top+bottom margins = 10+10 = 20mm
-    //   usable height = 277mm, scale = 210/800 mm/px → pageH = 277 / (210/800) = 1054px
-    // (html2pdf maps the full container width including padding to the page width minus margins)
+    // Fixed page 1: set min-height so page 1 always fills exactly 1 A4 page.
+    // html2pdf scales 800px container → A4 width (210mm - 20mm margins = 190mm usable).
+    // Page height in px: A4 height 297mm - 20mm margins = 277mm usable.
+    // Scale = 800px / (210-20)mm → pageH = 277 * 800 / 190 ≈ 1166px
+    // But html2pdf uses full 210mm width mapping, so: pageH = 277 * 800 / 210 ≈ 1054px
     var pageHeightPx = Math.round(277 * 800 / 210);  // ≈ 1054px
-    var spacer = container.querySelector('.pdf-page-spacer');
-    if (spacer) {
-        var spacerTop = spacer.offsetTop - container.offsetTop;
-        var posInPage = spacerTop % pageHeightPx;
-        var remainder = pageHeightPx - posInPage;
-        // If already near top of a new page, just add small gap
-        if (posInPage < pageHeightPx * 0.15) {
-            spacer.style.height = '10px';
-        } else {
-            spacer.style.height = (remainder + 10) + 'px';
-        }
-        console.log('PDF spacer: spacerTop=' + spacerTop + ', pageH=' + pageHeightPx + ', posInPage=' + posInPage + ', spacerH=' + spacer.style.height);
+    var page1 = container.querySelector('.pdf-page1');
+    if (page1) {
+        page1.style.minHeight = pageHeightPx + 'px';
+        console.log('PDF page1 min-height set to:', pageHeightPx + 'px');
     }
 
-    // Re-wait after spacer adjustment
+    // Re-wait after height adjustment
     await new Promise(function(r) { setTimeout(r, 300); });
 
     var containerHeight = container.scrollHeight;
