@@ -3188,7 +3188,8 @@ function matchPattern(traits) {
         similarities[key] = Math.max(0, Math.round((1 - distances[key] / maxDist) * 100));
     });
 
-    return { type: bestMatch, distance: bestDist, distances: distances, similarities: similarities, pattern: PATTERNS[bestMatch] };
+    var noMatch = similarities[bestMatch] < 80;
+    return { type: bestMatch, distance: bestDist, distances: distances, similarities: similarities, pattern: PATTERNS[bestMatch], noMatch: noMatch };
 }
 
 function generatePersonalityAnalysis(traits, lang) {
@@ -3435,30 +3436,44 @@ function showResults() {
     resultsDiv.appendChild(refDiv);
 
     const patternDiv = document.createElement('div');
-    patternDiv.style.cssText = 'background:' + match.pattern.bg + ';border:2px solid ' + match.pattern.border + ';border-radius:12px;padding:24px;margin:20px 0;';
+    if (match.noMatch) {
+        patternDiv.style.cssText = 'background:#f9fafb;border:2px solid #d1d5db;border-radius:12px;padding:24px;margin:20px 0;';
+    } else {
+        patternDiv.style.cssText = 'background:' + match.pattern.bg + ';border:2px solid ' + match.pattern.border + ';border-radius:12px;padding:24px;margin:20px 0;';
+    }
 
     let ph = '';
-    // Header with pattern badge
-    ph += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">';
-    ph += '<span style="background:' + match.pattern.color + ';color:white;padding:8px 20px;border-radius:24px;font-size:16px;font-weight:700">' + match.type + '型</span>';
-    ph += '<span style="font-size:18px;font-weight:700;color:#374151">' + bilingInline(match.pattern.name, pi18n.headings.typePrefix + ' ' + match.type + ' ' + pi18n.patternNames[match.type]) + '</span>';
-    var webMatchLabel = isJa ? '一致度' : appState.currentLanguage === 'vi' ? 'Mức tương đồng' : appState.currentLanguage === 'en' ? 'Match' : appState.currentLanguage === 'th' ? 'ความตรงกัน' : appState.currentLanguage === 'my' ? 'ကိုက်ညီမှု' : appState.currentLanguage === 'id' ? 'Kecocokan' : appState.currentLanguage === 'km' ? 'ភាពស្រដៀង' : appState.currentLanguage === 'bn' ? 'মিল' : 'Match';
-    ph += '<span style="font-size:13px;color:#666;background:white;padding:4px 12px;border-radius:12px;border:1px solid #e5e7eb">' + biling('一致度', webMatchLabel) + ': ' + match.similarities[match.type] + '%</span>';
-    ph += '</div>';
 
-    // Pattern description
-    ph += '<div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid #e5e7eb">';
-    ph += '<h3 style="color:' + match.pattern.color + ';font-size:15px;margin:0 0 10px 0">' + bilingInline(jaI18n.headings.typeFeature, pi18n.headings.typeFeature) + '</h3>';
-    ph += '<p style="font-size:14px;color:#374151;line-height:1.8;margin:0">' + biling(match.pattern.description, pi18n.patternDesc[match.type]) + '</p>';
-    ph += '</div>';
+    if (match.noMatch) {
+        // No match case - all similarities < 80%
+        var noMatchJa = 'いずれのパターンにも該当しません';
+        var noMatchLocal = appState.currentLanguage === 'vi' ? 'Không thuộc nhóm nào' : appState.currentLanguage === 'en' ? 'Does not match any pattern' : appState.currentLanguage === 'th' ? 'ไม่ตรงกับรูปแบบใดเลย' : appState.currentLanguage === 'my' ? 'မည်သည့်ပုံစံနှင့်မှ မကိုက်ညီပါ' : appState.currentLanguage === 'id' ? 'Tidak cocok dengan pola manapun' : appState.currentLanguage === 'km' ? 'មិនត្រូវគ្នាជាមួយគំរូណាមួយទេ' : appState.currentLanguage === 'bn' ? 'কোনো প্যাটার্নের সাথে মেলে না' : noMatchJa;
+        ph += '<div style="text-align:center;margin-bottom:16px">';
+        ph += '<span style="background:#6b7280;color:white;padding:10px 24px;border-radius:24px;font-size:16px;font-weight:700">' + biling(noMatchJa, noMatchLocal) + '</span>';
+        ph += '</div>';
+    } else {
+        // Header with pattern badge
+        ph += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">';
+        ph += '<span style="background:' + match.pattern.color + ';color:white;padding:8px 20px;border-radius:24px;font-size:16px;font-weight:700">' + match.type + '型</span>';
+        ph += '<span style="font-size:18px;font-weight:700;color:#374151">' + bilingInline(match.pattern.name, pi18n.headings.typePrefix + ' ' + match.type + ' ' + pi18n.patternNames[match.type]) + '</span>';
+        var webMatchLabel = isJa ? '一致度' : appState.currentLanguage === 'vi' ? 'Mức tương đồng' : appState.currentLanguage === 'en' ? 'Match' : appState.currentLanguage === 'th' ? 'ความตรงกัน' : appState.currentLanguage === 'my' ? 'ကိုက်ညီမှု' : appState.currentLanguage === 'id' ? 'Kecocokan' : appState.currentLanguage === 'km' ? 'ភាពស្រដៀង' : appState.currentLanguage === 'bn' ? 'মিল' : 'Match';
+        ph += '<span style="font-size:13px;color:#666;background:white;padding:4px 12px;border-radius:12px;border:1px solid #e5e7eb">' + biling('一致度', webMatchLabel) + ': ' + match.similarities[match.type] + '%</span>';
+        ph += '</div>';
 
-    // Similarity bars for all 3 patterns
+        // Pattern description
+        ph += '<div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid #e5e7eb">';
+        ph += '<h3 style="color:' + match.pattern.color + ';font-size:15px;margin:0 0 10px 0">' + bilingInline(jaI18n.headings.typeFeature, pi18n.headings.typeFeature) + '</h3>';
+        ph += '<p style="font-size:14px;color:#374151;line-height:1.8;margin:0">' + biling(match.pattern.description, pi18n.patternDesc[match.type]) + '</p>';
+        ph += '</div>';
+    }
+
+    // Similarity bars for all 3 patterns (always show)
     ph += '<div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid #e5e7eb">';
     ph += '<h3 style="color:#374151;font-size:14px;margin:0 0 12px 0">' + bilingInline(jaI18n.headings.similarity, pi18n.headings.similarity) + '</h3>';
     ['A', 'B', 'C'].forEach(function(pType) {
         var p = PATTERNS[pType];
         var sim = match.similarities[pType];
-        var isMatch = (pType === match.type);
+        var isMatch = !match.noMatch && (pType === match.type);
         ph += '<div style="display:flex;align-items:center;margin-bottom:8px">';
         ph += '<span style="width:220px;font-size:13px;font-weight:' + (isMatch ? '700' : '400') + ';color:' + (isMatch ? p.color : '#666') + '">' + pType + '型 ' + bilingInline(p.name, pi18n.patternNames[pType]) + '</span>';
         ph += '<div style="flex:1;background:#f3f4f6;border-radius:4px;height:10px;margin:0 10px"><div style="background:' + p.color + ';height:10px;border-radius:4px;width:' + sim + '%;opacity:' + (isMatch ? '1' : '0.5') + '"></div></div>';
@@ -3476,7 +3491,8 @@ function showResults() {
         var jaItem = personalityItemsJa[pi];
         var localItem = personalityItemsLocal[pi] || '';
         if (!jaItem && !localItem) { ph += '<div style="height:4px"></div>'; continue; }
-        ph += '<div style="font-size:13px;color:#555;line-height:1.7;margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + match.pattern.color + ';border-radius:0 4px 4px 0">' + biling(jaItem, localItem) + '</div>';
+        var borderCol = match.noMatch ? '#9ca3af' : match.pattern.color;
+        ph += '<div style="font-size:13px;color:#555;line-height:1.7;margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + borderCol + ';border-radius:0 4px 4px 0">' + biling(jaItem, localItem) + '</div>';
     }
     ph += '</div>';
 
@@ -3768,16 +3784,27 @@ function buildEmailHTML() {
     const match = appState.matchResult || matchPattern(traits);
     const personalityItems = generatePersonalityAnalysis(traits);
     let patternEmailHTML = '';
-    patternEmailHTML += '<div style="background:' + match.pattern.bg + ';border:2px solid ' + match.pattern.border + ';border-radius:8px;padding:16px;margin:12px 0;">';
-    patternEmailHTML += '<div style="margin-bottom:10px"><span style="background:' + match.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + match.type + '型 ' + match.pattern.name + '</span>';
-    patternEmailHTML += ' <span style="font-size:13px;color:#666">（一致度: ' + match.similarities[match.type] + '%）</span></div>';
-    patternEmailHTML += '<p style="font-size:14px;color:#374151;line-height:1.7;margin:10px 0">' + match.pattern.description + '</p>';
-    patternEmailHTML += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb">';
-    patternEmailHTML += '<p style="font-weight:700;font-size:14px;color:#374151;margin:0 0 8px">性格傾向・特性</p>';
-    personalityItems.forEach(function(item) {
-        patternEmailHTML += '<p style="margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + match.pattern.color + ';font-size:13px;line-height:1.6">' + item + '</p>';
-    });
-    patternEmailHTML += '</div></div>';
+    if (match.noMatch) {
+        patternEmailHTML += '<div style="background:#f9fafb;border:2px solid #d1d5db;border-radius:8px;padding:16px;margin:12px 0;">';
+        patternEmailHTML += '<div style="margin-bottom:10px;text-align:center"><span style="background:#6b7280;color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">いずれのパターンにも該当しません</span></div>';
+        patternEmailHTML += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb">';
+        patternEmailHTML += '<p style="font-weight:700;font-size:14px;color:#374151;margin:0 0 8px">性格傾向・特性</p>';
+        personalityItems.forEach(function(item) {
+            patternEmailHTML += '<p style="margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid #9ca3af;font-size:13px;line-height:1.6">' + item + '</p>';
+        });
+        patternEmailHTML += '</div></div>';
+    } else {
+        patternEmailHTML += '<div style="background:' + match.pattern.bg + ';border:2px solid ' + match.pattern.border + ';border-radius:8px;padding:16px;margin:12px 0;">';
+        patternEmailHTML += '<div style="margin-bottom:10px"><span style="background:' + match.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + match.type + '型 ' + match.pattern.name + '</span>';
+        patternEmailHTML += ' <span style="font-size:13px;color:#666">（一致度: ' + match.similarities[match.type] + '%）</span></div>';
+        patternEmailHTML += '<p style="font-size:14px;color:#374151;line-height:1.7;margin:10px 0">' + match.pattern.description + '</p>';
+        patternEmailHTML += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb">';
+        patternEmailHTML += '<p style="font-weight:700;font-size:14px;color:#374151;margin:0 0 8px">性格傾向・特性</p>';
+        personalityItems.forEach(function(item) {
+            patternEmailHTML += '<p style="margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + match.pattern.color + ';font-size:13px;line-height:1.6">' + item + '</p>';
+        });
+        patternEmailHTML += '</div></div>';
+    }
 
     return `
     <div style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;max-width:700px;margin:0 auto;color:#333;">
@@ -3828,15 +3855,22 @@ function buildPdfHTML(lang) {
     const match2 = appState.matchResult || matchPattern(traits);
     const personalityItems2 = generatePersonalityAnalysis(traits, pdfLang);
     var pdfPatternHTML = '';
-    pdfPatternHTML += '<div style="background:' + match2.pattern.bg + ';border:2px solid ' + match2.pattern.border + ';border-radius:8px;padding:16px;margin:12px 0;">';
-    pdfPatternHTML += '<div style="margin-bottom:10px"><span style="background:' + match2.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + (pdfLang === 'ja' ? match2.type + '型 ' : pi18n.headings.typePrefix + ' ' + match2.type + ' ') + (pi18n.patternNames[match2.type] || match2.pattern.name) + '</span>';
-    var matchLabel = pdfLang === 'ja' ? '一致度' : pdfLang === 'vi' ? 'Mức tương đồng' : pdfLang === 'en' ? 'Match' : pdfLang === 'th' ? 'ความตรงกัน' : pdfLang === 'my' ? 'ကိုက်ညီမှု' : pdfLang === 'id' ? 'Kecocokan' : pdfLang === 'km' ? 'ភាពស្រដៀង' : pdfLang === 'bn' ? 'মিল' : 'Match';
-    pdfPatternHTML += ' <span style="font-size:13px;color:#666">（' + matchLabel + ': ' + match2.similarities[match2.type] + '%）</span></div>';
-    pdfPatternHTML += '<p style="font-size:14px;color:#374151;line-height:1.7;margin:10px 0">' + (pi18n.patternDesc[match2.type] || match2.pattern.description) + '</p>';
+    var noMatchMsg = pdfLang === 'ja' ? 'いずれのパターンにも該当しません' : pdfLang === 'vi' ? 'Không thuộc nhóm nào' : pdfLang === 'en' ? 'Does not match any pattern' : pdfLang === 'th' ? 'ไม่ตรงกับรูปแบบใดเลย' : pdfLang === 'my' ? 'မည်သည့်ပုံစံနှင့်မှ မကိုက်ညီပါ' : pdfLang === 'id' ? 'Tidak cocok dengan pola manapun' : pdfLang === 'km' ? 'មិនត្រូវគ្នាជាមួយគំរូណាមួយទេ' : pdfLang === 'bn' ? 'কোনো প্যাটার্নের সাথে মেলে না' : 'いずれのパターンにも該当しません';
+    if (match2.noMatch) {
+        pdfPatternHTML += '<div style="background:#f9fafb;border:2px solid #d1d5db;border-radius:8px;padding:16px;margin:12px 0;">';
+        pdfPatternHTML += '<div style="margin-bottom:10px;text-align:center"><span style="background:#6b7280;color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + noMatchMsg + '</span></div>';
+    } else {
+        pdfPatternHTML += '<div style="background:' + match2.pattern.bg + ';border:2px solid ' + match2.pattern.border + ';border-radius:8px;padding:16px;margin:12px 0;">';
+        pdfPatternHTML += '<div style="margin-bottom:10px"><span style="background:' + match2.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + (pdfLang === 'ja' ? match2.type + '型 ' : pi18n.headings.typePrefix + ' ' + match2.type + ' ') + (pi18n.patternNames[match2.type] || match2.pattern.name) + '</span>';
+        var matchLabel = pdfLang === 'ja' ? '一致度' : pdfLang === 'vi' ? 'Mức tương đồng' : pdfLang === 'en' ? 'Match' : pdfLang === 'th' ? 'ความตรงกัน' : pdfLang === 'my' ? 'ကိုက်ညီမှု' : pdfLang === 'id' ? 'Kecocokan' : pdfLang === 'km' ? 'ភាពស្រដៀង' : pdfLang === 'bn' ? 'মিল' : 'Match';
+        pdfPatternHTML += ' <span style="font-size:13px;color:#666">（' + matchLabel + ': ' + match2.similarities[match2.type] + '%）</span></div>';
+        pdfPatternHTML += '<p style="font-size:14px;color:#374151;line-height:1.7;margin:10px 0">' + (pi18n.patternDesc[match2.type] || match2.pattern.description) + '</p>';
+    }
+    var pBorderCol = match2.noMatch ? '#9ca3af' : match2.pattern.color;
     pdfPatternHTML += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb">';
     pdfPatternHTML += '<p style="font-weight:700;font-size:14px;color:#374151;margin:0 0 8px">' + pi18n.headings.personality + '</p>';
     personalityItems2.forEach(function(item) {
-        pdfPatternHTML += '<p style="margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + match2.pattern.color + ';font-size:13px;line-height:1.6">' + item + '</p>';
+        pdfPatternHTML += '<p style="margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + pBorderCol + ';font-size:13px;line-height:1.6">' + item + '</p>';
     });
     pdfPatternHTML += '</div></div>';
 
