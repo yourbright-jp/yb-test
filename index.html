@@ -3991,18 +3991,25 @@ async function generatePdfBase64(lang) {
         console.log('[PDF] p1Offset:', p1Offset, 'g1H:', g1H, 'g2H:', g2H, 'g3H:', g3H,
             'total:', totalContentH, 'pageH:', pageHeightPx, 'available:', availableH, 'extra:', extraSpace);
         if (extraSpace > 20) {
-            // Distribute extra space into 4 equal gaps: top, g1→g2, g2→g3, bottom
-            // Use paddingTop/paddingBottom on page1 (not margin) to avoid CSS margin collapsing
-            // This ensures top margin ≈ bottom margin (sếp: 上下の余白をほぼ同じに)
-            var gap = Math.floor(extraSpace / 4);
-            page1.style.paddingTop = gap + 'px';
-            g2.style.marginTop = gap + 'px';
-            g3.style.marginTop = gap + 'px';
-            page1.style.paddingBottom = gap + 'px';
-            // Page 2 top margin should match page 1 top margin
+            // Split: 45% for top+bottom padding, 55% for 2 section gaps
+            var padTotal = Math.floor(extraSpace * 0.45);
+            var midTotal = extraSpace - padTotal;
+            var midGap = Math.floor(midTotal / 2);
+            // Compensate for p1Offset so visual top = visual bottom exactly
+            // Visual top (from page edge) = p1Offset + topPad
+            // Visual bottom (from page edge) = bottomPad
+            // Equal when: bottomPad = topPad + p1Offset
+            var topPad = Math.max(0, Math.floor((padTotal - p1Offset) / 2));
+            var bottomPad = padTotal - topPad;
+            page1.style.paddingTop = topPad + 'px';
+            g2.style.marginTop = midGap + 'px';
+            g3.style.marginTop = midGap + 'px';
+            page1.style.paddingBottom = bottomPad + 'px';
+            // Page 2 top margin should match page 1 visual top
             var p2Start = container.querySelector('.pdf-page2-start');
-            if (p2Start) p2Start.style.marginTop = gap + 'px';
-            console.log('[PDF] Added ' + gap + 'px gaps (page1 padding-top/bottom + g2/g3 margin-top + page2 top)');
+            if (p2Start) p2Start.style.marginTop = (p1Offset + topPad) + 'px';
+            console.log('[PDF] topPad:', topPad, 'bottomPad:', bottomPad, 'midGap:', midGap,
+                'visual top:', (p1Offset + topPad), 'visual bottom:', bottomPad);
         } else {
             console.log('[PDF] No extra space to distribute, content fills page naturally');
         }
