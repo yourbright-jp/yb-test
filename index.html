@@ -3819,7 +3819,7 @@ function buildEmailHTML() {
             <tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">${tBi('marital')}</td><td style="padding:6px 12px;border:1px solid #ddd;">${marital}</td></tr>
         </table>
 
-        <h3 style="margin-top:24px;color:#333;text-align:center;">応募者のレーダーチャート</h3>
+        <h3 style="margin-top:24px;color:#333;text-align:center;">${nameR}さんのレーダーチャート</h3>
         <div style="text-align:center;margin:20px 0;">
             ${buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 500)}
         </div>
@@ -3874,7 +3874,7 @@ function buildPdfHTML(lang) {
     });
     pdfPatternHTML += '</div></div>';
 
-    return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#333;background:#fff;">' +
+    return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:0 20px;color:#333;background:#fff;">' +
         '<div class="pdf-page1">' +
         // Group 1: Title + Info table
         '<div class="pdf-g1">' +
@@ -3890,7 +3890,7 @@ function buildPdfHTML(lang) {
         '</div>' +
         // Group 2: Radar chart
         '<div class="pdf-g2">' +
-        '<h3 style="margin:0 0 0 0;color:#333;text-align:left;">' + pi18n.headings.radarTitle + '</h3>' +
+        '<h3 style="margin:0 0 0 0;color:#333;text-align:left;">' + (pdfLang === 'ja' ? nameR2 + 'さんのレーダーチャート' : nameR2 + ' - ' + pi18n.headings.radarTitle) + '</h3>' +
         '<div style="text-align:center;margin:0;">' +
         buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 460, shortLabels) +
         '</div>' +
@@ -3926,7 +3926,7 @@ function buildPdfHTML(lang) {
         '</div>' +
         '</div>' +
         '</div>' +
-        '<h3 style="margin-top:0;color:#333;">' + nameR2 + (pdfLang === 'ja' ? 'さんの' : pdfLang === 'vi' ? ' - ' : pdfLang === 'th' ? ' - ' : ' - ') + pi18n.headings.patternTitle + '</h3>' +
+        '<h3 class="pdf-page2-start" style="margin-top:0;color:#333;">' + nameR2 + (pdfLang === 'ja' ? 'さんの' : pdfLang === 'vi' ? ' - ' : pdfLang === 'th' ? ' - ' : ' - ') + pi18n.headings.patternTitle + '</h3>' +
         pdfPatternHTML +
         // Score bars
         '<h3 style="margin-top:24px;color:#333;">' + pi18n.headings.scoreDetail + '</h3>' +
@@ -3961,7 +3961,7 @@ async function generatePdfBase64(lang) {
     // MUST be position:absolute at top:0 so html2canvas captures from (0,0)
     const container = document.createElement('div');
     container.id = 'pdfRenderContainer';
-    container.style.cssText = 'position:absolute;left:0;top:0;width:800px;background:#fff;padding:20px;margin:0;z-index:99999;';
+    container.style.cssText = 'position:absolute;left:0;top:0;width:800px;background:#fff;padding:0 20px;margin:0;z-index:99999;';
     container.innerHTML = buildPdfHTML(lang);
 
     var oldScroll = window.scrollY;
@@ -3991,11 +3991,17 @@ async function generatePdfBase64(lang) {
         console.log('[PDF] p1Offset:', p1Offset, 'g1H:', g1H, 'g2H:', g2H, 'g3H:', g3H,
             'total:', totalContentH, 'pageH:', pageHeightPx, 'available:', availableH, 'extra:', extraSpace);
         if (extraSpace > 20) {
-            // Distribute extra space as margins between the 3 groups (2 gaps)
-            var gap = Math.floor(extraSpace / 2);
+            // Distribute extra space into 4 equal gaps: top, g1→g2, g2→g3, bottom
+            // This ensures top margin ≈ bottom margin (sếp yêu cầu 上下の余白をほぼ同じに)
+            var gap = Math.floor(extraSpace / 4);
+            g1.style.marginTop = gap + 'px';
             g2.style.marginTop = gap + 'px';
             g3.style.marginTop = gap + 'px';
-            console.log('[PDF] Added ' + gap + 'px margin-top to g2 and g3');
+            g3.style.marginBottom = gap + 'px';
+            // Page 2 top margin should match page 1 top margin
+            var p2Start = container.querySelector('.pdf-page2-start');
+            if (p2Start) p2Start.style.marginTop = gap + 'px';
+            console.log('[PDF] Added ' + gap + 'px margin (4 gaps: top/g1-g2/g2-g3/bottom + page2 top)');
         } else {
             console.log('[PDF] No extra space to distribute, content fills page naturally');
         }
