@@ -3877,7 +3877,7 @@ function buildPdfHTML(lang) {
     return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:0 20px;color:#333;background:#fff;">' +
         '<div class="pdf-page1">' +
         // Group 1: Title + Info table
-        '<div class="pdf-g1">' +
+        '<div class="pdf-g1" style="overflow:hidden;">' +
         '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:8px;margin-top:0;margin-bottom:8px;">' + pi18n.headings.resultTitle + '</h2>' +
         '<table style="width:100%;border-collapse:collapse;margin:0 0 8px 0;font-size:14px;">' +
         '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tP('name') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
@@ -3889,14 +3889,14 @@ function buildPdfHTML(lang) {
         '</table>' +
         '</div>' +
         // Group 2: Radar chart
-        '<div class="pdf-g2">' +
+        '<div class="pdf-g2" style="overflow:hidden;">' +
         '<h3 style="margin:0 0 0 0;color:#333;text-align:left;">' + (pdfLang === 'ja' ? nameR2 + 'さんのレーダーチャート' : nameR2 + ' - ' + pi18n.headings.radarTitle) + '</h3>' +
         '<div style="text-align:center;margin:0;">' +
         buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 460, shortLabels) +
         '</div>' +
         '</div>' +
         // Group 3: 3 Reference pattern types
-        '<div class="pdf-g3">' +
+        '<div class="pdf-g3" style="overflow:hidden;">' +
         '<h3 style="margin:0 0 4px 0;color:#333;">' + pi18n.headings.threeTypes + '</h3>' +
         '<div style="display:flex;gap:8px;margin:4px 0;">' +
         (function() {
