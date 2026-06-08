@@ -3878,7 +3878,7 @@ function buildPdfHTML(lang) {
         '<div class="pdf-page1">' +
         // Group 1: Title + Info table
         '<div class="pdf-g1">' +
-        '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:8px;margin-bottom:8px;">' + pi18n.headings.resultTitle + '</h2>' +
+        '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:8px;margin-top:0;margin-bottom:8px;">' + pi18n.headings.resultTitle + '</h2>' +
         '<table style="width:100%;border-collapse:collapse;margin:0 0 8px 0;font-size:14px;">' +
         '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tP('name') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
         '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('country') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + country + '</td></tr>' +
@@ -3992,16 +3992,17 @@ async function generatePdfBase64(lang) {
             'total:', totalContentH, 'pageH:', pageHeightPx, 'available:', availableH, 'extra:', extraSpace);
         if (extraSpace > 20) {
             // Distribute extra space into 4 equal gaps: top, g1→g2, g2→g3, bottom
-            // This ensures top margin ≈ bottom margin (sếp yêu cầu 上下の余白をほぼ同じに)
+            // Use paddingTop/paddingBottom on page1 (not margin) to avoid CSS margin collapsing
+            // This ensures top margin ≈ bottom margin (sếp: 上下の余白をほぼ同じに)
             var gap = Math.floor(extraSpace / 4);
-            g1.style.marginTop = gap + 'px';
+            page1.style.paddingTop = gap + 'px';
             g2.style.marginTop = gap + 'px';
             g3.style.marginTop = gap + 'px';
-            g3.style.marginBottom = gap + 'px';
+            page1.style.paddingBottom = gap + 'px';
             // Page 2 top margin should match page 1 top margin
             var p2Start = container.querySelector('.pdf-page2-start');
             if (p2Start) p2Start.style.marginTop = gap + 'px';
-            console.log('[PDF] Added ' + gap + 'px margin (4 gaps: top/g1-g2/g2-g3/bottom + page2 top)');
+            console.log('[PDF] Added ' + gap + 'px gaps (page1 padding-top/bottom + g2/g3 margin-top + page2 top)');
         } else {
             console.log('[PDF] No extra space to distribute, content fills page naturally');
         }
