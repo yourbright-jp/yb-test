@@ -3961,7 +3961,7 @@ async function generatePdfBase64(lang) {
     // MUST be position:absolute at top:0 so html2canvas captures from (0,0)
     const container = document.createElement('div');
     container.id = 'pdfRenderContainer';
-    container.style.cssText = 'position:absolute;left:0;top:0;width:800px;background:#fff;padding:0 20px;margin:0;z-index:99999;';
+    container.style.cssText = 'position:absolute;left:0;top:0;width:800px;background:#fff;padding:12px 20px;margin:0;z-index:99999;';
     container.innerHTML = buildPdfHTML(lang);
 
     var oldScroll = window.scrollY;
@@ -3991,28 +3991,28 @@ async function generatePdfBase64(lang) {
         console.log('[PDF] p1Offset:', p1Offset, 'g1H:', g1H, 'g2H:', g2H, 'g3H:', g3H,
             'total:', totalContentH, 'pageH:', pageHeightPx, 'available:', availableH, 'extra:', extraSpace);
         if (extraSpace > 20) {
-            // Split: 45% for top+bottom padding, 55% for 2 section gaps
-            var padTotal = Math.floor(extraSpace * 0.45);
-            var midTotal = extraSpace - padTotal;
-            var midGap = Math.floor(midTotal / 2);
-            // Compensate for p1Offset so visual top = visual bottom exactly
-            // Visual top (from page edge) = p1Offset + topPad
-            // Visual bottom (from page edge) = bottomPad
-            // Equal when: bottomPad = topPad + p1Offset
-            var topPad = Math.max(0, Math.floor((padTotal - p1Offset) / 2));
-            var bottomPad = padTotal - topPad;
+            // Safety margin to prevent subpixel overflow
+            var safeExtra = extraSpace - 6;
+            // 4-way split: topPad, gap(g1→g2), gap(g2→g3), bottomPad
+            // Balanced so visual_top (p1Offset + topPad) ≈ visual_bottom (bottomPad)
+            var midGap = Math.floor(safeExtra * 0.25);
+            var padSpace = safeExtra - 2 * midGap;
+            // Solve: p1Offset + topPad = bottomPad, topPad + bottomPad = padSpace
+            // → topPad = (padSpace - p1Offset) / 2, bottomPad = (padSpace + p1Offset) / 2
+            var topPad = Math.max(0, Math.floor((padSpace - p1Offset) / 2));
+            var bottomPad = padSpace - topPad;
             page1.style.paddingTop = topPad + 'px';
             g2.style.marginTop = midGap + 'px';
             g3.style.marginTop = midGap + 'px';
             page1.style.paddingBottom = bottomPad + 'px';
-            // Page 2 top margin should match page 1 visual top
-            var p2Start = container.querySelector('.pdf-page2-start');
-            if (p2Start) p2Start.style.marginTop = (p1Offset + topPad) + 'px';
             console.log('[PDF] topPad:', topPad, 'bottomPad:', bottomPad, 'midGap:', midGap,
                 'visual top:', (p1Offset + topPad), 'visual bottom:', bottomPad);
         } else {
             console.log('[PDF] No extra space to distribute, content fills page naturally');
         }
+        // Page 2: fixed small top margin (does NOT affect page 1 height)
+        var p2Start = container.querySelector('.pdf-page2-start');
+        if (p2Start) p2Start.style.marginTop = '12px';
     }
 
     // Re-wait after height adjustment
