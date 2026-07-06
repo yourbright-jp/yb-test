@@ -3892,7 +3892,7 @@ function buildPdfHTML(lang) {
         '<div class="pdf-g2" style="overflow:hidden;">' +
         '<h3 style="margin:0 0 0 0;color:#333;text-align:left;">' + (pdfLang === 'ja' ? nameR2 + 'さんのレーダーチャート' : nameR2 + ' - ' + pi18n.headings.radarTitle) + '</h3>' +
         '<div style="text-align:center;margin:0;">' +
-        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 460, shortLabels) +
+        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 420, shortLabels) +
         '</div>' +
         '</div>' +
         // Group 3: 3 Reference pattern types
@@ -3906,7 +3906,7 @@ function buildPdfHTML(lang) {
                 var p = PATTERNS[k];
                 h += '<div style="flex:1;background:' + p.bg + ';border:2px solid ' + p.border + ';border-radius:8px;padding:8px 6px;text-align:center;">';
                 h += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:800;margin-bottom:4px;letter-spacing:0.5px;">' + (pdfLang === 'ja' ? k + '型 ' : pi18n.headings.typePrefix + ' ' + k + ' ') + (pi18n.patternNames[k] || p.name) + '</div>';
-                var svg = buildRadarSVG(p.means, p.color, 340, pi18n.traitNames);
+                var svg = buildRadarSVG(p.means, p.color, 300, pi18n.traitNames);
                 h += svg.replace('style="display:block;"', 'style="display:block;width:100%;height:auto;"');
                 h += '<div style="text-align:left;margin-top:2px;padding:0 4px;">';
                 p.means.forEach(function(val, i) {
@@ -3926,8 +3926,6 @@ function buildPdfHTML(lang) {
         '</div>' +
         '</div>' +
         '</div>' +
-        '<div style="page-break-before:always;"></div>' +
-        '<div class="pdf-page2">' +
         '<h3 class="pdf-page2-start" style="margin-top:0;color:#333;">' + nameR2 + (pdfLang === 'ja' ? 'さんの' : pdfLang === 'vi' ? ' - ' : pdfLang === 'th' ? ' - ' : ' - ') + pi18n.headings.patternTitle + '</h3>' +
         pdfPatternHTML +
         // Score bars
@@ -3950,7 +3948,6 @@ function buildPdfHTML(lang) {
         })() +
         '<hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">' +
         '<p style="color:#999;font-size:12px;">検査日: ' + date + ' ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>' +
-        '</div>' +
         '</div>';
 }
 
@@ -3973,17 +3970,14 @@ async function generatePdfBase64(lang) {
     // Wait for DOM rendering
     await new Promise(function(r) { setTimeout(r, 800); });
 
-    // === DYNAMIC AUTO-FIT: Both Page 1 & Page 2 ===
-    // html2pdf: 800px logical width at scale 2 → 1600px canvas → 190mm content width.
-    // Page height: 277mm * 800 / 190 ≈ 1166px logical.
-    var pageHeightPx = Math.round(277 * 800 / 190);
+    // Dynamic page 1 spacing: measure actual content, calculate gap to fill 1 A4 page.
+    // html2pdf: canvas 800px (logical) at scale 2 → 1600px canvas → maps to 190mm content width.
+    // Page content height: 277mm * 1600 / 190 = 2332.6 canvas px → 1166.3 logical px.
+    var pageHeightPx = Math.round(277 * 800 / 190);  // ≈ 1166px (1 A4 page in logical px)
     var page1 = container.querySelector('.pdf-page1');
-    var page2 = container.querySelector('.pdf-page2');
     var g1 = page1 ? page1.querySelector('.pdf-g1') : null;
     var g2 = page1 ? page1.querySelector('.pdf-g2') : null;
     var g3 = page1 ? page1.querySelector('.pdf-g3') : null;
-
-    // --- Page 1 auto-fit ---
     if (page1 && g1 && g2 && g3) {
         var cRect = container.getBoundingClientRect();
         var p1Rect = page1.getBoundingClientRect();
@@ -3994,53 +3988,31 @@ async function generatePdfBase64(lang) {
         var totalContentH = g1H + g2H + g3H;
         var availableH = pageHeightPx - p1Offset;
         var extraSpace = availableH - totalContentH;
-        console.log('[PDF-P1] offset:', p1Offset, 'g1:', g1H, 'g2:', g2H, 'g3:', g3H,
-            'total:', totalContentH, 'avail:', availableH, 'extra:', extraSpace);
-
-        if (extraSpace < -5) {
-            // OVERFLOW → shrink with CSS zoom so content fits in 1 page
-            var zf1 = (availableH - 4) / totalContentH;
-            page1.style.zoom = zf1.toFixed(4);
-            // Force page1 to occupy exactly 1 page height so page2 starts correctly
-            page1.style.minHeight = Math.floor(pageHeightPx / zf1) + 'px';
-            console.log('[PDF-P1] SHRINK zoom:', zf1.toFixed(4));
-        } else if (extraSpace > 20) {
-            // EXTRA SPACE → distribute evenly
+        console.log('[PDF] p1Offset:', p1Offset, 'g1H:', g1H, 'g2H:', g2H, 'g3H:', g3H,
+            'total:', totalContentH, 'pageH:', pageHeightPx, 'available:', availableH, 'extra:', extraSpace);
+        if (extraSpace > 20) {
+            // Safety margin to prevent subpixel overflow
             var safeExtra = extraSpace - 6;
+            // 4-way split: topPad, gap(g1→g2), gap(g2→g3), bottomPad
+            // Balanced so visual_top (p1Offset + topPad) ≈ visual_bottom (bottomPad)
             var midGap = Math.floor(safeExtra * 0.25);
             var padSpace = safeExtra - 2 * midGap;
+            // Solve: p1Offset + topPad = bottomPad, topPad + bottomPad = padSpace
+            // → topPad = (padSpace - p1Offset) / 2, bottomPad = (padSpace + p1Offset) / 2
             var topPad = Math.max(0, Math.floor((padSpace - p1Offset) / 2));
             var bottomPad = padSpace - topPad;
             page1.style.paddingTop = topPad + 'px';
             g2.style.marginTop = midGap + 'px';
             g3.style.marginTop = midGap + 'px';
             page1.style.paddingBottom = bottomPad + 'px';
-            console.log('[PDF-P1] EXPAND top:', topPad, 'gap:', midGap, 'bot:', bottomPad);
+            console.log('[PDF] topPad:', topPad, 'bottomPad:', bottomPad, 'midGap:', midGap,
+                'visual top:', (p1Offset + topPad), 'visual bottom:', bottomPad);
         } else {
-            console.log('[PDF-P1] Fits naturally');
+            console.log('[PDF] No extra space to distribute, content fills page naturally');
         }
-    }
-
-    // --- Page 2 auto-fit ---
-    if (page2) {
-        await new Promise(function(r) { setTimeout(r, 200); });
-        var p2H = page2.scrollHeight;
-        var p2Available = pageHeightPx - 8;
-        var p2Extra = p2Available - p2H;
-        console.log('[PDF-P2] height:', p2H, 'avail:', p2Available, 'extra:', p2Extra);
-
-        if (p2H < 200) {
-            // scrollHeight too small = not rendered yet, skip auto-fit
-            console.log('[PDF-P2] SKIP - scrollHeight too small, likely not rendered');
-        } else if (p2Extra < -5) {
-            // OVERFLOW → shrink page 2 content with CSS zoom
-            var zf2 = (p2Available - 4) / p2H;
-            page2.style.zoom = zf2.toFixed(4);
-            console.log('[PDF-P2] SHRINK zoom:', zf2.toFixed(4));
-        } else {
-            // Fits or has extra space → leave content at top, no padding
-            console.log('[PDF-P2] OK (extra:', p2Extra + 'px)');
-        }
+        // Page 2: fixed small top margin (does NOT affect page 1 height)
+        var p2Start = container.querySelector('.pdf-page2-start');
+        if (p2Start) p2Start.style.marginTop = '12px';
     }
 
     // Re-wait after height adjustment
