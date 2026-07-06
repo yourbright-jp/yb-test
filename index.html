@@ -4001,6 +4001,8 @@ async function generatePdfBase64(lang) {
             // OVERFLOW → shrink with CSS zoom so content fits in 1 page
             var zf1 = (availableH - 4) / totalContentH;
             page1.style.zoom = zf1.toFixed(4);
+            // Force page1 to occupy exactly 1 page height so page2 starts correctly
+            page1.style.minHeight = Math.floor(pageHeightPx / zf1) + 'px';
             console.log('[PDF-P1] SHRINK zoom:', zf1.toFixed(4));
         } else if (extraSpace > 20) {
             // EXTRA SPACE → distribute evenly
@@ -4021,29 +4023,23 @@ async function generatePdfBase64(lang) {
 
     // --- Page 2 auto-fit ---
     if (page2) {
-        await new Promise(function(r) { setTimeout(r, 100); });
+        await new Promise(function(r) { setTimeout(r, 200); });
         var p2H = page2.scrollHeight;
         var p2Available = pageHeightPx - 8;
         var p2Extra = p2Available - p2H;
         console.log('[PDF-P2] height:', p2H, 'avail:', p2Available, 'extra:', p2Extra);
 
-        if (p2Extra < -5) {
-            // OVERFLOW → shrink page 2 content
+        if (p2H < 200) {
+            // scrollHeight too small = not rendered yet, skip auto-fit
+            console.log('[PDF-P2] SKIP - scrollHeight too small, likely not rendered');
+        } else if (p2Extra < -5) {
+            // OVERFLOW → shrink page 2 content with CSS zoom
             var zf2 = (p2Available - 4) / p2H;
             page2.style.zoom = zf2.toFixed(4);
             console.log('[PDF-P2] SHRINK zoom:', zf2.toFixed(4));
-        } else if (p2Extra > 30) {
-            // EXTRA SPACE → distribute padding
-            var safe2 = p2Extra - 10;
-            var p2TopPad = Math.floor(safe2 * 0.30);
-            var p2BotPad = Math.floor(safe2 * 0.30);
-            page2.style.paddingTop = p2TopPad + 'px';
-            page2.style.paddingBottom = p2BotPad + 'px';
-            var p2Start = page2.querySelector('.pdf-page2-start');
-            if (p2Start) p2Start.style.marginTop = Math.floor(safe2 * 0.10) + 'px';
-            console.log('[PDF-P2] EXPAND top:', p2TopPad, 'bot:', p2BotPad);
         } else {
-            console.log('[PDF-P2] Fits naturally');
+            // Fits or has extra space → leave content at top, no padding
+            console.log('[PDF-P2] OK (extra:', p2Extra + 'px)');
         }
     }
 
