@@ -3892,30 +3892,30 @@ function buildPdfHTML(lang) {
         '<div class="pdf-g2" style="overflow:hidden;">' +
         '<h3 style="margin:0 0 0 0;color:#333;text-align:left;">' + (pdfLang === 'ja' ? nameR2 + 'さんのレーダーチャート' : nameR2 + ' - ' + pi18n.headings.radarTitle) + '</h3>' +
         '<div style="text-align:center;margin:0;">' +
-        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 420, shortLabels) +
+        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 380, shortLabels) +
         '</div>' +
         '</div>' +
         // Group 3: 3 Reference pattern types
         '<div class="pdf-g3" style="overflow:hidden;">' +
-        '<h3 style="margin:0 0 4px 0;color:#333;">' + pi18n.headings.threeTypes + '</h3>' +
-        '<div style="display:flex;gap:8px;margin:4px 0;">' +
+        '<h3 style="margin:0 0 2px 0;color:#333;font-size:14px;">' + pi18n.headings.threeTypes + '</h3>' +
+        '<div style="display:flex;gap:6px;margin:2px 0;">' +
         (function() {
             var h = '';
             var tn = pi18n.traitNames;
             ['A','B','C'].forEach(function(k) {
                 var p = PATTERNS[k];
-                h += '<div style="flex:1;background:' + p.bg + ';border:2px solid ' + p.border + ';border-radius:8px;padding:8px 6px;text-align:center;">';
-                h += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:800;margin-bottom:4px;letter-spacing:0.5px;">' + (pdfLang === 'ja' ? k + '型 ' : pi18n.headings.typePrefix + ' ' + k + ' ') + (pi18n.patternNames[k] || p.name) + '</div>';
-                var svg = buildRadarSVG(p.means, p.color, 300, pi18n.traitNames);
+                h += '<div style="flex:1;background:' + p.bg + ';border:1.5px solid ' + p.border + ';border-radius:6px;padding:4px 4px;text-align:center;">';
+                h += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;margin-bottom:2px;letter-spacing:0.3px;">' + (pdfLang === 'ja' ? k + '型 ' : pi18n.headings.typePrefix + ' ' + k + ' ') + (pi18n.patternNames[k] || p.name) + '</div>';
+                var svg = buildRadarSVG(p.means, p.color, 260, pi18n.traitNames);
                 h += svg.replace('style="display:block;"', 'style="display:block;width:100%;height:auto;"');
-                h += '<div style="text-align:left;margin-top:2px;padding:0 4px;">';
+                h += '<div style="text-align:left;margin-top:1px;padding:0 2px;">';
                 p.means.forEach(function(val, i) {
                     var barW = Math.round((val/5)*100);
                     var barCol = val >= 4.5 ? '#059669' : val >= 3.5 ? '#eab308' : '#ef4444';
-                    h += '<div style="display:flex;align-items:center;margin-bottom:1px;font-size:7px;">';
-                    h += '<span style="width:55px;color:#555;font-weight:600;text-align:left;flex-shrink:0;">' + (tn[i].length > 7 ? tn[i].substring(0,6) + '..' : tn[i]) + '</span>';
-                    h += '<div style="flex:1;background:#e5e7eb;border-radius:2px;height:5px;margin:0 3px;"><div style="background:' + barCol + ';height:5px;border-radius:2px;width:' + barW + '%;"></div></div>';
-                    h += '<span style="width:22px;text-align:right;font-weight:700;color:' + p.color + ';">' + val.toFixed(1) + '</span>';
+                    h += '<div style="display:flex;align-items:center;margin-bottom:0;font-size:6px;line-height:1.2;">';
+                    h += '<span style="width:45px;color:#555;font-weight:600;text-align:left;flex-shrink:0;overflow:hidden;">' + (tn[i].length > 7 ? tn[i].substring(0,6) + '..' : tn[i]) + '</span>';
+                    h += '<div style="flex:1;background:#e5e7eb;border-radius:2px;height:4px;margin:0 2px;"><div style="background:' + barCol + ';height:4px;border-radius:2px;width:' + barW + '%;"></div></div>';
+                    h += '<span style="width:20px;text-align:right;font-weight:700;color:' + p.color + ';font-size:7px;">' + val.toFixed(1) + '</span>';
                     h += '</div>';
                 });
                 h += '</div>';
