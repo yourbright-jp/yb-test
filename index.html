@@ -3962,6 +3962,12 @@ async function generatePdfBase64(lang) {
     const container = document.createElement('div');
     container.id = 'pdfRenderContainer';
     container.style.cssText = 'position:absolute;left:0;top:0;width:800px;background:#fff;padding:12px 20px;margin:0;z-index:99999;';
+    // FIX (chặn dịch): html2pdf chụp DOM đang sống. Nếu Chrome/Edge bật dịch tự động,
+    // trình duyệt ghi đè text ngay trên trang → PDF "JA" ra tiếng của ứng viên, layout
+    // phình ra và bị cắt. Chặn dịch cho riêng vùng render này. KHÔNG sửa gì khác.
+    container.setAttribute('translate', 'no');
+    container.setAttribute('lang', lang || 'ja');
+    container.classList.add('notranslate');
     container.innerHTML = buildPdfHTML(lang);
 
     var oldScroll = window.scrollY;
