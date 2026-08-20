@@ -19,12 +19,6 @@
 
         /* Language Selector */
         .lang-selector { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        /* ===== PDF capture hardening (do not remove) ===== */
-        /* Real page breaks: page 1 always ends after .pdf-page1, and the page-1
-           groups are never sliced in half by html2pdf. */
-        .pdf-page1 { page-break-after: always; break-after: page; }
-        .pdf-g1, .pdf-g2, .pdf-g3 { page-break-inside: avoid; break-inside: avoid; }
-        .pdf-noclip { overflow: visible !important; }
         /* Language selector removed - Japanese only */
 
         /* Progress Bar */
@@ -3244,7 +3238,7 @@ function generatePersonalityAnalysis(traits, lang) {
     }
 
     // Weakness analysis
-    // (no empty spacer item: it rendered as a stray empty coloured bar in the PDF)
+    analysis.push('');
     analysis.push(i18n.headings.weakness);
 
     var weak1 = indexed[indexed.length - 1];
@@ -3883,7 +3877,7 @@ function buildPdfHTML(lang) {
     return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:0 20px;color:#333;background:#fff;">' +
         '<div class="pdf-page1">' +
         // Group 1: Title + Info table
-        '<div class="pdf-g1 pdf-noclip">' +
+        '<div class="pdf-g1" style="overflow:hidden;">' +
         '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:8px;margin-top:0;margin-bottom:8px;">' + pi18n.headings.resultTitle + '</h2>' +
         '<table style="width:100%;border-collapse:collapse;margin:0 0 8px 0;font-size:14px;">' +
         '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tP('name') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
@@ -3895,14 +3889,14 @@ function buildPdfHTML(lang) {
         '</table>' +
         '</div>' +
         // Group 2: Radar chart
-        '<div class="pdf-g2 pdf-noclip">' +
+        '<div class="pdf-g2" style="overflow:hidden;">' +
         '<h3 style="margin:0 0 0 0;color:#333;text-align:left;">' + (pdfLang === 'ja' ? nameR2 + 'さんのレーダーチャート' : nameR2 + ' - ' + pi18n.headings.radarTitle) + '</h3>' +
         '<div style="text-align:center;margin:0;">' +
         buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 380, shortLabels) +
         '</div>' +
         '</div>' +
         // Group 3: 3 Reference pattern types
-        '<div class="pdf-g3 pdf-noclip">' +
+        '<div class="pdf-g3" style="overflow:hidden;">' +
         '<h3 style="margin:0 0 2px 0;color:#333;font-size:14px;">' + pi18n.headings.threeTypes + '</h3>' +
         '<div style="display:flex;gap:6px;margin:2px 0;">' +
         (function() {
@@ -3932,7 +3926,6 @@ function buildPdfHTML(lang) {
         '</div>' +
         '</div>' +
         '</div>' +
-        '<div class="pdf-page2">' +
         '<h3 class="pdf-page2-start" style="margin-top:0;color:#333;">' + nameR2 + (pdfLang === 'ja' ? 'さんの' : pdfLang === 'vi' ? ' - ' : pdfLang === 'th' ? ' - ' : ' - ') + pi18n.headings.patternTitle + '</h3>' +
         pdfPatternHTML +
         // Score bars
@@ -3955,7 +3948,6 @@ function buildPdfHTML(lang) {
         })() +
         '<hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">' +
         '<p style="color:#999;font-size:12px;">検査日: ' + date + ' ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>' +
-        '</div>' +
         '</div>';
 }
 
@@ -3965,77 +3957,93 @@ async function generatePdfBase64(lang) {
     if (oldContainer) oldContainer.parentNode.removeChild(oldContainer);
 
     console.log('generatePdfBase64 called with lang:', lang);
-
+    // Create container positioned at document origin (top-left)
+    // MUST be position:absolute at top:0 so html2canvas captures from (0,0)
     const container = document.createElement('div');
     container.id = 'pdfRenderContainer';
     container.style.cssText = 'position:absolute;left:0;top:0;width:800px;background:#fff;padding:12px 20px;margin:0;z-index:99999;';
-    // CRITICAL: html2pdf photographs the live DOM. If Chrome / Edge auto-translate is on,
-    // the browser rewrites these text nodes in place, so the "JA" PDF comes out in the
-    // translated language while SVG <text> (the radar labels) stays Japanese. Opt this
-    // subtree out of translation BEFORE any content goes into it.
-    container.setAttribute('translate', 'no');
-    container.setAttribute('lang', lang || 'ja');
-    container.classList.add('notranslate');
     container.innerHTML = buildPdfHTML(lang);
 
     var oldScroll = window.scrollY;
     document.body.appendChild(container);
 
-    // Let layout settle, then wait for web fonts. Measuring before fonts are ready
-    // yields fallback-font metrics and every height below would be wrong.
-    await new Promise(function(r) { setTimeout(r, 600); });
-    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch(e) {}
-    await new Promise(function(r) { setTimeout(r, 250); });
+    // Wait for DOM rendering
+    await new Promise(function(r) { setTimeout(r, 800); });
+
+    // Dynamic page 1 spacing: measure actual content, calculate gap to fill 1 A4 page.
+    // html2pdf: canvas 800px (logical) at scale 2 → 1600px canvas → maps to 190mm content width.
+    // Page content height: 277mm * 1600 / 190 = 2332.6 canvas px → 1166.3 logical px.
+    var pageHeightPx = Math.round(277 * 800 / 190);  // ≈ 1166px (1 A4 page in logical px)
+    var page1 = container.querySelector('.pdf-page1');
+    var g1 = page1 ? page1.querySelector('.pdf-g1') : null;
+    var g2 = page1 ? page1.querySelector('.pdf-g2') : null;
+    var g3 = page1 ? page1.querySelector('.pdf-g3') : null;
+    if (page1 && g1 && g2 && g3) {
+        var cRect = container.getBoundingClientRect();
+        var p1Rect = page1.getBoundingClientRect();
+        var p1Offset = Math.round(p1Rect.top - cRect.top);
+        var g1H = g1.offsetHeight;
+        var g2H = g2.offsetHeight;
+        var g3H = g3.offsetHeight;
+        var totalContentH = g1H + g2H + g3H;
+        var availableH = pageHeightPx - p1Offset;
+        var extraSpace = availableH - totalContentH;
+        console.log('[PDF] p1Offset:', p1Offset, 'g1H:', g1H, 'g2H:', g2H, 'g3H:', g3H,
+            'total:', totalContentH, 'pageH:', pageHeightPx, 'available:', availableH, 'extra:', extraSpace);
+        if (extraSpace > 20) {
+            // Safety margin to prevent subpixel overflow
+            var safeExtra = extraSpace - 6;
+            // 4-way split: topPad, gap(g1→g2), gap(g2→g3), bottomPad
+            // Balanced so visual_top (p1Offset + topPad) ≈ visual_bottom (bottomPad)
+            var midGap = Math.floor(safeExtra * 0.25);
+            var padSpace = safeExtra - 2 * midGap;
+            // Solve: p1Offset + topPad = bottomPad, topPad + bottomPad = padSpace
+            // → topPad = (padSpace - p1Offset) / 2, bottomPad = (padSpace + p1Offset) / 2
+            var topPad = Math.max(0, Math.floor((padSpace - p1Offset) / 2));
+            var bottomPad = padSpace - topPad;
+            page1.style.paddingTop = topPad + 'px';
+            g2.style.marginTop = midGap + 'px';
+            g3.style.marginTop = midGap + 'px';
+            page1.style.paddingBottom = bottomPad + 'px';
+            console.log('[PDF] topPad:', topPad, 'bottomPad:', bottomPad, 'midGap:', midGap,
+                'visual top:', (p1Offset + topPad), 'visual bottom:', bottomPad);
+        } else {
+            console.log('[PDF] No extra space to distribute, content fills page naturally');
+        }
+        // Page 2: fixed small top margin (does NOT affect page 1 height)
+        var p2Start = container.querySelector('.pdf-page2-start');
+        if (p2Start) p2Start.style.marginTop = '12px';
+    }
+
+    // Re-wait after height adjustment
+    await new Promise(function(r) { setTimeout(r, 300); });
+
+    var containerHeight = container.scrollHeight;
+    console.log('PDF container height:', containerHeight);
 
     try {
-        // ONE CANVAS PER PAGE.
-        // The previous build rendered the whole document into a single tall canvas and
-        // let html2pdf slice it into pages. That slicing is what cut the type cards in
-        // half and silently dropped the tail of 特性スコア詳細: html2pdf pushes content
-        // down to honour page breaks, but the canvas height had already been fixed, so
-        // whatever got pushed past it was never captured. Rendering each page block on
-        // its own canvas removes that failure mode entirely - nothing can be sliced and
-        // nothing can fall off the end.
-        var blocks = [];
-        var p1 = container.querySelector('.pdf-page1');
-        var p2 = container.querySelector('.pdf-page2');
-        if (p1) blocks.push(p1);
-        if (p2) blocks.push(p2);
-        if (!blocks.length) blocks = [container];
+        var opt = {
+            margin: [10, 10, 10, 10],
+            filename: 'YB_Result.pdf',
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                logging: true,
+                width: 800,
+                height: containerHeight,
+                windowWidth: 800,
+                windowHeight: containerHeight,
+                x: 0,
+                y: 0,
+                scrollX: 0,
+                scrollY: 0
+            },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['css', 'legacy'] }
+        };
 
-        var canvases = [];
-        for (var i = 0; i < blocks.length; i++) {
-            var cv = await html2pdf().set({
-                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }
-            }).from(blocks[i]).toCanvas().get('canvas');
-            if (!cv || !cv.width || !cv.height) throw new Error('PDFページ ' + (i + 1) + ' の描画に失敗しました。');
-            console.log('[PDF] page', i + 1, 'canvas', cv.width + 'x' + cv.height);
-            canvases.push(cv);
-        }
-
-        var pdf = await html2pdf().set({
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).from(document.createElement('div')).toPdf().get('pdf');
-
-        var PW = pdf.internal.pageSize.getWidth();
-        var PH = pdf.internal.pageSize.getHeight();
-        var M = 10;
-        var maxW = PW - 2 * M;
-        var maxH = PH - 2 * M;
-
-        for (var j = 0; j < canvases.length; j++) {
-            if (j > 0) pdf.addPage();
-            var c = canvases[j];
-            var w = maxW;
-            var h = c.height * (maxW / c.width);
-            if (h > maxH) {           // taller than the printable area -> scale to fit
-                h = maxH;
-                w = c.width * (maxH / c.height);
-            }
-            pdf.addImage(c.toDataURL('image/jpeg', 0.95), 'JPEG', M + (maxW - w) / 2, M, w, h);
-        }
-
-        var dataUri = pdf.output('datauristring');
+        var dataUri = await html2pdf().set(opt).from(container).outputPdf('datauristring');
         var base64 = dataUri.split(',')[1];
 
         if (!base64 || base64.length < 500) {
