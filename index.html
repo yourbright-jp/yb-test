@@ -255,7 +255,7 @@
 // Google Apps Script URL (same method as rirekisho app)
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzcbWJzDisX4qLRfWLPY2dGum8Vd3IZPQn1YEKiauCl8n8JPTo88wPgNfAGZe2qNu0ARA/exec';
 const EMAIL_CONFIG = {
-    toEmail: 'nguyen.thi.hong@yourbright.co.jp'
+    toEmail: 'yu.nandar.mon@yourbright.co.jp'
 };
 
 // ==================== TRANSLATIONS ====================
@@ -2676,42 +2676,86 @@ function generateDetailedComments() {
 
 // ==================== PATTERN MATCHING ====================
 const PATTERNS = {
-    A: {
+    // ===== 6 aptitude patterns (Masuoka report 260805, n=274) =====
+    // means order: [interest, learning, adaptation, communication, careWork, autonomy]
+    // NOTE: these are the CANONICAL RADAR SILHOUETTES the Masuoka report plots for each
+    // pattern (threshold profiles), NOT the raw cluster means - the report's own charts
+    // use these values, and the app must match the report visually.
+    // (raw means for reference: 1:[4.44,4.59,4.69,4.56,4.56,4.69] 2:[4.32,4.59,4.57,4.04,4.57,2.54]
+    //  3:[4.46,2.85,4.46,3.92,4.54,2.85] 4:[2.58,4.62,4.67,4.18,4.68,3.01]
+    //  5:[4.38,4.31,3.57,3.81,3.74,2.40] 6:[2.54,4.00,3.96,3.71,3.62,2.75])
+    // stars/rec/reason/internalNote are INTERNAL ONLY (company email) - never in candidate PDF/web.
+    '1': {
         name: '総合エキスパート型',
-        means: [4.44, 4.28, 4.47, 4.44, 4.25, 4.61],
-        color: '#e11d48',
-        bg: '#fff1f2',
-        border: '#fecdd3',
-        description: '全特性がバランス良く高水準。コミュニケーション能力と異文化適応力が強みで、自律的判断力も高く、利用者との信頼構築からチーム調整まで幅広く対応できるリーダー人材です。',
-        shortDesc: '万能型・即戦力'
+        means: [4, 4, 4, 4, 4, 4],
+        color: '#e11d48', bg: '#fff1f2', border: '#fecdd3',
+        description: '全6特性（日本への関心、日本語学習適性、異文化適応力、コミュニケーション能力、介護職適応力、自律的判断力）のすべてで4点以上を獲得。日本での就労に必要な能力を総合的に備え、長期就労・成長の両面で最も期待できるタイプです。',
+        internalNote: '',
+        stars: '★★★★★', rec: '最も推奨',
+        reason: '全6特性が4以上の最高水準。自律的判断力も高く即戦力として最優先で採用推奨。'
     },
-    B: {
-        name: '親日コミュニケーター型',
-        means: [4.43, 4.35, 4.51, 4.59, 4.65, 2.65],
-        color: '#16a34a',
-        bg: '#f0fdf4',
-        border: '#bbf7d0',
-        description: 'コミュニケーション能力と介護職適応力が非常に高い現場即戦力タイプです。日本への関心も高く、直接ケア業務での活躍が期待できます。自律的判断力はやや弱いため、チームでのサポートが効果的です。',
-        shortDesc: '社交型・日本好き'
+    '2': {
+        name: '準エキスパート型',
+        means: [4, 4, 4, 4, 4, 2],
+        color: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe',
+        description: '「日本志向・介護実務型」と「異文化適応・学習特化型」の双方の特性を兼ね備えたバランス型です。総合エキスパート型には一歩及ばないものの、日本での定着・成長が十分期待できます。',
+        internalNote: '',
+        stars: '★★★★★', rec: '積極推奨',
+        reason: '日本への関心・日本語学習適性・異文化適応力・介護職適応力が全て4以上。高水準の複合適性を持つ。'
     },
-    C: {
-        name: '堅実ランナー型',
-        means: [4.02, 4.44, 4.51, 3.46, 3.88, 1.95],
-        color: '#9333ea',
-        bg: '#faf5ff',
-        border: '#e9d5ff',
-        description: '日本語学習適性と異文化適応力が高い堅実なタイプです。コツコツと努力を積み重ね、着実に成長していきます。コミュニケーション能力はやや低めですが、サポート体制があれば段階的に力を発揮できる人材です。',
-        shortDesc: '堅実型・努力家'
+    '3': {
+        name: '日本志向・介護実務型',
+        means: [4, 2, 4, 2, 4, 2],
+        color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0',
+        description: '日本への関心、介護職適応力、異文化適応力が高く、日本で働く意欲と介護現場への適応力を兼ね備えたタイプです。実務への適応と長期定着が期待できます。',
+        internalNote: '',
+        stars: '★★★★', rec: '推奨',
+        reason: '日本への関心・介護職適応力・異文化適応力が4以上。日本定着と実務力を兼ね備えた推奨グループ。'
+    },
+    '4': {
+        name: '異文化適応・学習特化型',
+        means: [2, 4, 4, 2, 4, 2],
+        color: '#f59e0b', bg: '#fffbeb', border: '#fde68a',
+        description: '日本語学習適性・異文化適応力・介護職適応力は高いものの、就労の前提となる日本への関心が低いタイプです。',
+        internalNote: '日本での就労意欲を含めて確認の上、十分に検討することを推奨します。',
+        stars: '★★', rec: '要検討⚠',
+        reason: '日本語学習適性・異文化適応力・介護職適応力が4以上。学習力と適応力が高く研修効果が期待できる。'
+    },
+    '5': {
+        name: '意欲先行・伸び代型',
+        means: [4, 3, 3, 3, 3, 3],
+        color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd',
+        description: '日本への関心が高く、日本で働く意欲が認められる一方、本分析で定義した代表的な適性パターンには該当しないタイプです。',
+        internalNote: '他の評価項目や面接結果とあわせて総合的に判断することを推奨します。',
+        stars: '★★★★', rec: '推奨',
+        reason: '日本への関心は高いが実務スキルが発展途上。動機づけと研修次第で成長が見込める。'
+    },
+    '6': {
+        name: '日本関心低位型',
+        means: [2, 3, 3, 3, 3, 3],
+        color: '#6b7280', bg: '#f9fafb', border: '#e5e7eb',
+        description: '日本への関心が相対的に低く、日本で働く目的や定着意欲について確認が必要なタイプです。',
+        internalNote: '採用前に来日の目的や就労意欲を十分に確認することを推奨します。',
+        stars: '★★', rec: '要検討 ⚠',
+        reason: '日本への関心が低く来日動機に課題。他のキャリアパスも含めた検討が必要。'
     }
 };
+const PATTERN_KEYS = ['1','2','3','4','5','6'];
+// Candidate-facing comparison lineup: 長期就労者４つのタイプ (Masuoka markup 2026-09-02).
+// Patterns 4 and 6 (low Japan-interest) are NOT shown as long-term-worker reference types;
+// classification itself still uses all 6 - a pattern-4/6 candidate keeps their own result.
+const COMPARE_KEYS = ['1','2','3','5'];
 
 const PATTERN_I18N = {
     ja: {
-        patternNames: { A: '総合エキスパート型', B: '親日コミュニケーター型', C: '堅実ランナー型' },
+        patternNames: { '1': '総合エキスパート型', '2': '準エキスパート型', '3': '日本志向・介護実務型', '4': '異文化適応・学習特化型', '5': '意欲先行・伸び代型', '6': '日本関心低位型' },
         patternDesc: {
-            A: '全特性がバランス良く高水準。コミュニケーション能力と異文化適応力が強みで、自律的判断力も高く、利用者との信頼構築からチーム調整まで幅広く対応できるリーダー人材です。',
-            B: 'コミュニケーション能力と介護職適応力が非常に高い現場即戦力タイプです。日本への関心も高く、直接ケア業務での活躍が期待できます。自律的判断力はやや弱いため、チームでのサポートが効果的です。',
-            C: '日本語学習適性と異文化適応力が高い堅実なタイプです。コツコツと努力を積み重ね、着実に成長していきます。コミュニケーション能力はやや低めですが、サポート体制があれば段階的に力を発揮できる人材です。'
+            '1': '全6特性（日本への関心、日本語学習適性、異文化適応力、コミュニケーション能力、介護職適応力、自律的判断力）のすべてで4点以上を獲得。日本での就労に必要な能力を総合的に備え、長期就労・成長の両面で最も期待できるタイプです。',
+            '2': '「日本志向・介護実務型」と「異文化適応・学習特化型」の双方の特性を兼ね備えたバランス型です。総合エキスパート型には一歩及ばないものの、日本での定着・成長が十分期待できます。',
+            '3': '日本への関心、介護職適応力、異文化適応力が高く、日本で働く意欲と介護現場への適応力を兼ね備えたタイプです。実務への適応と長期定着が期待できます。',
+            '4': '日本語学習適性・異文化適応力・介護職適応力は高いものの、就労の前提となる日本への関心が低いタイプです。',
+            '5': '日本への関心が高く、日本で働く意欲が認められる一方、本分析で定義した代表的な適性パターンには該当しないタイプです。',
+            '6': '日本への関心が相対的に低く、日本で働く目的や定着意欲について確認が必要なタイプです。'
         },
         traitNames: ['日本への関心', '日本語学習適性', '異文化適応力', 'コミュニケーション能力', '介護職適応力', '自律的判断力'],
         headings: {
@@ -2722,7 +2766,7 @@ const PATTERN_I18N = {
             resultTitle: 'ユアブライト検査結果',
             radarTitle: '応募者のレーダーチャート',
             patternTitle: '適性パターン分析',
-            threeTypes: '長期就労者３つのタイプ',
+            threeTypes: '長期就労者４つのタイプ',
             scoreDetail: '特性スコア詳細',
             yourScore: 'あなたのスコア',
             typePrefix: '型'
@@ -2753,11 +2797,14 @@ const PATTERN_I18N = {
         }
     },
     en: {
-        patternNames: { A: 'Comprehensive Expert', B: 'Pro-Japan Communicator', C: 'Steady Runner' },
+        patternNames: { '1': 'Comprehensive Expert', '2': 'Near-Expert', '3': 'Japan-Oriented Care Practitioner', '4': 'Cross-Cultural Learner', '5': 'Motivated Growth-Potential', '6': 'Low Japan-Interest' },
         patternDesc: {
-            A: 'An all-around type with well-balanced high scores across all 6 indicators. Particularly outstanding in care work adaptability and Japanese language learning aptitude, able to perform stably even in cross-cultural environments. Highly expected as an immediate asset in care settings with the highest potential for long-term employment.',
-            B: 'A sociable type with very high interest in Japan and communication skills. Has strong affinity for Japanese culture and can quickly build trust with users and staff. Also high in autonomous judgment, an proactive person who can think and act independently.',
-            C: 'A steady type with well-balanced Japanese language learning aptitude and interest in Japan. Accumulates effort steadily and grows consistently. Values teamwork and is a stable worker who faithfully follows instructions.'
+            '1': 'Scored 4 or higher on all six traits (interest in Japan, Japanese-learning aptitude, cross-cultural adaptability, communication, care-work adaptability, independent judgment). Comprehensively equipped for working in Japan, with the strongest outlook for both long-term employment and growth.',
+            '2': 'A balanced type combining the strengths of both the Japan-Oriented Care Practitioner and the Cross-Cultural Learner. One step short of the Comprehensive Expert, but long-term settlement and growth in Japan can fully be expected.',
+            '3': 'High interest in Japan, care-work adaptability and cross-cultural adaptability - combining the motivation to work in Japan with adaptability to care settings. Practical adaptation and long-term settlement can be expected.',
+            '4': 'Japanese-learning aptitude, cross-cultural adaptability and care-work adaptability are high, but interest in Japan - the premise for working there - is low.',
+            '5': 'Shows high interest in Japan and a clear willingness to work there, while not falling under any of the representative aptitude patterns defined in this analysis.',
+            '6': 'Interest in Japan is comparatively low; the purpose of working in Japan and the intention to settle need to be confirmed.'
         },
         traitNames: ['Interest in Japan', 'Japanese Learning', 'Cross-cultural Adapt.', 'Communication', 'Care Work Adapt.', 'Autonomous Judgment'],
         headings: {
@@ -2768,7 +2815,7 @@ const PATTERN_I18N = {
             resultTitle: 'YourBright Test Results',
             radarTitle: "Applicant's Radar Chart",
             patternTitle: 'Aptitude Pattern Analysis',
-            threeTypes: '3 Types of Long-term Workers',
+            threeTypes: 'The 4 Types of Long-term Workers',
             scoreDetail: 'Trait Score Details',
             yourScore: 'Your Score',
             typePrefix: 'Type'
@@ -2799,11 +2846,14 @@ const PATTERN_I18N = {
         }
     },
     vi: {
-        patternNames: { A: 'Chuyên gia toàn diện', B: 'Người giao tiếp thân Nhật', C: 'Người kiên định' },
+        patternNames: { '1': 'Chuyên gia toàn diện', '2': 'Cận chuyên gia', '3': 'Hướng Nhật – thực hành chăm sóc', '4': 'Thích ứng văn hóa – ham học', '5': 'Nhiệt huyết – giàu tiềm năng', '6': 'Quan tâm Nhật Bản thấp' },
         patternDesc: {
-            A: 'Loại toàn diện với điểm số cân bằng cao trên tất cả 6 chỉ số. Đặc biệt nổi bật về khả năng thích ứng công việc chăm sóc và năng lực học tiếng Nhật, có thể phát huy ổn định ngay cả trong môi trường đa văn hóa. Được kỳ vọng là nhân lực chủ lực tại hiện trường chăm sóc với khả năng làm việc lâu dài cao nhất.',
-            B: 'Loại hòa đồng với sự quan tâm đến Nhật Bản và khả năng giao tiếp rất cao. Có sự gắn bó mạnh mẽ với văn hóa Nhật Bản, có thể nhanh chóng xây dựng niềm tin với người sử dụng dịch vụ và nhân viên. Khả năng phán đoán tự chủ cũng cao, là nhân lực tích cực có thể tự suy nghĩ và hành động.',
-            C: 'Loại kiên định với năng lực học tiếng Nhật và sự quan tâm đến Nhật Bản cân bằng cao. Tích lũy nỗ lực từng bước và phát triển chắc chắn. Coi trọng tinh thần đồng đội, là nhân lực ổn định thực hiện công việc trung thành theo chỉ thị.'
+            '1': 'Đạt từ 4 điểm trở lên ở cả 6 đặc tính (quan tâm đến Nhật Bản, năng khiếu học tiếng Nhật, thích ứng đa văn hóa, năng lực giao tiếp, thích ứng nghề chăm sóc, phán đoán tự chủ). Hội tụ toàn diện năng lực cần thiết để làm việc tại Nhật, là nhóm được kỳ vọng cao nhất về cả làm việc lâu dài lẫn trưởng thành.',
+            '2': 'Nhóm cân bằng, hội tụ đặc tính của cả «nhóm hướng Nhật – thực hành chăm sóc» và «nhóm thích ứng văn hóa – ham học». Tuy kém nhóm chuyên gia toàn diện một bậc, nhưng hoàn toàn có thể kỳ vọng về sự gắn bó và trưởng thành tại Nhật.',
+            '3': 'Quan tâm đến Nhật Bản, thích ứng nghề chăm sóc và thích ứng đa văn hóa đều cao — vừa có ý chí làm việc tại Nhật vừa thích ứng tốt với hiện trường chăm sóc. Kỳ vọng thích ứng thực vụ và gắn bó lâu dài.',
+            '4': 'Năng khiếu học tiếng Nhật, thích ứng đa văn hóa và thích ứng nghề chăm sóc đều cao, tuy nhiên mức quan tâm đến Nhật Bản — tiền đề của việc làm việc tại Nhật — còn thấp.',
+            '5': 'Quan tâm đến Nhật Bản cao và có ý chí làm việc tại Nhật rõ rệt, tuy nhiên chưa thuộc vào các nhóm thích tính tiêu biểu được định nghĩa trong phân tích này.',
+            '6': 'Mức quan tâm đến Nhật Bản tương đối thấp; cần xác nhận thêm về mục đích làm việc tại Nhật và ý định gắn bó.'
         },
         traitNames: ['Quan tâm đến Nhật', 'Học tiếng Nhật', 'Thích ứng đa VH', 'Giao tiếp', 'Thích ứng chăm sóc', 'Phán đoán tự chủ'],
         headings: {
@@ -2814,7 +2864,7 @@ const PATTERN_I18N = {
             resultTitle: 'Kết quả kiểm tra YourBright',
             radarTitle: 'Biểu đồ radar của ứng viên',
             patternTitle: 'Phân tích mẫu thích ứng',
-            threeTypes: '3 loại lao động dài hạn',
+            threeTypes: '4 nhóm lao động làm việc dài hạn',
             scoreDetail: 'Chi tiết điểm đặc tính',
             yourScore: 'Điểm của bạn',
             typePrefix: 'Nhóm'
@@ -2845,11 +2895,14 @@ const PATTERN_I18N = {
         }
     },
     th: {
-        patternNames: { A: 'ผู้เชี่ยวชาญรอบด้าน', B: 'นักสื่อสารรักญี่ปุ่น', C: 'นักวิ่งมั่นคง' },
+        patternNames: { '1': 'ประเภทผู้เชี่ยวชาญรอบด้าน', '2': 'ประเภทกึ่งผู้เชี่ยวชาญ', '3': 'ประเภทมุ่งญี่ปุ่น–ปฏิบัติงานดูแล', '4': 'ประเภทปรับตัวข้ามวัฒนธรรม–ใฝ่เรียนรู้', '5': 'ประเภทแรงจูงใจสูง–มีศักยภาพเติบโต', '6': 'ประเภทความสนใจญี่ปุ่นต่ำ' },
         patternDesc: {
-            A: 'ประเภทรอบด้านที่มีคะแนนสูงสมดุลทั้ง 6 ตัวชี้วัด โดดเด่นเป็นพิเศษด้านความสามารถในการปรับตัวเข้ากับงานดูแลและความถนัดในการเรียนภาษาญี่ปุ่น สามารถทำงานได้อย่างมั่นคงในสภาพแวดล้อมข้ามวัฒนธรรม คาดหวังเป็นกำลังสำคัญในสถานดูแลและมีโอกาสทำงานระยะยาวสูงสุด',
-            B: 'ประเภทที่เข้าสังคมได้ดี มีความสนใจในญี่ปุ่นและทักษะการสื่อสารสูงมาก มีความผูกพันกับวัฒนธรรมญี่ปุ่นอย่างแข็งแกร่ง สามารถสร้างความไว้วางใจกับผู้ใช้บริการและเจ้าหน้าที่ได้อย่างรวดเร็ว มีความสามารถในการตัดสินใจด้วยตนเองสูง เป็นบุคลากรที่คิดและลงมือทำอย่างกระตือรือร้น',
-            C: 'ประเภทมั่นคงที่มีความถนัดในการเรียนภาษาญี่ปุ่นและความสนใจในญี่ปุ่นสมดุลสูง สะสมความพยายามทีละน้อยและเติบโตอย่างสม่ำเสมอ ให้ความสำคัญกับการทำงานเป็นทีม เป็นบุคลากรที่มีความมั่นคงและปฏิบัติงานตามคำสั่งอย่างซื่อสัตย์'
+            '1': 'ได้คะแนน 4 ขึ้นไปครบทั้ง 6 คุณลักษณะ (ความสนใจในญี่ปุ่น ความถนัดเรียนภาษาญี่ปุ่น การปรับตัวข้ามวัฒนธรรม การสื่อสาร การปรับตัวกับงานดูแล การตัดสินใจด้วยตนเอง) มีความพร้อมรอบด้านสำหรับการทำงานในญี่ปุ่น เป็นประเภทที่คาดหวังได้สูงสุดทั้งการทำงานระยะยาวและการเติบโต',
+            '2': 'ประเภทสมดุลที่มีจุดแข็งของทั้ง «ประเภทมุ่งญี่ปุ่น–ปฏิบัติงานดูแล» และ «ประเภทปรับตัวข้ามวัฒนธรรม–ใฝ่เรียนรู้» แม้จะเป็นรองประเภทผู้เชี่ยวชาญรอบด้านหนึ่งขั้น แต่คาดหวังการตั้งหลักและเติบโตในญี่ปุ่นได้อย่างเต็มที่',
+            '3': 'ความสนใจในญี่ปุ่น การปรับตัวกับงานดูแล และการปรับตัวข้ามวัฒนธรรมสูง มีทั้งความมุ่งมั่นทำงานในญี่ปุ่นและการปรับตัวเข้ากับหน้างานดูแล คาดหวังการปรับตัวเชิงปฏิบัติและการทำงานระยะยาวได้',
+            '4': 'ความถนัดเรียนภาษาญี่ปุ่น การปรับตัวข้ามวัฒนธรรม และการปรับตัวกับงานดูแลอยู่ในระดับสูง แต่ความสนใจในญี่ปุ่นซึ่งเป็นพื้นฐานของการทำงานที่ญี่ปุ่นยังต่ำ',
+            '5': 'มีความสนใจในญี่ปุ่นสูงและเห็นความตั้งใจทำงานในญี่ปุ่นชัดเจน แต่ยังไม่เข้าข่ายรูปแบบความถนัดตัวแทนที่นิยามไว้ในการวิเคราะห์นี้',
+            '6': 'ความสนใจในญี่ปุ่นค่อนข้างต่ำ จำเป็นต้องยืนยันวัตถุประสงค์ของการทำงานในญี่ปุ่นและความตั้งใจตั้งหลักเพิ่มเติม'
         },
         traitNames: ['ความสนใจในญี่ปุ่น', 'การเรียนภาษาญี่ปุ่น', 'การปรับตัวข้ามวัฒนธรรม', 'การสื่อสาร', 'การปรับตัวงานดูแล', 'การตัดสินใจด้วยตนเอง'],
         headings: {
@@ -2860,7 +2913,7 @@ const PATTERN_I18N = {
             resultTitle: 'ผลการทดสอบ YourBright',
             radarTitle: 'แผนภูมิเรดาร์ของผู้สมัคร',
             patternTitle: 'การวิเคราะห์รูปแบบความถนัด',
-            threeTypes: '3 ประเภทผู้ทำงานระยะยาว',
+            threeTypes: 'ผู้ทำงานระยะยาว 4 ประเภท',
             scoreDetail: 'รายละเอียดคะแนนคุณสมบัติ',
             yourScore: 'คะแนนของคุณ',
             typePrefix: 'ประเภท'
@@ -2891,11 +2944,14 @@ const PATTERN_I18N = {
         }
     },
     my: {
-        patternNames: { A: 'ဘက်စုံကျွမ်းကျင်သူ', B: 'ဂျပန်ချစ်ဆက်သွယ်ရေးသမား', C: 'တည်ငြိမ်သောပြေးသမား' },
+        patternNames: { '1': 'ဘက်စုံကျွမ်းကျင်သူအမျိုးအစား', '2': 'ကျွမ်းကျင်သူအဆင့်နီးပါးအမျိုးအစား', '3': 'ဂျပန်ဦးတည်–ပြုစုစောင့်ရှောက်မှုလက်တွေ့အမျိုးအစား', '4': 'ယဉ်ကျေးမှုလိုက်လျောညီထွေ–သင်ယူမှုအားသာအမျိုးအစား', '5': 'စိတ်အားထက်သန်–တိုးတက်နိုင်ခြေရှိအမျိုးအစား', '6': 'ဂျပန်စိတ်ဝင်စားမှုနည်းအမျိုးအစား' },
         patternDesc: {
-            A: 'ညွှန်ကိန်း ၆ ခုလုံးတွင် မျှတစွာ အမှတ်မြင့်ရရှိသော ဘက်စုံအမျိုးအစားဖြစ်သည်။ အထူးသဖြင့် စောင့်ရှောက်မှုလုပ်ငန်း လိုက်လျောညီထွေဖြစ်မှုနှင့် ဂျပန်ဘာသာ သင်ယူနိုင်စွမ်းတွင် ထူးချွန်ပြီး ယဉ်ကျေးမှုဖြတ်ကျော် ပတ်ဝန်းကျင်တွင်ပင် တည်ငြိမ်စွာ လုပ်ဆောင်နိုင်သည်။',
-            B: 'ဂျပန်အပေါ် စိတ်ဝင်စားမှုနှင့် ဆက်သွယ်ရေးစွမ်းရည် အလွန်မြင့်သော လူမှုရေးကျွမ်းကျင်သည့် အမျိုးအစားဖြစ်သည်။ ဂျပန်ယဉ်ကျေးမှုနှင့် ခိုင်မာသော ဆက်နွယ်မှုရှိပြီး အသုံးပြုသူများနှင့် ဝန်ထမ်းများနှင့် ယုံကြည်မှုကို လျင်မြန်စွာ တည်ဆောက်နိုင်သည်။',
-            C: 'ဂျပန်ဘာသာ သင်ယူနိုင်စွမ်းနှင့် ဂျပန်အပေါ် စိတ်ဝင်စားမှု မျှတစွာ မြင့်မားသော တည်ငြိမ်သည့် အမျိုးအစားဖြစ်သည်။ ကြိုးစားအားထုတ်မှုကို တစ်စတစ်စ စုဆောင်းပြီး တိုးတက်မှု ခိုင်မာသည်။ အဖွဲ့လုပ်ငန်းကို တန်ဖိုးထားပြီး ညွှန်ကြားချက်များကို သစ္စာရှိစွာ လုပ်ဆောင်သည်။'
+            '1': 'ဂုဏ်သတ္တိ ၆ ခုစလုံး (ဂျပန်စိတ်ဝင်စားမှု၊ ဂျပန်စာသင်ယူနိုင်စွမ်း၊ ယဉ်ကျေးမှုလိုက်လျောညီထွေမှု၊ ဆက်သွယ်ပြောဆိုနိုင်စွမ်း၊ ပြုစုစောင့်ရှောက်မှုအလုပ်နှင့်လိုက်ဖက်မှု၊ ကိုယ်ပိုင်ဆုံးဖြတ်နိုင်စွမ်း) တွင် ၄ မှတ်နှင့်အထက် ရရှိသည်။ ဂျပန်တွင်အလုပ်လုပ်ရန် လိုအပ်သောစွမ်းရည်များ ဘက်စုံပြည့်စုံပြီး ရေရှည်အလုပ်နှင့် တိုးတက်မှုနှစ်မျိုးလုံးအတွက် အမျှော်လင့်ဆုံးအမျိုးအစားဖြစ်သည်။',
+            '2': '«ဂျပန်ဦးတည်–ပြုစုစောင့်ရှောက်မှုလက်တွေ့» နှင့် «ယဉ်ကျေးမှုလိုက်လျောညီထွေ–သင်ယူမှုအားသာ» နှစ်မျိုးလုံး၏ အားသာချက်များ ပေါင်းစပ်ထားသော ဟန်ချက်ညီအမျိုးအစားဖြစ်သည်။ ဘက်စုံကျွမ်းကျင်သူထက် တစ်ဆင့်နိမ့်သော်လည်း ဂျပန်တွင် အခြေချ တိုးတက်နိုင်မှုကို လုံလောက်စွာ မျှော်လင့်နိုင်သည်။',
+            '3': 'ဂျပန်စိတ်ဝင်စားမှု၊ ပြုစုစောင့်ရှောက်မှုအလုပ်နှင့်လိုက်ဖက်မှု၊ ယဉ်ကျေးမှုလိုက်လျောညီထွေမှု မြင့်မားပြီး ဂျပန်တွင်အလုပ်လုပ်လိုစိတ်နှင့် ပြုစုစောင့်ရှောက်မှုနေရာနှင့် လိုက်ဖက်နိုင်မှုကို ပေါင်းစပ်ထားသည်။ လက်တွေ့လုပ်ငန်းလိုက်ဖက်မှုနှင့် ရေရှည်အခြေချမှုကို မျှော်လင့်နိုင်သည်။',
+            '4': 'ဂျပန်စာသင်ယူနိုင်စွမ်း၊ ယဉ်ကျေးမှုလိုက်လျောညီထွေမှု၊ ပြုစုစောင့်ရှောက်မှုအလုပ်နှင့်လိုက်ဖက်မှုတို့ မြင့်မားသော်လည်း ဂျပန်တွင်အလုပ်လုပ်ရန် အခြေခံဖြစ်သော ဂျပန်စိတ်ဝင်စားမှု နည်းပါးသောအမျိုးအစားဖြစ်သည်။',
+            '5': 'ဂျပန်စိတ်ဝင်စားမှုမြင့်မားပြီး ဂျပန်တွင် အလုပ်လုပ်လိုစိတ် ထင်ရှားသော်လည်း ဤသုံးသပ်ချက်တွင် သတ်မှတ်ထားသော ကိုယ်စားပြုပုံစံများနှင့် မကိုက်ညီသောအမျိုးအစားဖြစ်သည်။',
+            '6': 'ဂျပန်စိတ်ဝင်စားမှု နှိုင်းယှဉ်ချက်အားဖြင့် နည်းပါးပြီး ဂျပန်တွင်အလုပ်လုပ်ရသည့် ရည်ရွယ်ချက်နှင့် အခြေချလိုစိတ်ကို ထပ်မံအတည်ပြုရန် လိုအပ်သောအမျိုးအစားဖြစ်သည်။'
         },
         traitNames: ['ဂျပန်စိတ်ဝင်စားမှု', 'ဂျပန်ဘာသာသင်ယူ', 'ယဉ်ကျေးမှုလိုက်လျော', 'ဆက်သွယ်ရေး', 'စောင့်ရှောက်မှုလိုက်လျော', 'ကိုယ်ပိုင်ဆုံးဖြတ်'],
         headings: {
@@ -2906,7 +2962,7 @@ const PATTERN_I18N = {
             resultTitle: 'YourBright စမ်းသပ်မှုရလဒ်',
             radarTitle: 'လျှောက်ထားသူ၏ ရေဒါဇယား',
             patternTitle: 'သင့်လျော်မှုပုံစံ ခွဲခြမ်းစိတ်ဖြာမှု',
-            threeTypes: 'ရေရှည်အလုပ်သမား ၃ မျိုး',
+            threeTypes: 'ရေရှည်အလုပ်သမား ၄ မျိုး',
             scoreDetail: 'လက္ခဏာအမှတ် အသေးစိတ်',
             yourScore: 'သင့်အမှတ်',
             typePrefix: 'အမျိုးအစား'
@@ -2937,11 +2993,14 @@ const PATTERN_I18N = {
         }
     },
     id: {
-        patternNames: { A: 'Ahli Komprehensif', B: 'Komunikator Pro-Jepang', C: 'Pelari Mantap' },
+        patternNames: { '1': 'Tipe Pakar Komprehensif', '2': 'Tipe Mendekati Pakar', '3': 'Tipe Berorientasi Jepang – Praktik Perawatan', '4': 'Tipe Adaptasi Budaya – Gemar Belajar', '5': 'Tipe Motivasi Tinggi – Potensi Berkembang', '6': 'Tipe Minat Rendah terhadap Jepang' },
         patternDesc: {
-            A: 'Tipe serba bisa dengan skor tinggi seimbang di semua 6 indikator. Sangat menonjol dalam kemampuan adaptasi kerja perawatan dan bakat belajar bahasa Jepang, mampu berkinerja stabil bahkan di lingkungan lintas budaya. Sangat diharapkan sebagai tenaga siap pakai di tempat perawatan dengan potensi kerja jangka panjang tertinggi.',
-            B: 'Tipe yang supel dengan minat terhadap Jepang dan kemampuan komunikasi yang sangat tinggi. Memiliki afinitas kuat dengan budaya Jepang dan dapat dengan cepat membangun kepercayaan dengan pengguna layanan dan staf. Kemampuan penilaian mandiri juga tinggi, merupakan tenaga kerja yang proaktif dalam berpikir dan bertindak.',
-            C: 'Tipe mantap dengan bakat belajar bahasa Jepang dan minat terhadap Jepang yang seimbang tinggi. Mengumpulkan usaha secara bertahap dan tumbuh secara konsisten. Menghargai kerja tim dan merupakan tenaga kerja stabil yang menjalankan tugas dengan setia.'
+            '1': 'Meraih skor 4 ke atas pada keenam karakteristik (minat pada Jepang, bakat belajar bahasa Jepang, adaptasi lintas budaya, komunikasi, adaptasi kerja perawatan, penilaian mandiri). Secara menyeluruh memiliki kemampuan yang dibutuhkan untuk bekerja di Jepang; tipe yang paling diharapkan baik untuk kerja jangka panjang maupun pertumbuhan.',
+            '2': 'Tipe seimbang yang menggabungkan keunggulan «Tipe Berorientasi Jepang – Praktik Perawatan» dan «Tipe Adaptasi Budaya – Gemar Belajar». Meski satu tingkat di bawah Pakar Komprehensif, kemapanan dan pertumbuhan di Jepang sangat dapat diharapkan.',
+            '3': 'Minat pada Jepang, adaptasi kerja perawatan, dan adaptasi lintas budaya tinggi - menggabungkan kemauan bekerja di Jepang dengan adaptasi terhadap lapangan perawatan. Adaptasi praktik dan kemapanan jangka panjang dapat diharapkan.',
+            '4': 'Bakat belajar bahasa Jepang, adaptasi lintas budaya, dan adaptasi kerja perawatan tinggi, namun minat pada Jepang - prasyarat untuk bekerja di sana - masih rendah.',
+            '5': 'Minat pada Jepang tinggi dan kemauan bekerja di Jepang jelas terlihat, namun tidak termasuk dalam pola kecocokan representatif yang didefinisikan dalam analisis ini.',
+            '6': 'Minat pada Jepang relatif rendah; tujuan bekerja di Jepang dan niat untuk menetap perlu dikonfirmasi.'
         },
         traitNames: ['Minat pada Jepang', 'Belajar Bhs Jepang', 'Adaptasi Lintas Budaya', 'Komunikasi', 'Adaptasi Kerja Perawatan', 'Penilaian Mandiri'],
         headings: {
@@ -2952,7 +3011,7 @@ const PATTERN_I18N = {
             resultTitle: 'Hasil Tes YourBright',
             radarTitle: 'Grafik Radar Pelamar',
             patternTitle: 'Analisis Pola Kecocokan',
-            threeTypes: '3 Tipe Pekerja Jangka Panjang',
+            threeTypes: '4 Tipe Pekerja Jangka Panjang',
             scoreDetail: 'Detail Skor Sifat',
             yourScore: 'Skor Anda',
             typePrefix: 'Tipe'
@@ -2983,11 +3042,14 @@ const PATTERN_I18N = {
         }
     },
     km: {
-        patternNames: { A: 'អ្នកជំនាញគ្រប់ជ្រុង', B: 'អ្នកទំនាក់ទំនងស្រលាញ់ជប៉ុន', C: 'អ្នករត់ស្ថិតស្ថេរ' },
+        patternNames: { '1': 'ប្រភេទអ្នកជំនាញគ្រប់ជ្រុងជ្រោយ', '2': 'ប្រភេទជិតអ្នកជំនាញ', '3': 'ប្រភេទតម្រង់ទៅជប៉ុន–អនុវត្តការថែទាំ', '4': 'ប្រភេទសម្របខ្លួនវប្បធម៌–ចូលចិត្តរៀន', '5': 'ប្រភេទឆន្ទៈខ្ពស់–មានសក្ដានុពលរីកចម្រើន', '6': 'ប្រភេទចំណាប់អារម្មណ៍ជប៉ុនទាប' },
         patternDesc: {
-            A: 'ប្រភេទគ្រប់ជ្រុងដែលមានពិន្ទុខ្ពស់ស្មើគ្នាក្នុងសូចនាករទាំង ៦។ ពូកែជាពិសេសក្នុងការសម្របខ្លួនក្នុងការងារថែទាំ និងសមត្ថភាពរៀនភាសាជប៉ុន អាចបំពេញការងារបានស្ថិរភាពក្នុងបរិស្ថានឆ្លងវប្បធម៌។',
-            B: 'ប្រភេទសង្គមដែលមានចំណាប់អារម្មណ៍ខ្ពស់ក្នុងប្រទេសជប៉ុន និងសមត្ថភាពទំនាក់ទំនងខ្ពស់បំផុត។ មានទំនាក់ទំនងជិតស្និទ្ធជាមួយវប្បធម៌ជប៉ុន អាចបង្កើតទំនុកចិត្តជាមួយអ្នកប្រើប្រាស់សេវា និងបុគ្គលិកបានយ៉ាងរហ័ស។',
-            C: 'ប្រភេទស្ថិតស្ថេរដែលមានសមត្ថភាពរៀនភាសាជប៉ុន និងចំណាប់អារម្មណ៍ក្នុងប្រទេសជប៉ុនខ្ពស់ស្មើគ្នា។ ប្រមូលផ្តុំកិច្ចខិតខំប្រឹងប្រែងបន្តិចម្តងៗ ហើយរីកចម្រើនដោយស្ថិរភាព។ ឲ្យតម្លៃការធ្វើការជាក្រុម។'
+            '1': 'ទទួលបានពិន្ទុ ៤ ឡើងទៅលើលក្ខណៈទាំង ៦ (ចំណាប់អារម្មណ៍លើជប៉ុន សមត្ថភាពរៀនភាសាជប៉ុន ការសម្របខ្លួនវប្បធម៌ ការទំនាក់ទំនង ការសម្របខ្លួនការងារថែទាំ ការវិនិច្ឆ័យដោយខ្លួនឯង)។ មានសមត្ថភាពគ្រប់ជ្រុងជ្រោយសម្រាប់ធ្វើការនៅជប៉ុន ជាប្រភេទដែលរំពឹងខ្ពស់បំផុតទាំងការងាររយៈពេលវែងនិងការរីកចម្រើន។',
+            '2': 'ប្រភេទតុល្យភាពដែលរួមបញ្ចូលចំណុចខ្លាំងរបស់ «ប្រភេទតម្រង់ទៅជប៉ុន–អនុវត្តការថែទាំ» និង «ប្រភេទសម្របខ្លួនវប្បធម៌–ចូលចិត្តរៀន»។ ទោះជាទាបជាងអ្នកជំនាញគ្រប់ជ្រុងជ្រោយមួយកម្រិត ក៏អាចរំពឹងការតាំងទីនិងរីកចម្រើននៅជប៉ុនបានពេញលេញ។',
+            '3': 'ចំណាប់អារម្មណ៍លើជប៉ុន ការសម្របខ្លួនការងារថែទាំ និងការសម្របខ្លួនវប្បធម៌ខ្ពស់ — រួមបញ្ចូលឆន្ទៈធ្វើការនៅជប៉ុននិងការសម្របខ្លួនទៅកន្លែងថែទាំ។ អាចរំពឹងការសម្របខ្លួនការងារជាក់ស្ដែងនិងការតាំងទីរយៈពេលវែង។',
+            '4': 'សមត្ថភាពរៀនភាសាជប៉ុន ការសម្របខ្លួនវប្បធម៌ និងការសម្របខ្លួនការងារថែទាំខ្ពស់ ប៉ុន្តែចំណាប់អារម្មណ៍លើជប៉ុន ដែលជាមូលដ្ឋាននៃការធ្វើការនៅជប៉ុន នៅទាបនៅឡើយ។',
+            '5': 'មានចំណាប់អារម្មណ៍លើជប៉ុនខ្ពស់ និងឆន្ទៈធ្វើការនៅជប៉ុនច្បាស់លាស់ ប៉ុន្តែមិនស្ថិតក្នុងគំរូសមត្ថភាពតំណាងដែលកំណត់ក្នុងការវិភាគនេះទេ។',
+            '6': 'ចំណាប់អារម្មណ៍លើជប៉ុនទាបជាងគេ ត្រូវការបញ្ជាក់បន្ថែមអំពីគោលបំណងធ្វើការនៅជប៉ុននិងបំណងតាំងទីនៅ។'
         },
         traitNames: ['ចំណាប់អារម្មណ៍ជប៉ុន', 'រៀនភាសាជប៉ុន', 'សម្របវប្បធម៌', 'ទំនាក់ទំនង', 'សម្របការថែទាំ', 'វិនិច្ឆ័យខ្លួនឯង'],
         headings: {
@@ -2998,7 +3060,7 @@ const PATTERN_I18N = {
             resultTitle: 'លទ្ធផលតេស្ត YourBright',
             radarTitle: 'គំនូសតាងរ៉ាដាររបស់អ្នកដាក់ពាក្យ',
             patternTitle: 'ការវិភាគគំរូភាពសមស្រប',
-            threeTypes: 'ប្រភេទកម្មកររយៈពេលវែង ៣',
+            threeTypes: 'កម្មករការងាររយៈពេលវែង ៤ ប្រភេទ',
             scoreDetail: 'ព័ត៌មានលម្អិតពិន្ទុលក្ខណៈ',
             yourScore: 'ពិន្ទុរបស់អ្នក',
             typePrefix: 'ប្រភេទ'
@@ -3029,11 +3091,14 @@ const PATTERN_I18N = {
         }
     },
     bn: {
-        patternNames: { A: 'সর্বজনীন বিশেষজ্ঞ', B: 'জাপানপ্রেমী যোগাযোগকারী', C: 'স্থিতিশীল ধাবক' },
+        patternNames: { '1': 'সর্বাঙ্গীণ বিশেষজ্ঞ ধরন', '2': 'প্রায়-বিশেষজ্ঞ ধরন', '3': 'জাপানমুখী–কেয়ার বাস্তবধর্মী ধরন', '4': 'সংস্কৃতি-অভিযোজন–শিক্ষণপ্রবণ ধরন', '5': 'উচ্চ প্রেরণা–সম্ভাবনাময় ধরন', '6': 'জাপানে কম আগ্রহের ধরন' },
         patternDesc: {
-            A: 'সকল ৬টি সূচকে সমানভাবে উচ্চ স্কোর সহ সর্বজনীন ধরন। বিশেষত কেয়ারওয়ার্ক অভিযোজন এবং জাপানি ভাষা শেখার যোগ্যতায় অসাধারণ, আন্তঃসাংস্কৃতিক পরিবেশেও স্থিতিশীল কর্মক্ষমতা দেখাতে পারে। কেয়ার সেটিংয়ে তাৎক্ষণিক সম্পদ হিসেবে প্রত্যাশিত।',
-            B: 'জাপানের প্রতি আগ্রহ এবং যোগাযোগ দক্ষতা অত্যন্ত উচ্চ সামাজিক ধরন। জাপানি সংস্কৃতির সাথে দৃঢ় সম্পর্ক রয়েছে, ব্যবহারকারী এবং কর্মীদের সাথে দ্রুত বিশ্বাস তৈরি করতে পারে। স্বায়ত্তশাসিত রায় দেওয়ার ক্ষমতাও উচ্চ।',
-            C: 'জাপানি ভাষা শেখার যোগ্যতা এবং জাপানের প্রতি আগ্রহ সমানভাবে উচ্চ স্থিতিশীল ধরন। ধীরে ধীরে প্রচেষ্টা সঞ্চয় করে এবং স্থিরভাবে বৃদ্ধি পায়। দলগত কাজকে মূল্য দেয় এবং নির্দেশনা অনুসারে বিশ্বস্তভাবে কাজ করে।'
+            '1': 'ছয়টি বৈশিষ্ট্যেই (জাপানে আগ্রহ, জাপানি ভাষা শেখার দক্ষতা, আন্তঃসাংস্কৃতিক অভিযোজন, যোগাযোগ, কেয়ার কাজে অভিযোজন, স্বাধীন বিচারবুদ্ধি) ৪ বা তার বেশি স্কোর। জাপানে কাজের জন্য প্রয়োজনীয় সক্ষমতা সার্বিকভাবে রয়েছে; দীর্ঘমেয়াদী কর্মসংস্থান ও বিকাশ—উভয় দিকেই সবচেয়ে প্রত্যাশিত ধরন।',
+            '2': '«জাপানমুখী–কেয়ার বাস্তবধর্মী» ও «সংস্কৃতি-অভিযোজন–শিক্ষণপ্রবণ» উভয় ধরনের গুণাবলি সমন্বিত ভারসাম্যপূর্ণ ধরন। সর্বাঙ্গীণ বিশেষজ্ঞের চেয়ে এক ধাপ পিছিয়ে থাকলেও জাপানে স্থায়িত্ব ও বিকাশ যথেষ্ট প্রত্যাশা করা যায়।',
+            '3': 'জাপানে আগ্রহ, কেয়ার কাজে অভিযোজন ও আন্তঃসাংস্কৃতিক অভিযোজন উঁচু — জাপানে কাজের ইচ্ছা ও কেয়ার ক্ষেত্রে অভিযোজন ক্ষমতা উভয়ই রয়েছে। বাস্তব কাজে অভিযোজন ও দীর্ঘমেয়াদী স্থায়িত্ব প্রত্যাশা করা যায়।',
+            '4': 'জাপানি ভাষা শেখার দক্ষতা, আন্তঃসাংস্কৃতিক অভিযোজন ও কেয়ার কাজে অভিযোজন উঁচু হলেও, জাপানে কাজের পূর্বশর্ত — জাপানে আগ্রহ — কম।',
+            '5': 'জাপানে আগ্রহ বেশি এবং জাপানে কাজের ইচ্ছা স্পষ্ট, তবে এই বিশ্লেষণে সংজ্ঞায়িত প্রতিনিধিত্বমূলক প্যাটার্নগুলোর কোনোটিতে পড়ে না।',
+            '6': 'জাপানে আগ্রহ তুলনামূলকভাবে কম; জাপানে কাজের উদ্দেশ্য ও স্থায়ী হওয়ার ইচ্ছা যাচাই করা প্রয়োজন।'
         },
         traitNames: ['জাপানে আগ্রহ', 'জাপানি ভাষা শিক্ষা', 'আন্তঃসাংস্কৃতিক অভিযোজন', 'যোগাযোগ', 'কেয়ারওয়ার্ক অভিযোজন', 'স্বায়ত্তশাসিত রায়'],
         headings: {
@@ -3044,7 +3109,7 @@ const PATTERN_I18N = {
             resultTitle: 'YourBright পরীক্ষার ফলাফল',
             radarTitle: 'আবেদনকারীর রাডার চার্ট',
             patternTitle: 'যোগ্যতা প্যাটার্ন বিশ্লেষণ',
-            threeTypes: '৩ ধরনের দীর্ঘমেয়াদী কর্মী',
+            threeTypes: 'দীর্ঘমেয়াদী কর্মীর ৪টি ধরন',
             scoreDetail: 'বৈশিষ্ট্য স্কোর বিবরণ',
             yourScore: 'আপনার স্কোর',
             typePrefix: 'ধরন'
@@ -3162,34 +3227,24 @@ function buildRadarSVG(scores, color, size, customLabels) {
 }
 
 function matchPattern(traits) {
-    const userScores = [traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy];
+    // Masuoka threshold cascade (260805 report) - checked in priority order.
+    // Reproduces the report's cluster assignment for all 274 analysed persons.
+    var i = traits.interest, l = traits.learning, a = traits.adaptation;
+    var c = traits.communication, w = traits.careWork, u = traits.autonomy;
+    var type;
+    if (i >= 4 && l >= 4 && a >= 4 && c >= 4 && w >= 4 && u >= 4) type = '1';
+    else if (i >= 4 && l >= 4 && a >= 4 && w >= 4) type = '2';
+    else if (i >= 4 && a >= 4 && w >= 4) type = '3';
+    else if (l >= 4 && a >= 4 && w >= 4) type = '4';
+    else if (i >= 4) type = '5';
+    else type = '6';
 
-    let bestMatch = 'A';
-    let bestDist = Infinity;
-    const distances = {};
+    // care_score: the report's ranking index (weighted mean, weights from report data).
+    var careScore = 0.08 * i + 0.07 * l + 0.20 * a + 0.25 * c + 0.30 * w + 0.10 * u;
 
-    ['A', 'B', 'C'].forEach(function(key) {
-        let dist = 0;
-        for (let i = 0; i < 6; i++) {
-            dist += Math.pow(userScores[i] - PATTERNS[key].means[i], 2);
-        }
-        dist = Math.sqrt(dist);
-        distances[key] = dist;
-        if (dist < bestDist) {
-            bestDist = dist;
-            bestMatch = key;
-        }
-    });
-
-    // Calculate similarity percentages (max distance ~12.25 for 6 dims, 0-5 range)
-    const maxDist = Math.sqrt(6 * 25);
-    const similarities = {};
-    ['A', 'B', 'C'].forEach(function(key) {
-        similarities[key] = Math.max(0, Math.round((1 - distances[key] / maxDist) * 100));
-    });
-
-    var noMatch = similarities[bestMatch] < 80;
-    return { type: bestMatch, distance: bestDist, distances: distances, similarities: similarities, pattern: PATTERNS[bestMatch], noMatch: noMatch };
+    // noMatch is kept for backward compatibility but can no longer occur:
+    // the cascade always ends in one of the 6 patterns (5/6 are the catch-alls).
+    return { type: type, pattern: PATTERNS[type], careScore: Math.round(careScore * 100) / 100, noMatch: false };
 }
 
 function generatePersonalityAnalysis(traits, lang) {
@@ -3411,11 +3466,12 @@ function showResults() {
     var refDiv = document.createElement('div');
     refDiv.style.cssText = 'margin:40px 0 24px 0;';
     var refH = '<h3 style="font-size:15px;color:#374151;margin-bottom:16px;border-bottom:2px solid #667eea;padding-bottom:8px;">' + biling(jaI18n.headings.threeTypes, pi18n.headings.threeTypes) + '</h3>';
-    refH += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">';
-    ['A','B','C'].forEach(function(pKey) {
+    refH += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">';
+    COMPARE_KEYS.forEach(function(pKey) {
         var p = PATTERNS[pKey];
-        refH += '<div style="background:' + p.bg + ';border:1px solid ' + p.border + ';border-radius:8px;padding:12px;text-align:center;">';
-        refH += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:6px 12px;border-radius:12px;font-size:12px;font-weight:700;margin-bottom:8px;line-height:1.5;text-align:center;">' + pKey + '型 ' + p.name + (isJa ? '' : '<br><span style="color:white;font-size:11px;font-weight:400;">' + pi18n.patternNames[pKey] + '</span>') + '</div>';
+        var isMine = (pKey === match.type);
+        refH += '<div style="background:' + p.bg + ';border:' + (isMine ? '3px solid ' + p.color : '1px solid ' + p.border) + ';border-radius:8px;padding:12px;text-align:center;">';
+        refH += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:6px 12px;border-radius:12px;font-size:12px;font-weight:700;margin-bottom:8px;line-height:1.5;text-align:center;">' + p.name + (isJa ? '' : '<br><span style="color:white;font-size:11px;font-weight:400;">' + pi18n.patternNames[pKey] + '</span>') + '</div>';
         refH += buildRadarSVG(p.means, p.color, 240, pi18n.traitNames);
         refH += '<div style="text-align:left;margin-top:4px;padding:0 8px;">';
         var tn = pi18n.traitNames;
@@ -3454,10 +3510,7 @@ function showResults() {
     } else {
         // Header with pattern badge
         ph += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">';
-        ph += '<span style="background:' + match.pattern.color + ';color:white;padding:8px 20px;border-radius:24px;font-size:16px;font-weight:700">' + match.type + '型</span>';
-        ph += '<span style="font-size:18px;font-weight:700;color:#374151">' + bilingInline(match.pattern.name, pi18n.headings.typePrefix + ' ' + match.type + ' ' + pi18n.patternNames[match.type]) + '</span>';
-        var webMatchLabel = isJa ? '一致度' : appState.currentLanguage === 'vi' ? 'Mức tương đồng' : appState.currentLanguage === 'en' ? 'Match' : appState.currentLanguage === 'th' ? 'ความตรงกัน' : appState.currentLanguage === 'my' ? 'ကိုက်ညီမှု' : appState.currentLanguage === 'id' ? 'Kecocokan' : appState.currentLanguage === 'km' ? 'ភាពស្រដៀង' : appState.currentLanguage === 'bn' ? 'মিল' : 'Match';
-        ph += '<span style="font-size:13px;color:#666;background:white;padding:4px 12px;border-radius:12px;border:1px solid #e5e7eb">' + biling('一致度', webMatchLabel) + ': ' + match.similarities[match.type] + '%</span>';
+        ph += '<span style="background:' + match.pattern.color + ';color:white;padding:8px 20px;border-radius:24px;font-size:16px;font-weight:700">' + bilingInline(match.pattern.name, pi18n.patternNames[match.type]) + '</span>';
         ph += '</div>';
 
         // Pattern description
@@ -3466,21 +3519,6 @@ function showResults() {
         ph += '<p style="font-size:14px;color:#374151;line-height:1.8;margin:0">' + biling(match.pattern.description, pi18n.patternDesc[match.type]) + '</p>';
         ph += '</div>';
     }
-
-    // Similarity bars for all 3 patterns (always show)
-    ph += '<div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid #e5e7eb">';
-    ph += '<h3 style="color:#374151;font-size:14px;margin:0 0 12px 0">' + bilingInline(jaI18n.headings.similarity, pi18n.headings.similarity) + '</h3>';
-    ['A', 'B', 'C'].forEach(function(pType) {
-        var p = PATTERNS[pType];
-        var sim = match.similarities[pType];
-        var isMatch = !match.noMatch && (pType === match.type);
-        ph += '<div style="display:flex;align-items:center;margin-bottom:8px">';
-        ph += '<span style="width:220px;font-size:13px;font-weight:' + (isMatch ? '700' : '400') + ';color:' + (isMatch ? p.color : '#666') + '">' + pType + '型 ' + bilingInline(p.name, pi18n.patternNames[pType]) + '</span>';
-        ph += '<div style="flex:1;background:#f3f4f6;border-radius:4px;height:10px;margin:0 10px"><div style="background:' + p.color + ';height:10px;border-radius:4px;width:' + sim + '%;opacity:' + (isMatch ? '1' : '0.5') + '"></div></div>';
-        ph += '<span style="width:40px;text-align:right;font-size:13px;font-weight:' + (isMatch ? '700' : '400') + ';color:' + (isMatch ? p.color : '#888') + '">' + sim + '%</span>';
-        ph += '</div>';
-    });
-    ph += '</div>';
 
     // Personality analysis - bilingual
     var personalityItemsJa = generatePersonalityAnalysis(traits, 'ja');
@@ -3527,6 +3565,7 @@ function showResults() {
         <div class="form-group" style="margin-bottom:12px;">
             <label>送信先メールアドレス</label>
             <input type="email" id="emailInput" value="${EMAIL_CONFIG.toEmail}" placeholder="example@example.com" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:15px;">
+            <div style="text-align:right;color:#b6bcc9;font-size:11px;margin-top:4px;">build v11</div>
         </div>
         <button type="button" class="btn-primary" id="sendEmailBtn" onclick="sendResultsEmail()" style="padding:14px 32px;font-size:16px;">📧 結果を送信</button>
         <p id="emailStatus" style="margin-top:12px;display:none;font-weight:bold;"></p>
@@ -3795,9 +3834,15 @@ function buildEmailHTML() {
         patternEmailHTML += '</div></div>';
     } else {
         patternEmailHTML += '<div style="background:' + match.pattern.bg + ';border:2px solid ' + match.pattern.border + ';border-radius:8px;padding:16px;margin:12px 0;">';
-        patternEmailHTML += '<div style="margin-bottom:10px"><span style="background:' + match.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + match.type + '型 ' + match.pattern.name + '</span>';
-        patternEmailHTML += ' <span style="font-size:13px;color:#666">（一致度: ' + match.similarities[match.type] + '%）</span></div>';
-        patternEmailHTML += '<p style="font-size:14px;color:#374151;line-height:1.7;margin:10px 0">' + match.pattern.description + '</p>';
+        patternEmailHTML += '<div style="margin-bottom:10px"><span style="background:' + match.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">パターン' + match.type + ' ' + match.pattern.name + '</span></div>';
+        patternEmailHTML += '<p style="font-size:14px;color:#374151;line-height:1.7;margin:10px 0">' + match.pattern.description + (match.pattern.internalNote ? '<br><span style="color:#92400e">' + match.pattern.internalNote + '</span>' : '') + '</p>';
+        // ===== 社内向け: 採用推奨度・判定理由・ケア適性スコア（候補者PDFには出さない） =====
+        patternEmailHTML += '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;margin:12px 0">';
+        patternEmailHTML += '<p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#92400e">社内参考情報（候補者には非表示）</p>';
+        patternEmailHTML += '<p style="margin:4px 0;font-size:14px">採用推奨度: <span style="color:#d97706;font-weight:700">' + match.pattern.stars + '</span>（' + match.pattern.rec + '）</p>';
+        patternEmailHTML += '<p style="margin:4px 0;font-size:13px;color:#555">判定根拠: ' + match.pattern.reason + '</p>';
+        patternEmailHTML += '<p style="margin:4px 0;font-size:13px;color:#555">ケア適性スコア: <b>' + match.careScore.toFixed(2) + '</b> / 5.00（重み付け: 介護30%・コミュ25%・異文化20%・自律10%・関心8%・学習7%）</p>';
+        patternEmailHTML += '</div>';
         patternEmailHTML += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb">';
         patternEmailHTML += '<p style="font-weight:700;font-size:14px;color:#374151;margin:0 0 8px">性格傾向・特性</p>';
         personalityItems.forEach(function(item) {
@@ -3860,76 +3905,42 @@ function buildPdfHTML(lang) {
         pdfPatternHTML += '<div style="background:#f9fafb;border:2px solid #d1d5db;border-radius:8px;padding:16px;margin:12px 0;">';
         pdfPatternHTML += '<div style="margin-bottom:10px;text-align:center"><span style="background:#6b7280;color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + noMatchMsg + '</span></div>';
     } else {
-        pdfPatternHTML += '<div style="background:' + match2.pattern.bg + ';border:2px solid ' + match2.pattern.border + ';border-radius:8px;padding:16px;margin:12px 0;">';
-        pdfPatternHTML += '<div style="margin-bottom:10px"><span style="background:' + match2.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + (pdfLang === 'ja' ? match2.type + '型 ' : pi18n.headings.typePrefix + ' ' + match2.type + ' ') + (pi18n.patternNames[match2.type] || match2.pattern.name) + '</span>';
-        var matchLabel = pdfLang === 'ja' ? '一致度' : pdfLang === 'vi' ? 'Mức tương đồng' : pdfLang === 'en' ? 'Match' : pdfLang === 'th' ? 'ความตรงกัน' : pdfLang === 'my' ? 'ကိုက်ညီမှု' : pdfLang === 'id' ? 'Kecocokan' : pdfLang === 'km' ? 'ភាពស្រដៀង' : pdfLang === 'bn' ? 'মিল' : 'Match';
-        pdfPatternHTML += ' <span style="font-size:13px;color:#666">（' + matchLabel + ': ' + match2.similarities[match2.type] + '%）</span></div>';
-        pdfPatternHTML += '<p style="font-size:14px;color:#374151;line-height:1.7;margin:10px 0">' + (pi18n.patternDesc[match2.type] || match2.pattern.description) + '</p>';
+        pdfPatternHTML += '<div style="background:' + match2.pattern.bg + ';border:2px solid ' + match2.pattern.border + ';border-radius:8px;padding:12px 14px;margin:8px 0;">';
+        pdfPatternHTML += '<div style="margin-bottom:10px"><span style="background:' + match2.pattern.color + ';color:white;padding:6px 16px;border-radius:20px;font-size:14px;font-weight:700">' + (pi18n.patternNames[match2.type] || match2.pattern.name) + '</span></div>';
+        pdfPatternHTML += '<p style="font-size:14px;color:#374151;line-height:1.6;margin:6px 0">' + (pi18n.patternDesc[match2.type] || match2.pattern.description) + '</p>';
     }
     var pBorderCol = match2.noMatch ? '#9ca3af' : match2.pattern.color;
-    pdfPatternHTML += '<div style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb">';
-    pdfPatternHTML += '<p style="font-weight:700;font-size:14px;color:#374151;margin:0 0 8px">' + pi18n.headings.personality + '</p>';
+    pdfPatternHTML += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb">';
+    pdfPatternHTML += '<p style="font-weight:700;font-size:14px;color:#374151;margin:0 0 6px">' + pi18n.headings.personality + '</p>';
     personalityItems2.forEach(function(item) {
-        pdfPatternHTML += '<p style="margin:6px 0;padding:8px 12px;background:#f8f9fa;border-left:3px solid ' + pBorderCol + ';font-size:13px;line-height:1.6">' + item + '</p>';
+        pdfPatternHTML += '<p style="margin:4px 0;padding:5px 10px;background:#f8f9fa;border-left:3px solid ' + pBorderCol + ';font-size:13px;line-height:1.55">' + item + '</p>';
     });
     pdfPatternHTML += '</div></div>';
 
-    return '<div style="font-family:sans-serif;max-width:700px;margin:0 auto;padding:0 20px;color:#333;background:#fff;">' +
+    return '<div style="font-family:sans-serif;max-width:708px;margin:0 auto;padding:0;color:#333;background:#fff;">' +
         '<div class="pdf-page1">' +
         // Group 1: Title + Info table
         '<div class="pdf-g1" style="overflow:hidden;">' +
-        '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:8px;margin-top:0;margin-bottom:8px;">' + pi18n.headings.resultTitle + '</h2>' +
+        '<h2 style="color:#667eea;border-bottom:3px solid #667eea;padding-bottom:8px;margin-top:0;margin-bottom:10px;">' + pi18n.headings.resultTitle + '</h2>' +
         '<table style="width:100%;border-collapse:collapse;margin:0 0 8px 0;font-size:14px;">' +
-        '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tP('name') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
-        '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('country') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + country + '</td></tr>' +
-        '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('education') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + education + '</td></tr>' +
-        '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('age') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + age + '</td></tr>' +
-        '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('gender') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + gender + '</td></tr>' +
-        '<tr><td style="padding:5px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('marital') + '</td><td style="padding:5px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
+        '<tr><td style="padding:12px 12px;border:1px solid #ddd;background:#f0f4ff;width:120px;font-weight:bold;">' + tP('name') + '</td><td style="padding:12px 12px;border:1px solid #ddd;">' + nameDisp2 + '</td></tr>' +
+        '<tr><td style="padding:12px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('country') + '</td><td style="padding:12px 12px;border:1px solid #ddd;">' + country + '</td></tr>' +
+        '<tr><td style="padding:12px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('education') + '</td><td style="padding:12px 12px;border:1px solid #ddd;">' + education + '</td></tr>' +
+        '<tr><td style="padding:12px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('age') + '</td><td style="padding:12px 12px;border:1px solid #ddd;">' + age + '</td></tr>' +
+        '<tr><td style="padding:12px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('gender') + '</td><td style="padding:12px 12px;border:1px solid #ddd;">' + gender + '</td></tr>' +
+        '<tr><td style="padding:12px 12px;border:1px solid #ddd;background:#f0f4ff;font-weight:bold;">' + tP('marital') + '</td><td style="padding:12px 12px;border:1px solid #ddd;">' + marital + '</td></tr>' +
         '</table>' +
         '</div>' +
-        // Group 2: Radar chart
+        // Group 2: personal radar, own full-width section (original order)
         '<div class="pdf-g2" style="overflow:hidden;">' +
         '<h3 style="margin:0 0 0 0;color:#333;text-align:left;">' + (pdfLang === 'ja' ? nameR2 + 'さんのレーダーチャート' : nameR2 + ' - ' + pi18n.headings.radarTitle) + '</h3>' +
         '<div style="text-align:center;margin:0;">' +
-        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 380, shortLabels) +
+        buildRadarSVG([traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy], '#667eea', 410, shortLabels) +
         '</div>' +
         '</div>' +
-        // Group 3: 3 Reference pattern types
+        // Group 3: score detail - moved to the FRONT page (Masuoka markup 260908)
         '<div class="pdf-g3" style="overflow:hidden;">' +
-        '<h3 style="margin:0 0 2px 0;color:#333;font-size:14px;">' + pi18n.headings.threeTypes + '</h3>' +
-        '<div style="display:flex;gap:6px;margin:2px 0;">' +
-        (function() {
-            var h = '';
-            var tn = pi18n.traitNames;
-            ['A','B','C'].forEach(function(k) {
-                var p = PATTERNS[k];
-                h += '<div style="flex:1;background:' + p.bg + ';border:1.5px solid ' + p.border + ';border-radius:6px;padding:4px 4px;text-align:center;">';
-                h += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;margin-bottom:2px;letter-spacing:0.3px;">' + (pdfLang === 'ja' ? k + '型 ' : pi18n.headings.typePrefix + ' ' + k + ' ') + (pi18n.patternNames[k] || p.name) + '</div>';
-                var svg = buildRadarSVG(p.means, p.color, 260, pi18n.traitNames);
-                h += svg.replace('style="display:block;"', 'style="display:block;width:100%;height:auto;"');
-                h += '<div style="text-align:left;margin-top:1px;padding:0 2px;">';
-                p.means.forEach(function(val, i) {
-                    var barW = Math.round((val/5)*100);
-                    var barCol = val >= 4.5 ? '#059669' : val >= 3.5 ? '#eab308' : '#ef4444';
-                    h += '<div style="display:flex;align-items:center;margin-bottom:0;font-size:6px;line-height:1.2;">';
-                    h += '<span style="width:45px;color:#555;font-weight:600;text-align:left;flex-shrink:0;overflow:hidden;">' + (tn[i].length > 7 ? tn[i].substring(0,6) + '..' : tn[i]) + '</span>';
-                    h += '<div style="flex:1;background:#e5e7eb;border-radius:2px;height:4px;margin:0 2px;"><div style="background:' + barCol + ';height:4px;border-radius:2px;width:' + barW + '%;"></div></div>';
-                    h += '<span style="width:20px;text-align:right;font-weight:700;color:' + p.color + ';font-size:7px;">' + val.toFixed(1) + '</span>';
-                    h += '</div>';
-                });
-                h += '</div>';
-                h += '</div>';
-            });
-            return h;
-        })() +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '<h3 class="pdf-page2-start" style="margin-top:0;color:#333;">' + nameR2 + (pdfLang === 'ja' ? 'さんの' : pdfLang === 'vi' ? ' - ' : pdfLang === 'th' ? ' - ' : ' - ') + pi18n.headings.patternTitle + '</h3>' +
-        pdfPatternHTML +
-        // Score bars
-        '<h3 style="margin-top:24px;color:#333;">' + pi18n.headings.scoreDetail + '</h3>' +
+        '<h3 style="margin:0 0 6px 0;color:#333;">' + pi18n.headings.scoreDetail + '</h3>' +
         (function() {
             var h = '';
             var tv = [traits.interest, traits.learning, traits.adaptation, traits.communication, traits.careWork, traits.autonomy];
@@ -3938,16 +3949,57 @@ function buildPdfHTML(lang) {
             tv.forEach(function(val, i) {
                 var pct = (val / 5 * 100).toFixed(0);
                 var bc = tColors[i];
-                h += '<div style="display:flex;align-items:center;margin-bottom:6px;">';
-                h += '<span style="width:100px;font-size:12px;font-weight:600;color:#374151;">' + tn[i] + '</span>';
-                h += '<div style="flex:1;background:#f3f4f6;border-radius:3px;height:12px;margin:0 8px;"><div style="background:' + bc + ';height:12px;border-radius:3px;width:' + pct + '%;"></div></div>';
-                h += '<span style="width:35px;text-align:right;font-size:12px;font-weight:700;color:#374151;">' + val.toFixed(2) + '</span>';
+                h += '<div style="display:flex;align-items:center;margin-bottom:10px;">';
+                h += '<span style="width:130px;font-size:14px;font-weight:600;color:#374151;">' + tn[i] + '</span>';
+                h += '<div style="flex:1;background:#f3f4f6;border-radius:3px;height:14px;margin:0 8px;"><div style="background:' + bc + ';height:14px;border-radius:3px;width:' + pct + '%;"></div></div>';
+                h += '<span style="width:40px;text-align:right;font-size:13px;font-weight:700;color:#374151;">' + val.toFixed(2) + '</span>';
+                h += '</div>';
+            });
+            return h;
+        })() +
+        '</div>' +
+        '</div>' +
+        '<div class="pdf-page2">' +
+        '<h3 class="pdf-page2-start" style="margin-top:0;color:#333;">' + nameR2 + (pdfLang === 'ja' ? 'さんの' : pdfLang === 'vi' ? ' - ' : pdfLang === 'th' ? ' - ' : ' - ') + pi18n.headings.patternTitle + '</h3>' +
+        pdfPatternHTML +
+        // 4 reference types - moved to the BACK page, 2 x 2 (Masuoka markup 260908)
+        '<h3 style="margin:10px 0 0 0;color:#333;font-size:14px;">' + pi18n.headings.threeTypes + '</h3>' +
+        (function() {
+            var h = '';
+            var mineKey = match2.type;
+            var tn = pi18n.traitNames;
+            // 2 x 2 so the four reference charts stay large and readable (Masuoka markup 260908)
+            [['1','2'],['3','5']].forEach(function(row, ri) {
+                h += '<div style="display:flex;gap:10px;margin:' + (ri === 0 ? '4px' : '10px') + ' 0 0 0;">';
+                row.forEach(function(k) {
+                    var p = PATTERNS[k];
+                    var isMine = (k === mineKey);
+                    h += '<div style="flex:1;background:' + p.bg + ';border:' + (isMine ? '2.5px solid ' + p.color : '1.5px solid ' + p.border) + ';border-radius:8px;padding:4px 8px;text-align:center;">';
+                    h += '<div style="background:' + p.color + ';color:white;display:inline-block;padding:2px 14px;border-radius:12px;font-size:12px;font-weight:800;letter-spacing:0.3px;max-width:100%;overflow:hidden;white-space:nowrap;">' + (pi18n.patternNames[k] || p.name) + '</div>';
+                    var svg = buildRadarSVG(p.means, p.color, 260, pi18n.traitNames);
+                    // html2canvas cannot scale inline SVG (it crops / misplaces it), so the
+                    // radar is embedded as an <img> with a data-URI - images scale correctly.
+                    h += '<img width="172" height="172" style="display:block;margin:0 auto;" src="data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg) + '"/>';
+                    h += '<div style="text-align:left;margin-top:3px;padding:0 4px;">';
+                    p.means.forEach(function(val, i) {
+                        var barW = Math.round((val / 5) * 100);
+                        var barCol = val >= 4.5 ? '#059669' : val >= 3.5 ? '#eab308' : '#ef4444';
+                        h += '<div style="display:flex;align-items:center;margin-bottom:1px;font-size:9px;line-height:1.3;">';
+                        h += '<span style="width:86px;color:#555;font-weight:600;text-align:left;flex-shrink:0;overflow:hidden;white-space:nowrap;">' + (tn[i].length > 11 ? tn[i].substring(0, 10) + '..' : tn[i]) + '</span>';
+                        h += '<div style="flex:1;background:#e5e7eb;border-radius:2px;height:7px;margin:0 4px;"><div style="background:' + barCol + ';height:7px;border-radius:2px;width:' + barW + '%;"></div></div>';
+                        h += '<span style="width:26px;text-align:right;font-weight:700;color:' + p.color + ';font-size:10px;">' + val.toFixed(1) + '</span>';
+                        h += '</div>';
+                    });
+                    h += '</div>';
+                    h += '</div>';
+                });
                 h += '</div>';
             });
             return h;
         })() +
         '<hr style="margin:24px 0;border:none;border-top:1px solid #ddd;">' +
         '<p style="color:#999;font-size:12px;">検査日: ' + date + ' ｜ YourBright Co., Ltd. - ユアブライト適性検査システム</p>' +
+        '</div>' +
         '</div>';
 }
 
@@ -4019,6 +4071,27 @@ async function generatePdfBase64(lang) {
         // Page 2: fixed small top margin (does NOT affect page 1 height)
         var p2Start = container.querySelector('.pdf-page2-start');
         if (p2Start) p2Start.style.marginTop = '12px';
+    }
+
+    // ===== Page 2 auto-fit (language-proof) =====
+    // Text length differs a lot per language: Khmer/Myanmar/English run ~80px taller
+    // than Japanese, which pushed the back page onto a 3rd page. html2canvas also
+    // re-wraps text in its clone and renders a few percent taller than the DOM
+    // measurement, so we keep a safety band and scale the whole back page down only
+    // when it does not fit. Japanese is unaffected (it already fits).
+    var page2 = container.querySelector('.pdf-page2');
+    if (page2) {
+        page2.style.transformOrigin = 'top center';
+        var p2H = page2.offsetHeight;
+        var p2Target = Math.round(pageHeightPx * 0.93);   // safety band for clone drift
+        if (p2H > p2Target) {
+            var p2Scale = Math.max(0.72, p2Target / p2H);
+            page2.style.transform = 'scale(' + p2Scale.toFixed(4) + ')';
+            page2.style.height = Math.ceil(p2H * p2Scale) + 'px';
+            console.log('[PDF] page2', p2H, '>', p2Target, '-> scale', p2Scale.toFixed(4));
+        } else {
+            console.log('[PDF] page2', p2H, 'fits within', p2Target);
+        }
     }
 
     // Re-wait after height adjustment
@@ -4164,9 +4237,15 @@ async function sendResultsEmail() {
                 redirect: 'follow',
                 body: payload
             });
-            let result;
-            try { result = await resp.json(); } catch (e) { result = { success: resp.ok }; }
-            emailSent = result.success;
+            var raw = '';
+            try { raw = await resp.text(); } catch (e) {}
+            var result = null;
+            try { result = JSON.parse(raw); } catch (e) {}
+            console.log('[MAIL] http', resp.status, 'body:', raw.slice(0, 300));
+            // Apps Script v2 replies {"status":"ok"}, old versions {"success":true}, and a
+            // plain 2xx with any body still means the script ran - all of these are success.
+            // Only a real HTTP failure keeps the warning.
+            emailSent = resp.ok && (!result || result.success === true || result.status === 'ok' || result.result === 'success');
         } catch (fetchErr) {
             console.warn('Fetch with redirect failed, trying no-cors fallback:', fetchErr);
             // no-cors fallback (like rirekisho)
@@ -4249,6 +4328,20 @@ function initLanguageSelector() {
 
 function init() {
     initLanguageSelector();
+
+    // Enter key submits the screen you are on. Delegated on document so it also
+    // covers inputs that are created later (the e-mail field on the results page).
+    document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Enter' && e.keyCode !== 13) return;
+        var t = e.target;
+        if (!t || !t.id) return;
+        if (t.id === 'gateCodeInput')      { e.preventDefault(); validateGateCode(); }
+        else if (t.id === 'adminPassword') { e.preventDefault(); adminLogin(); }
+        else if (t.id === 'emailInput')    { e.preventDefault(); sendResultsEmail(); }
+    });
+    // Cursor already in the code box, so the user can just type and hit Enter.
+    var gateInput = document.getElementById('gateCodeInput');
+    if (gateInput) setTimeout(function() { try { gateInput.focus(); } catch (err) {} }, 120);
 
     document.querySelectorAll('.mode-card').forEach(card => {
         card.addEventListener('click', () => selectMode(card.dataset.mode));
